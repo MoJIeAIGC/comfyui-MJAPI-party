@@ -1,3 +1,4 @@
+# comfyui节点定义
 import requests
 from PIL import Image
 from io import BytesIO
@@ -76,6 +77,7 @@ class VolcPicNode:
             print(f"🔥 VolcPicNode 错误: {str(e)}")
             error_img = Image.new("RGB", (width, height), (255, 0, 0))  # 红色错误图
             return (self.pil2tensor(error_img),)
+
 
 NODE_CLASS_MAPPINGS = {
     "VolcPicNode": VolcPicNode
