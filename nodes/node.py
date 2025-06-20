@@ -51,11 +51,17 @@ class VolcPicNode:
         oneapi_url = config.get('API', 'BASE_URL')
         oneapi_token = config.get('API', 'KEY')
 
+        use_pre_llm = False
+        # Bug 修复：使用 len() 函数获取字符串长度
+        if len(prompt) > 500:
+            use_pre_llm = True
+
         payload = {
             "model": "volc-pic-3.0",
             "req_key": "high_aes_general_v30l_zt2i",
             "prompt": prompt,
             "width": width,
+            "use_pre_llm": use_pre_llm,
             "height": height,
             # "steps": steps,
             "cfg_scale": cfg_scale,
