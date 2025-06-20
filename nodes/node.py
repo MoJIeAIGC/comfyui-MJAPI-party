@@ -6,7 +6,7 @@ import base64
 from torchvision import transforms
 import numpy as np  # 加这个！
 import torch  # 确保导入torch
-
+import configparser  # 导入configparser模块
 # 文生图节点
 class VolcPicNode:
     @classmethod
@@ -16,11 +16,11 @@ class VolcPicNode:
                 "prompt": ("STRING", {"default": "A beautiful sunset"}),
                 "width": ("INT", {"default": 512}),
                 "height": ("INT", {"default": 512}),
-                "steps": ("INT", {"default": 30}),
+                # "steps": ("INT", {"default": 30}),
                 "cfg_scale": ("FLOAT", {"default": 7.5}),
                 "seed": ("INT", {"default": 1234}),
-                "oneapi_url": ("STRING", {"default": "http://118.145.81.83:1024/v1/completions"}),
-                "oneapi_token": ("STRING", {"default": "sk-xxx"}),
+                # "oneapi_url": ("STRING", {"default": "http://118.145.81.83:1024/v1/completions"}),
+                # "oneapi_token": ("STRING", {"default": "sk-xxx"}),
             }
         }
 
@@ -36,14 +36,28 @@ class VolcPicNode:
         return img_tensor
     
 
-    def generate(self, prompt, width, height, steps, cfg_scale, seed, oneapi_url, oneapi_token):
+    def generate(self, prompt, width, height,  cfg_scale, seed):
+        # 读取配置文件
+        # 读取配置文件
+        import os  # 导入 os 模块用于路径操作
+        config = configparser.ConfigParser()
+        # 获取 node.py 文件所在目录
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        # 构建项目根目录下 config.ini 的绝对路径
+        config_path = os.path.join(os.path.dirname(current_dir), 'config.ini')
+        config.read(config_path)
+        
+        # 从配置文件中获取 oneapi_url 和 oneapi_token
+        oneapi_url = config.get('API', 'BASE_URL')
+        oneapi_token = config.get('API', 'KEY')
+
         payload = {
             "model": "volc-pic-3.0",
             "req_key": "high_aes_general_v30l_zt2i",
             "prompt": prompt,
             "width": width,
             "height": height,
-            "steps": steps,
+            # "steps": steps,
             "cfg_scale": cfg_scale,
             "seed": int(seed)
         }
