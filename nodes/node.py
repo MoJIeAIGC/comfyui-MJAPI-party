@@ -17,7 +17,7 @@ class VolcPicNode:
                 "width": ("INT", {"default": 512}),
                 "height": ("INT", {"default": 512}),
                 # "steps": ("INT", {"default": 30}),
-                "cfg_scale": ("FLOAT", {"default": 7.5}),
+                "cfg_scale": ("FLOAT", {"default": 2.5}),
                 "seed": ("INT", {"default": 1234}),
                 # "oneapi_url": ("STRING", {"default": "http://118.145.81.83:1024/v1/completions"}),
                 # "oneapi_token": ("STRING", {"default": "sk-xxx"}),
@@ -27,7 +27,7 @@ class VolcPicNode:
     RETURN_TYPES = ("IMAGE",)
     RETURN_NAMES = ("output",)
     FUNCTION = "generate"
-    CATEGORY = "VolcPic"
+    CATEGORY = "🔥 MJapiparty/ImageGenerate"
 
     def pil2tensor(self, image):
         img_array = np.array(image).astype(np.float32) / 255.0  # (H, W, 3)
@@ -100,9 +100,9 @@ class VolcPicNode:
 
 
 NODE_CLASS_MAPPINGS = {
-    "VolcPicNode": VolcPicNode
+    "Dreamina t2i": VolcPicNode
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
-    "VolcPicNode": "🔥 火山文生图（OneAPI）"
+    "VolcPicNode": "Dreamina t2i"
 }
