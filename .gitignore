@@ -4,4 +4,4 @@
 *.ptx
 *.cubin
 *.fatbin
-# config.ini
+config.ini
