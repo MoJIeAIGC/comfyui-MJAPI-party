@@ -16,23 +16,23 @@ class VolcPicNode:
                 "prompt": ("STRING", {"default": "A beautiful sunset"}),
                 "width": ("INT", {"default": 512}),
                 "height": ("INT", {"default": 512}),
-                "cfg_scale": ("FLOAT", {"default": 7.5}),
+                "cfg_scale": ("FLOAT", {"default": 2.5}),
                 "seed": ("INT", {"default": 1234}),
-                "quantity": ("INT", {"default": 1, "min": 1, "max": 2}),  # 新增参数，只能是1或2
+                "batch_size": ("INT", {"default": 1, "min": 1, "max": 2}),  # 新增参数，只能是1或2
             }
         }
 
     RETURN_TYPES = ("IMAGE",)  # 返回一个或多个IMAGE
     RETURN_NAMES = ("output",)  # 保持为一个返回名
     FUNCTION = "generate"
-    CATEGORY = "VolcPic"
+    CATEGORY = "🔥 MJapiparty/ImageGenerate"
 
     def pil2tensor(self, image):
         img_array = np.array(image).astype(np.float32) / 255.0  # (H, W, 3)
         img_tensor = torch.from_numpy(img_array)[None,]  # (1, H, W, 3)
         return img_tensor
 
-    def generate(self, prompt, width, height, cfg_scale, seed, quantity):
+    def generate(self, prompt, width, height, cfg_scale, seed, batch_size):
         # 读取配置文件
         config = configparser.ConfigParser()
         current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -75,7 +75,7 @@ class VolcPicNode:
         output_tensors = []
 
         try:
-            for i in range(quantity):
+            for i in range(batch_size):
                 # 如果两次请求用同一个seed也行，可改为 seed+i 实现不同seed
                 img = call_api(seed + i)
                 tensor_img = self.pil2tensor(img)
@@ -89,13 +89,13 @@ class VolcPicNode:
             error_img = Image.new("RGB", (width, height), (255, 0, 0))
             error_tensor = self.pil2tensor(error_img)
             # 返回指定数量错误图
-            error_tensors = [error_tensor for _ in range(quantity)]
+            error_tensors = [error_tensor for _ in range(batch_size)]
             return (torch.cat(error_tensors, dim=0),)
 
 NODE_CLASS_MAPPINGS = {
-    "VolcPicNode": VolcPicNode
+     "Dreamina t2i": VolcPicNode
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
-    "VolcPicNode": "🔥 火山文生图（OneAPI）"
+    "VolcPicNode": "Dreamina t2i"
 }

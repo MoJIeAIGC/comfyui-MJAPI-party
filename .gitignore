@@ -5,3 +5,4 @@
 *.cubin
 *.fatbin
 config.ini
+.idea
