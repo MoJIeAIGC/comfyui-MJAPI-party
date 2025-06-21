@@ -92,10 +92,114 @@ class VolcPicNode:
             error_tensors = [error_tensor for _ in range(batch_size)]
             return (torch.cat(error_tensors, dim=0),)
 
+
+
+class DreaminaI2INode:
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "image": ("IMAGE",),  # 输入图像
+                # "image": ("STRING", {"default": "https://pic.52112.com/180320/180320_17/Bl3t6ivHKZ_small.jpg"}),
+                "prompt": ("STRING", {"default": ""}),
+                "width": ("INT", {"default": 1024}),
+                "height": ("INT", {"default": 1024}),
+                "gpen": ("FLOAT", {"default": 0.4}),
+                "skin": ("FLOAT", {"default": 0.3}),
+                "skin_unifi": ("FLOAT", {"default": 0.0}),
+                "gen_mode": (["creative", "reference", "reference_char"], {"default": "reference"}),
+                "seed": ("INT", {"default": -1}),  # -1表示随机
+                "batch_size": ("INT", {"default": 1, "min": 1, "max": 2}),  # 生成张数
+            }
+        }
+
+    RETURN_TYPES = ("IMAGE",)
+    RETURN_NAMES = ("output",)
+    FUNCTION = "generate"
+    CATEGORY = "Dreamina"
+
+    def pil2tensor(self, image):
+        img_array = np.array(image).astype(np.float32) / 255.0  # (H, W, 3)
+        img_tensor = torch.from_numpy(img_array)[None,]  # (1, H, W, 3)
+        return img_tensor
+
+    def tensor2pil(self, tensor):
+        # Tensor (1, H, W, 3) to PIL
+        image = tensor.squeeze().numpy() * 255.0
+        return Image.fromarray(image.astype(np.uint8))
+
+    def generate(self, image, prompt, width, height, gpen, skin, skin_unifi, gen_mode, seed, batch_size):
+        # 读取配置文件
+        config = configparser.ConfigParser()
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        config_path = os.path.join(os.path.dirname(current_dir), 'config.ini')
+        config.read(config_path)
+        
+        oneapi_url = config.get('API', 'BASE_URL')
+        oneapi_token = config.get('API', 'KEY')
+
+        # Convert input tensor to base64
+        pil_image = self.tensor2pil(image)
+        buffered = BytesIO()
+        pil_image.save(buffered, format="JPEG")
+        img_base64 = base64.b64encode(buffered.getvalue()).decode("utf-8")
+
+        headers = {
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {oneapi_token}"
+        }
+
+        output_tensors = []
+
+        for i in range(batch_size):  # batch_size=2 时调用两次
+            payload = {
+                "model": "volc-pic-3.0",
+                "req_key": "i2i_portrait_photo",
+                "prompt": prompt,
+                "width": width,
+                "height": height,
+                "gpen": gpen,
+                "skin": skin,
+                "skin_unifi": skin_unifi,
+                "gen_mode": gen_mode,
+                "seed": None if seed == -1 else seed + i,  # 避免完全一样
+                "batch_size": 1,  
+                "image_base64": img_base64
+            }
+
+            try:
+                response = requests.post(oneapi_url, headers=headers, json=payload, timeout=120)
+                response.raise_for_status()
+                result = response.json()
+                img_base64_list = result.get('data', {}).get('binary_data_base64', [])
+
+                if not img_base64_list:
+                    raise ValueError("API返回空图像数据.")
+
+                # 正常情况下每次返回1张
+                img_bytes = base64.b64decode(img_base64_list[0])
+                img = Image.open(BytesIO(img_bytes)).convert("RGB")
+                tensor_img = self.pil2tensor(img)
+                output_tensors.append(tensor_img)
+
+                print(f"✅ DreaminaI2INode 第{i+1}次调用成功")
+
+            except Exception as e:
+                print(f"❌ DreaminaI2INode 错误(第{i+1}次): {str(e)}")
+                error_img = Image.new("RGB", (width, height), (255, 0, 0))
+                error_tensor = self.pil2tensor(error_img)
+                output_tensors.append(error_tensor)
+
+        return (torch.cat(output_tensors, dim=0),)  # 返回(batch_size, H, W, 3)
+
+
+
 NODE_CLASS_MAPPINGS = {
+    "DreaminaI2INode": DreaminaI2INode,
      "Dreamina t2i": VolcPicNode
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
+    "DreaminaI2INode": "🎨 Dreamina i2i（梦图生图）",
     "VolcPicNode": "Dreamina t2i"
 }
