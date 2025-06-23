@@ -8,6 +8,9 @@ import torch
 import configparser
 import os  # 导入 os 用于路径处理
 
+# 从 base.py 导入 pil2tensor 函数
+from .base import pil2tensor
+
 class VolcPicNode:
     @classmethod
     def INPUT_TYPES(cls):
@@ -26,11 +29,6 @@ class VolcPicNode:
     RETURN_NAMES = ("output",)  # 保持为一个返回名
     FUNCTION = "generate"
     CATEGORY = "🔥 MJapiparty/ImageGenerate"
-
-    def pil2tensor(self, image):
-        img_array = np.array(image).astype(np.float32) / 255.0  # (H, W, 3)
-        img_tensor = torch.from_numpy(img_array)[None,]  # (1, H, W, 3)
-        return img_tensor
 
     def generate(self, prompt, width, height, cfg_scale, seed, batch_size):
         # 读取配置文件
@@ -78,7 +76,8 @@ class VolcPicNode:
             for i in range(batch_size):
                 # 如果两次请求用同一个seed也行，可改为 seed+i 实现不同seed
                 img = call_api(seed + i)
-                tensor_img = self.pil2tensor(img)
+                # 直接调用导入的 pil2tensor 函数
+                tensor_img = pil2tensor(img)
                 output_tensors.append(tensor_img)
                 print(f"🔥 VolcPicNode 第 {i+1} 张图片生成成功: {prompt} ({width}x{height})")
 
@@ -87,12 +86,11 @@ class VolcPicNode:
         except Exception as e:
             print(f"🔥 VolcPicNode 错误: {str(e)}")
             error_img = Image.new("RGB", (width, height), (255, 0, 0))
-            error_tensor = self.pil2tensor(error_img)
+            # 直接调用导入的 pil2tensor 函数
+            error_tensor = pil2tensor(error_img)
             # 返回指定数量错误图
             error_tensors = [error_tensor for _ in range(batch_size)]
             return (torch.cat(error_tensors, dim=0),)
-
-
 
 class DreaminaI2INode:
     @classmethod
@@ -117,11 +115,6 @@ class DreaminaI2INode:
     RETURN_NAMES = ("output",)
     FUNCTION = "generate"
     CATEGORY = "Dreamina"
-
-    def pil2tensor(self, image):
-        img_array = np.array(image).astype(np.float32) / 255.0  # (H, W, 3)
-        img_tensor = torch.from_numpy(img_array)[None,]  # (1, H, W, 3)
-        return img_tensor
 
     def tensor2pil(self, tensor):
         # Tensor (1, H, W, 3) to PIL
@@ -179,7 +172,8 @@ class DreaminaI2INode:
                 # 正常情况下每次返回1张
                 img_bytes = base64.b64decode(img_base64_list[0])
                 img = Image.open(BytesIO(img_bytes)).convert("RGB")
-                tensor_img = self.pil2tensor(img)
+                # 直接调用导入的 pil2tensor 函数
+                tensor_img = pil2tensor(img)
                 output_tensors.append(tensor_img)
 
                 print(f"✅ DreaminaI2INode 第{i+1}次调用成功")
@@ -187,7 +181,8 @@ class DreaminaI2INode:
             except Exception as e:
                 print(f"❌ DreaminaI2INode 错误(第{i+1}次): {str(e)}")
                 error_img = Image.new("RGB", (width, height), (255, 0, 0))
-                error_tensor = self.pil2tensor(error_img)
+                # 直接调用导入的 pil2tensor 函数
+                error_tensor = pil2tensor(error_img)
                 output_tensors.append(error_tensor)
 
         return (torch.cat(output_tensors, dim=0),)  # 返回(batch_size, H, W, 3)
