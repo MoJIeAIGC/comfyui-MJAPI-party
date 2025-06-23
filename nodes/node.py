@@ -20,7 +20,8 @@ class VolcPicNode:
                 "width": ("INT", {"default": 512}),
                 "height": ("INT", {"default": 512}),
                 "cfg_scale": ("FLOAT", {"default": 2.5}),
-                "seed": ("INT", {"default": 1234}),
+                "seed": ("INT", {"default": -1}),
+                # "seed": ("INT", {"default": 1234}),
                 "batch_size": ("INT", {"default": 1, "min": 1, "max": 2}),  # 新增参数，只能是1或2
             }
         }
@@ -155,7 +156,7 @@ class DreaminaI2INode:
                 "skin": skin,
                 "skin_unifi": skin_unifi,
                 "gen_mode": gen_mode,
-                "seed": None if seed == -1 else seed + i,  # 避免完全一样
+                "seed": seed+i,  # 避免完全一样
                 "batch_size": 1,  
                 "image_base64": img_base64
             }
