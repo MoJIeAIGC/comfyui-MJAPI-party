@@ -32,7 +32,7 @@ class VolcPicNode:
     RETURN_TYPES = ("IMAGE",)  # 返回一个或多个IMAGE
     RETURN_NAMES = ("output",)  # 保持为一个返回名
     FUNCTION = "generate"
-    CATEGORY = "🔥 MJapiparty/ImageGenerate"
+    CATEGORY = "MJapiparty/ImageGenerate"
 
     def generate(self, prompt, width, height, cfg_scale, seed, batch_size):
         # 调用配置管理器获取配置
@@ -58,6 +58,12 @@ class VolcPicNode:
                 "Authorization": f"Bearer {oneapi_token}"
             }
             response = requests.post(oneapi_url, headers=headers, json=payload, timeout=60)
+            # 判断状态码是否为 200
+            if response.status_code != 200:
+                error_msg = ImageConverter.get_status_error_msg(response.status_code)
+                error_tensor = ImageConverter.create_error_image(error_msg, width, height)
+                return error_tensor
+
             response.raise_for_status()
             result = response.json()
             img_base64_list = result.get('data', {}).get('binary_data_base64', [])
@@ -66,27 +72,26 @@ class VolcPicNode:
             img_data = img_base64_list[0]
             img_bytes = base64.b64decode(img_data)
             img = Image.open(BytesIO(img_bytes)).convert("RGB")
-            return img
+            return ImageConverter.pil2tensor(img)
 
         output_tensors = []
 
         try:
             for i in range(batch_size):
                 # 如果两次请求用同一个seed也行，可改为 seed+i 实现不同seed
-                img = call_api(seed + i)
-                # 修改调用方式
-                tensor_img = ImageConverter.pil2tensor(img)
-                output_tensors.append(tensor_img)
+                img_tensor = call_api(seed + i)
+                if isinstance(img_tensor, torch.Tensor):
+                    # 判断是否为错误图像 tensor
+                    if img_tensor.shape[1] == height and img_tensor.shape[2] == width and img_tensor[0, 0, 0, 0] == 1:
+                        return (img_tensor,)
+                output_tensors.append(img_tensor)
                 print(f"🔥 VolcPicNode 第 {i+1} 张图片生成成功: {prompt} ({width}x{height})")
 
             return (torch.cat(output_tensors, dim=0),)  # 拼接为 (数量, H, W, 3)
 
         except Exception as e:
             print(f"🔥 VolcPicNode 错误: {str(e)}")
-            error_img = Image.new("RGB", (width, height), (255, 0, 0))
-            # 修改调用方式
-            error_tensor = ImageConverter.pil2tensor(error_img)
-            # 返回指定数量错误图
+            error_tensor = ImageConverter.create_error_image(str(e), width, height)
             error_tensors = [error_tensor for _ in range(batch_size)]
             return (torch.cat(error_tensors, dim=0),)
 
@@ -149,6 +154,12 @@ class DreaminaI2INode:
 
             try:
                 response = requests.post(oneapi_url, headers=headers, json=payload, timeout=120)
+                # 判断状态码是否为 200
+                if response.status_code != 200:
+                    error_msg = ImageConverter.get_status_error_msg(response.status_code)
+                    error_tensor = ImageConverter.create_error_image(error_msg, width, height)
+                    output_tensors.append(error_tensor)
+                    continue
                 response.raise_for_status()
                 result = response.json()
                 img_base64_list = result.get('data', {}).get('binary_data_base64', [])
@@ -167,9 +178,7 @@ class DreaminaI2INode:
 
             except Exception as e:
                 print(f"❌ DreaminaI2INode 错误(第{i+1}次): {str(e)}")
-                error_img = Image.new("RGB", (width, height), (255, 0, 0))
-                # 修改调用方式
-                error_tensor = ImageConverter.pil2tensor(error_img)
+                error_tensor = ImageConverter.create_error_image("运行异常，请稍后重试")
                 output_tensors.append(error_tensor)
 
         return (torch.cat(output_tensors, dim=0),)  # 返回(batch_size, H, W, 3)
@@ -229,6 +238,11 @@ class FluxProNode:
                 "Authorization": f"Bearer {oneapi_token}"
             }
             response = requests.post(oneapi_url, headers=headers, json=payload, timeout=1200)
+            # 判断状态码是否为 200
+            if response.status_code != 200:
+                error_msg = ImageConverter.get_status_error_msg(response.status_code)
+                error_tensor = ImageConverter.create_error_image(error_msg, width=512, height=512)
+                return error_tensor
             response.raise_for_status()
             result = response.json()
 
@@ -241,7 +255,7 @@ class FluxProNode:
             response.raise_for_status()
             # 将图片数据转换为 PIL 图像对象
             img = Image.open(BytesIO(response.content)).convert("RGB")
-            return img
+            return ImageConverter.pil2tensor(img)
 
         output_tensors = []
 
@@ -250,17 +264,15 @@ class FluxProNode:
                 # 如果两次请求用同一个seed也行，可改为 seed+i 实现不同seed
                 img = call_api(seed + i)
                 # 直接调用导入的 pil2tensor 函数
-                tensor_img = ImageConverter.pil2tensor(img)
-                output_tensors.append(tensor_img)
+                # tensor_img = ImageConverter.pil2tensor(img)
+                output_tensors.append(img)
                 print(f"Flux 第 {i+1} 张图片生成成功: {prompt}")
 
             return (torch.cat(output_tensors, dim=0),)  # 拼接为 (数量, H, W, 3)
 
         except Exception as e:
             print(f"Flux错误: {str(e)}")
-            error_img = Image.new("RGB", (100, 100), (255, 0, 0))
-            # 修改调用方式
-            error_tensor = ImageConverter.pil2tensor(error_img)
+            error_tensor = ImageConverter.create_error_image("运行异常，请稍后重试")
             # 返回指定数量错误图
             error_tensors = [error_tensor for _ in range(batch_size)]
             return (torch.cat(error_tensors, dim=0),)
@@ -320,6 +332,11 @@ class FluxMaxNode:
                 "Authorization": f"Bearer {oneapi_token}"
             }
             response = requests.post(oneapi_url, headers=headers, json=payload, timeout=1200)
+            # 判断状态码是否为 200
+            if response.status_code != 200:
+                error_msg = ImageConverter.get_status_error_msg(response.status_code)
+                error_tensor = ImageConverter.create_error_image(error_msg, width=512, height=512)
+                return error_tensor
             response.raise_for_status()
             result = response.json()
 
@@ -332,7 +349,7 @@ class FluxMaxNode:
             response.raise_for_status()
             # 将图片数据转换为 PIL 图像对象
             img = Image.open(BytesIO(response.content)).convert("RGB")
-            return img
+            return ImageConverter.pil2tensor(img)
 
         output_tensors = []
 
@@ -341,17 +358,15 @@ class FluxMaxNode:
                 # 如果两次请求用同一个seed也行，可改为 seed+i 实现不同seed
                 img = call_api(seed + i)
                 # 直接调用导入的 pil2tensor 函数
-                tensor_img = ImageConverter.pil2tensor(img)
-                output_tensors.append(tensor_img)
+                # tensor_img = ImageConverter.pil2tensor(img)
+                output_tensors.append(img)
                 print(f"Flux 第 {i+1} 张图片生成成功: {prompt}")
 
             return (torch.cat(output_tensors, dim=0),)  # 拼接为 (数量, H, W, 3)
 
         except Exception as e:
             print(f"Flux错误: {str(e)}")
-            error_img = Image.new("RGB", (100, 100), (255, 0, 0))
-            # 修改调用方式
-            error_tensor = ImageConverter.pil2tensor(error_img)
+            error_tensor = ImageConverter.create_error_image("运行异常，请稍后重试")
             # 返回指定数量错误图
             error_tensors = [error_tensor for _ in range(batch_size)]
             return (torch.cat(error_tensors, dim=0),)
