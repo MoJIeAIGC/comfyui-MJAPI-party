@@ -1,7 +1,8 @@
 import numpy as np
 import torch
 from PIL import Image, ImageDraw, ImageFont
-
+import base64
+from io import BytesIO
 class ImageConverter:
     @staticmethod
     def pil2tensor(image):
@@ -14,6 +15,19 @@ class ImageConverter:
         # Tensor (1, H, W, 3) to PIL
         image = tensor.squeeze().numpy() * 255.0
         return Image.fromarray(image.astype(np.uint8))
+
+    @staticmethod
+    def tensor_to_base64(image_tensor):
+        """
+        将图像张量转换为 base64 编码的字符串
+
+        :param image_tensor: 输入的图像张量
+        :return: base64 编码的字符串
+        """
+        pil_image = ImageConverter.tensor2pil(image_tensor)
+        buffered = BytesIO()
+        pil_image.save(buffered, format="JPEG")
+        return base64.b64encode(buffered.getvalue()).decode("utf-8")
 
     @staticmethod
     def get_status_error_msg(status_code):

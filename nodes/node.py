@@ -157,7 +157,7 @@ class DreaminaI2INode:
                 # 判断状态码是否为 200
                 if response.status_code != 200:
                     error_msg = ImageConverter.get_status_error_msg(response.status_code)
-                    error_tensor = ImageConverter.create_error_image(error_msg, width, height)
+                    error_tensor = ImageConverter.create_error_image(error_msg)
                     output_tensors.append(error_tensor)
                     continue
                 response.raise_for_status()
@@ -373,18 +373,96 @@ class FluxMaxNode:
 
 
 
+class ReplaceNode:
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "Product_image": ("IMAGE",),  # 输入图像
+                "migrate_image": ("IMAGE",),  # 输入图像
+                "prompt": ("STRING", {"default": ""}),
+                "strong": ("FLOAT", {"default": 0.6}),
+                "seed": ("INT", {"default": -1}),  # -1表示随机
+            }
+        }
+
+    RETURN_TYPES = ("IMAGE",)
+    RETURN_NAMES = ("output",)
+    FUNCTION = "generate"
+    CATEGORY = "MJapiparty/ImageGenerate"
+
+    def generate(self, Product_image, prompt, migrate_image, seed, strong ):
+        # 调用配置管理器获取配置
+        oneapi_url, oneapi_token = config_manager.get_api_config()
+
+        pro_base64 = ImageConverter.tensor_to_base64(Product_image)
+        mig_base64 = ImageConverter.tensor_to_base64(migrate_image)
+        headers = {
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {oneapi_token}"
+        }
+
+        output_tensors = []
+        prompt = "This is a collage picture，in the left Objects replaces the Objects in the right picture." + prompt
+
+        payload = {
+            "model": "Product_migrate_mjAPI",
+            "prompt": prompt,
+            "strong": strong,
+            "seed": seed,  # 避免完全一样
+            "image": pro_base64,
+            "imagem": mig_base64
+        }
+
+        try:
+            response = requests.post(oneapi_url, headers=headers, json=payload, timeout=300)
+            # 判断状态码是否为 200
+            if response.status_code != 200:
+                error_msg = ImageConverter.get_status_error_msg(response.status_code)
+                error_tensor = ImageConverter.create_error_image(error_msg)
+                output_tensors.append(error_tensor)
+                raise requests.exceptions.HTTPError(f"Request failed with status code {response.status_code}: {error_msg}")
+            response.raise_for_status()
+            result = response.json()
+            result_url = result.get('data')[0].get('fileUrl')
+
+            if not result_url:
+                raise ValueError("API返回空图像数据.")
+
+            responseurl = requests.get(result_url)
+            if responseurl.status_code != 200:
+                raise ValueError("从 URL 获取图片失败。")
+            
+            img_bytes = responseurl.content
+            img = Image.open(BytesIO(img_bytes)).convert("RGB")
+            # 直接调用导入的 pil2tensor 函数
+            tensor_img = ImageConverter.pil2tensor(img)
+            output_tensors.append(tensor_img)
+
+            print(f"✅ ReplaceNode 调用成功")
+
+        except Exception as e:
+            print(f"❌ ReplaceNode 错误: {str(e)}")
+            # error_tensor = ImageConverter.create_error_image("运行异常，请稍后重试")
+            # output_tensors.append(error_tensor)
+        return (torch.cat(output_tensors, dim=0),)  # 返回(batch_size, H, W, 3)
+
 
 
 NODE_CLASS_MAPPINGS = {
     "DreaminaI2INode": DreaminaI2INode,
     "FluxProNode": FluxProNode,
     "FluxMaxNode": FluxMaxNode,
-    "Dreamina t2i": VolcPicNode
+    "Dreamina t2i": VolcPicNode,
+    "ReplaceNode": ReplaceNode,
+
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
     "DreaminaI2INode": "🎨 Dreamina i2i（梦图生图）",
     "FluxProNode": "Flux-context-pro",
     "FluxMaxNode": "Flux-context-max",
-    "VolcPicNode": "Dreamina t2i"
+    "VolcPicNode": "Dreamina t2i",
+    "ReplaceNode": "Product_migrate_mjAPI",
+
 }
