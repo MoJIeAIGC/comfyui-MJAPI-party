@@ -5,9 +5,8 @@ import base64
 from torchvision import transforms
 import numpy as np
 import torch
-import os  # 导入 os 用于路径处理
+import os
 
-# 修改导入语句
 from .base import ImageConverter
 from .config import ConfigManager
 
@@ -24,7 +23,6 @@ class VolcPicNode:
                 "height": ("INT", {"default": 512}),
                 "cfg_scale": ("FLOAT", {"default": 2.5}),
                 "seed": ("INT", {"default": -1}),
-                # "seed": ("INT", {"default": 1234}),
                 "batch_size": ("INT", {"default": 1, "min": 1, "max": 2}),  # 新增参数，只能是1或2
             }
         }
@@ -32,7 +30,7 @@ class VolcPicNode:
     RETURN_TYPES = ("IMAGE",)  # 返回一个或多个IMAGE
     RETURN_NAMES = ("output",)  # 保持为一个返回名
     FUNCTION = "generate"
-    CATEGORY = "MJapiparty/ImageGenerate"
+    CATEGORY = "🎨MJapiparty/Dreamina(即梦)"
 
     def generate(self, prompt, width, height, cfg_scale, seed, batch_size):
         # 调用配置管理器获取配置
@@ -117,7 +115,7 @@ class DreaminaI2INode:
     RETURN_TYPES = ("IMAGE",)
     RETURN_NAMES = ("output",)
     FUNCTION = "generate"
-    CATEGORY = "Dreamina"
+    CATEGORY = "🎨MJapiparty/Dreamina(即梦)"
 
     def generate(self, image, prompt, width, height, gpen, skin, skin_unifi, gen_mode, seed, batch_size):
         # 调用配置管理器获取配置
@@ -202,7 +200,7 @@ class FluxProNode:
     RETURN_TYPES = ("IMAGE",)  # 返回一个或多个IMAGE
     RETURN_NAMES = ("output",)  # 保持为一个返回名
     FUNCTION = "generate"
-    CATEGORY = "MJapiparty/ImageGenerate"
+    CATEGORY = "🎨MJapiparty/Flux"
 
     def generate(self, prompt, seed, batch_size, image_input=None, is_translation=False, aspect_ratio="default"):
         # 调用配置管理器获取配置
@@ -299,7 +297,7 @@ class FluxMaxNode:
     RETURN_TYPES = ("IMAGE",)  # 返回一个或多个IMAGE
     RETURN_NAMES = ("output",)  # 保持为一个返回名
     FUNCTION = "generate"
-    CATEGORY = "MJapiparty/ImageGenerate"
+    CATEGORY = "🎨MJapiparty/Flux"
 
     def generate(self, prompt, seed, batch_size, image_input=None, is_translation=False, aspect_ratio="default"):
         # 调用配置管理器获取配置
@@ -395,7 +393,7 @@ class ReplaceNode:
     RETURN_TYPES = ("IMAGE",)
     RETURN_NAMES = ("output",)
     FUNCTION = "generate"
-    CATEGORY = "MJapiparty/ImageGenerate"
+    CATEGORY = "🎨MJapiparty/Tools_api"
 
     def generate(self, Product_image, prompt, migrate_image, seed, strong ):
         # 调用配置管理器获取配置
@@ -415,7 +413,7 @@ class ReplaceNode:
             "model": "Product_migrate_mjAPI",
             "prompt": prompt,
             "strong": strong,
-            "seed": seed,  # 避免完全一样
+            "seed": seed, 
             "image": pro_base64,
             "imagem": mig_base64
         }
@@ -459,16 +457,15 @@ NODE_CLASS_MAPPINGS = {
     "DreaminaI2INode": DreaminaI2INode,
     "FluxProNode": FluxProNode,
     "FluxMaxNode": FluxMaxNode,
-    "Dreamina t2i": VolcPicNode,
+    "VolcPicNode": VolcPicNode,
     "ReplaceNode": ReplaceNode,
-
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
-    "DreaminaI2INode": "🎨 Dreamina i2i（梦图生图）",
-    "FluxProNode": "Flux-context-pro",
-    "FluxMaxNode": "Flux-context-max",
-    "VolcPicNode": "Dreamina t2i",
-    "ReplaceNode": "Product_migrate_mjAPI",
+    "DreaminaI2INode": "Dreamina_I2i(即梦)",
+    "FluxProNode": "Flux-Kontext-pro",
+    "FluxMaxNode": "Flux-Kontext-max",
+    "VolcPicNode": "Dreamina_T2i(即梦)",
+    "ReplaceNode": "Redux迁移",
 
 }
