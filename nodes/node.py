@@ -191,6 +191,7 @@ class FluxProNode:
                 "prompt": ("STRING", {"default": "A beautiful sunset"}),
                 "seed": ("INT", {"default": -1}),
                 "is_translation": ("BOOLEAN", {"default": False}),  # 是否是翻译模式
+                "aspect_ratio": (["1:1", "3:4", "4:3", "9:16", "16:9"], {"default": "1:1"}),
                 "batch_size": ("INT", {"default": 1, "min": 1, "max": 2}),  # 新增参数，只能是1或2
             },
             "optional": {
@@ -203,7 +204,7 @@ class FluxProNode:
     FUNCTION = "generate"
     CATEGORY = "MJapiparty/ImageGenerate"
 
-    def generate(self, prompt, seed, batch_size, image_input=None, is_translation=False):
+    def generate(self, prompt, seed, batch_size, image_input=None, is_translation=False, aspect_ratio="1:1"):
         # 调用配置管理器获取配置
         oneapi_url, oneapi_token = config_manager.get_api_config()
 
@@ -225,14 +226,16 @@ class FluxProNode:
         def call_api(seed_override):
             payload = {
                 "model": "flux-context-pro",
+                "safety_tolerance":6,
                 "prompt": prompt,
                 "seed": int(seed_override),
                 "is_translation": is_translation,  # 传递翻译模式参数
             }
             # 如果有图像输入，加入到payload中
             if image_base64 is not None:
-                print("使用图像输入进行生成")
                 payload["input_image"] = image_base64
+            else:
+                payload["aspect_ratio"] = aspect_ratio
             headers = {
                 "Content-Type": "application/json",
                 "Authorization": f"Bearer {oneapi_token}"
@@ -285,6 +288,7 @@ class FluxMaxNode:
                 "prompt": ("STRING", {"default": "A beautiful sunset"}),
                 "seed": ("INT", {"default": -1}),
                 "is_translation": ("BOOLEAN", {"default": False}),  # 是否是翻译模式
+                "aspect_ratio": (["1:1", "3:4", "4:3", "9:16", "16:9"], {"default": "1:1"}),
                 "batch_size": ("INT", {"default": 1, "min": 1, "max": 2}),  # 新增参数，只能是1或2
             },
             "optional": {
@@ -297,7 +301,7 @@ class FluxMaxNode:
     FUNCTION = "generate"
     CATEGORY = "MJapiparty/ImageGenerate"
 
-    def generate(self, prompt, seed, batch_size, image_input=None, is_translation=False):
+    def generate(self, prompt, seed, batch_size, image_input=None, is_translation=False, aspect_ratio="1:1"):
         # 调用配置管理器获取配置
         oneapi_url, oneapi_token = config_manager.get_api_config()
 
@@ -319,14 +323,16 @@ class FluxMaxNode:
         def call_api(seed_override):
             payload = {
                 "model": "flux-context-max",
+                "safety_tolerance":6,
                 "prompt": prompt,
                 "seed": int(seed_override),
                 "is_translation": is_translation,  # 传递翻译模式参数
             }
             # 如果有图像输入，加入到payload中
             if image_base64 is not None:
-                print("使用图像输入进行生成")
                 payload["input_image"] = image_base64
+            else:
+                payload["aspect_ratio"] = aspect_ratio
             headers = {
                 "Content-Type": "application/json",
                 "Authorization": f"Bearer {oneapi_token}"
