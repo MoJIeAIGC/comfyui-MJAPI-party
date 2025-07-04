@@ -191,7 +191,7 @@ class FluxProNode:
                 "prompt": ("STRING", {"default": "A beautiful sunset"}),
                 "seed": ("INT", {"default": -1}),
                 "is_translation": ("BOOLEAN", {"default": False}),  # 是否是翻译模式
-                "aspect_ratio": (["1:1", "3:4", "4:3", "9:16", "16:9"], {"default": "1:1"}),
+                "aspect_ratio": (["default", "1:1", "3:4", "4:3", "9:16", "16:9"], {"default": "default"}),
                 "batch_size": ("INT", {"default": 1, "min": 1, "max": 2}),  # 新增参数，只能是1或2
             },
             "optional": {
@@ -204,7 +204,7 @@ class FluxProNode:
     FUNCTION = "generate"
     CATEGORY = "MJapiparty/ImageGenerate"
 
-    def generate(self, prompt, seed, batch_size, image_input=None, is_translation=False, aspect_ratio="1:1"):
+    def generate(self, prompt, seed, batch_size, image_input=None, is_translation=False, aspect_ratio="default"):
         # 调用配置管理器获取配置
         oneapi_url, oneapi_token = config_manager.get_api_config()
 
@@ -234,7 +234,7 @@ class FluxProNode:
             # 如果有图像输入，加入到payload中
             if image_base64 is not None:
                 payload["input_image"] = image_base64
-            else:
+            if aspect_ratio != "default":
                 payload["aspect_ratio"] = aspect_ratio
             headers = {
                 "Content-Type": "application/json",
@@ -288,7 +288,7 @@ class FluxMaxNode:
                 "prompt": ("STRING", {"default": "A beautiful sunset"}),
                 "seed": ("INT", {"default": -1}),
                 "is_translation": ("BOOLEAN", {"default": False}),  # 是否是翻译模式
-                "aspect_ratio": (["1:1", "3:4", "4:3", "9:16", "16:9"], {"default": "1:1"}),
+                "aspect_ratio": (["default", "1:1", "3:4", "4:3", "9:16", "16:9"], {"default": "default"}),
                 "batch_size": ("INT", {"default": 1, "min": 1, "max": 2}),  # 新增参数，只能是1或2
             },
             "optional": {
@@ -301,7 +301,7 @@ class FluxMaxNode:
     FUNCTION = "generate"
     CATEGORY = "MJapiparty/ImageGenerate"
 
-    def generate(self, prompt, seed, batch_size, image_input=None, is_translation=False, aspect_ratio="1:1"):
+    def generate(self, prompt, seed, batch_size, image_input=None, is_translation=False, aspect_ratio="default"):
         # 调用配置管理器获取配置
         oneapi_url, oneapi_token = config_manager.get_api_config()
 
@@ -331,7 +331,7 @@ class FluxMaxNode:
             # 如果有图像输入，加入到payload中
             if image_base64 is not None:
                 payload["input_image"] = image_base64
-            else:
+            if aspect_ratio != "default":
                 payload["aspect_ratio"] = aspect_ratio
             headers = {
                 "Content-Type": "application/json",
