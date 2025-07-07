@@ -96,3 +96,28 @@ class ImageConverter:
             print(f"在错误图片上绘制文字时出错: {font_error}")
 
         return ImageConverter.pil2tensor(error_img)
+
+
+    @staticmethod
+    def merge_image(image,mask):
+        if mask is None:
+            return ImageConverter.tensor_to_base64(image)
+        # 转为 PIL 图像
+        image = ImageConverter.tensor2pil(image).convert("RGB")
+        mask = ImageConverter.tensor2pil(mask).convert("L")
+
+        # 生成 Alpha 通道
+        alpha = Image.eval(mask, lambda px: 255 - px)
+
+        # 合并为 RGBA 图像
+        rgba_image = image.convert("RGBA")
+        rgba_image.putalpha(alpha)
+        # rgba_image.save("E:\\merged_result.png", format="PNG")
+
+        # 将 RGBA 图像转换为 Base64
+        buffered = BytesIO()
+        rgba_image.save(buffered, format="PNG")  # 保存为 PNG 格式到内存中
+        mig_base64 = base64.b64encode(buffered.getvalue()).decode("utf-8")  # 转换为 Base64 字符串
+
+        return mig_base64
+
