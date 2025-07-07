@@ -384,9 +384,13 @@ class ReplaceNode:
             "required": {
                 "Product_image": ("IMAGE",),  # 输入图像
                 "migrate_image": ("IMAGE",),  # 输入图像
+                "migrate_mask": ("MASK",),  # 输入遮罩
                 "prompt": ("STRING", {"default": ""}),
                 "strong": ("FLOAT", {"default": 0.6}),
                 "seed": ("INT", {"default": -1}),  # -1表示随机
+            },
+            "optional": {
+                "Product_mask": ("MASK",),  # 可选的图像输入
             }
         }
 
@@ -395,12 +399,13 @@ class ReplaceNode:
     FUNCTION = "generate"
     CATEGORY = "🎨MJapiparty/Tools_api"
 
-    def generate(self, Product_image, prompt, migrate_image, seed, strong ):
+    def generate(self, Product_image, prompt, migrate_image, seed, strong , Product_mask=None, migrate_mask=None):
         # 调用配置管理器获取配置
         oneapi_url, oneapi_token = config_manager.get_api_config()
 
-        pro_base64 = ImageConverter.tensor_to_base64(Product_image)
-        mig_base64 = ImageConverter.tensor_to_base64(migrate_image)
+        pro_base64 = ImageConverter.merge_image(Product_image, Product_mask)
+        mig_base64 = ImageConverter.merge_image(migrate_image, migrate_mask)
+
         headers = {
             "Content-Type": "application/json",
             "Authorization": f"Bearer {oneapi_token}"
