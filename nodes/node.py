@@ -382,9 +382,9 @@ class ReplaceNode:
     def INPUT_TYPES(cls):
         return {
             "required": {
-                "Product_image": ("IMAGE",),  # 输入图像
                 "migrate_image": ("IMAGE",),  # 输入图像
                 "migrate_mask": ("MASK",),  # 输入遮罩
+                "Product_image": ("IMAGE",),  # 输入图像
                 "prompt": ("STRING", {"default": ""}),
                 "strong": ("FLOAT", {"default": 0.6}),
                 "seed": ("INT", {"default": -1}),  # -1表示随机
