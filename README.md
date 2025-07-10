@@ -18,9 +18,10 @@ pip install -r requirements.txt
 8. 创建`config.ini`文件，放在项目根目录下，内容示例如下：
 ```ini
 [API]
-BASE_URL = your_api_base_url
 KEY = your_api_key
+BASE_URL = https://www.mojieaigc.com/v1/completions
 ```
+请求地址不要动，填入KEY就行了。
 
 ## 使用说明
 ### 即梦3.0节点
