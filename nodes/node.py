@@ -18,7 +18,7 @@ class VolcPicNode:
     def INPUT_TYPES(cls):
         return {
             "required": {
-                "prompt": ("STRING", {"default": "A beautiful sunset"}),
+                "prompt": ("STRING", {"default": "A beautiful sunset", "multiline": True}),
                 "width": ("INT", {"default": 512}),
                 "height": ("INT", {"default": 512}),
                 "cfg_scale": ("FLOAT", {"default": 2.5}),
@@ -100,7 +100,7 @@ class DreaminaI2INode:
             "required": {
                 "image": ("IMAGE",),  # 输入图像
                 # "image": ("STRING", {"default": "https://pic.52112.com/180320/180320_17/Bl3t6ivHKZ_small.jpg"}),
-                "prompt": ("STRING", {"default": ""}),
+                "prompt": ("STRING", {"default": "", "multiline": True}),
                 "width": ("INT", {"default": 1024}),
                 "height": ("INT", {"default": 1024}),
                 "gpen": ("FLOAT", {"default": 0.4}),
@@ -186,7 +186,7 @@ class FluxProNode:
     def INPUT_TYPES(cls):
         return {
             "required": {
-                "prompt": ("STRING", {"default": "A beautiful sunset"}),
+                "prompt": ("STRING", {"default": "A beautiful sunset", "multiline": True}),
                 "seed": ("INT", {"default": -1}),
                 "is_translation": ("BOOLEAN", {"default": False}),  # 是否是翻译模式
                 "aspect_ratio": (["default", "1:1", "3:4", "4:3", "9:16", "16:9"], {"default": "default"}),
@@ -283,7 +283,7 @@ class FluxMaxNode:
     def INPUT_TYPES(cls):
         return {
             "required": {
-                "prompt": ("STRING", {"default": "A beautiful sunset"}),
+                "prompt": ("STRING", {"default": "A beautiful sunset", "multiline": True}),
                 "seed": ("INT", {"default": -1}),
                 "is_translation": ("BOOLEAN", {"default": False}),  # 是否是翻译模式
                 "aspect_ratio": (["default", "1:1", "3:4", "4:3", "9:16", "16:9"], {"default": "default"}),
@@ -385,7 +385,7 @@ class ReplaceNode:
                 "migrate_image": ("IMAGE",),  # 输入图像
                 "migrate_mask": ("MASK",),  # 输入遮罩
                 "Product_image": ("IMAGE",),  # 输入图像
-                "prompt": ("STRING", {"default": ""}),
+                "prompt": ("STRING", {"default": "", "multiline": True}),
                 "strong": ("FLOAT", {"default": 0.6}),
                 "seed": ("INT", {"default": -1}),  # -1表示随机
             },
@@ -463,7 +463,7 @@ class SeedEdit3:
         return {
             "required": {
                 "image": ("IMAGE",),  # 输入图像
-                "prompt": ("STRING", {"default": ""}),
+                "prompt": ("STRING", {"default": "", "multiline": True}),
                 "cfg_scale": ("FLOAT", {"default": 0.5}),
                 "seed": ("INT", {"default": -1}),  # -1表示随机
                 "batch_size": ("INT", {"default": 1, "min": 1, "max": 2}),  # 生成张数
