@@ -18,7 +18,7 @@ class VolcPicNode:
     def INPUT_TYPES(cls):
         return {
             "required": {
-                "prompt": ("STRING", {"default": "A beautiful sunset"}),
+                "prompt": ("STRING", {"default": "A beautiful sunset", "multiline": True}),
                 "width": ("INT", {"default": 512}),
                 "height": ("INT", {"default": 512}),
                 "cfg_scale": ("FLOAT", {"default": 2.5}),
@@ -100,7 +100,7 @@ class DreaminaI2INode:
             "required": {
                 "image": ("IMAGE",),  # 输入图像
                 # "image": ("STRING", {"default": "https://pic.52112.com/180320/180320_17/Bl3t6ivHKZ_small.jpg"}),
-                "prompt": ("STRING", {"default": ""}),
+                "prompt": ("STRING", {"default": "", "multiline": True}),
                 "width": ("INT", {"default": 1024}),
                 "height": ("INT", {"default": 1024}),
                 "gpen": ("FLOAT", {"default": 0.4}),
@@ -186,7 +186,7 @@ class FluxProNode:
     def INPUT_TYPES(cls):
         return {
             "required": {
-                "prompt": ("STRING", {"default": "A beautiful sunset"}),
+                "prompt": ("STRING", {"default": "A beautiful sunset", "multiline": True}),
                 "seed": ("INT", {"default": -1}),
                 "is_translation": ("BOOLEAN", {"default": False}),  # 是否是翻译模式
                 "aspect_ratio": (["default", "1:1", "3:4", "4:3", "9:16", "16:9"], {"default": "default"}),
@@ -283,7 +283,7 @@ class FluxMaxNode:
     def INPUT_TYPES(cls):
         return {
             "required": {
-                "prompt": ("STRING", {"default": "A beautiful sunset"}),
+                "prompt": ("STRING", {"default": "A beautiful sunset", "multiline": True}),
                 "seed": ("INT", {"default": -1}),
                 "is_translation": ("BOOLEAN", {"default": False}),  # 是否是翻译模式
                 "aspect_ratio": (["default", "1:1", "3:4", "4:3", "9:16", "16:9"], {"default": "default"}),
@@ -385,7 +385,7 @@ class ReplaceNode:
                 "migrate_image": ("IMAGE",),  # 输入图像
                 "migrate_mask": ("MASK",),  # 输入遮罩
                 "Product_image": ("IMAGE",),  # 输入图像
-                "prompt": ("STRING", {"default": ""}),
+                "prompt": ("STRING", {"default": "", "multiline": True}),
                 "strong": ("FLOAT", {"default": 0.6}),
                 "seed": ("INT", {"default": -1}),  # -1表示随机
             },
@@ -457,6 +457,83 @@ class ReplaceNode:
         return (torch.cat(output_tensors, dim=0),)  # 返回(batch_size, H, W, 3)
 
 
+class SeedEdit3:
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "image": ("IMAGE",),  # 输入图像
+                "prompt": ("STRING", {"default": "", "multiline": True}),
+                "cfg_scale": ("FLOAT", {"default": 0.5}),
+                "seed": ("INT", {"default": -1}),  # -1表示随机
+                "batch_size": ("INT", {"default": 1, "min": 1, "max": 2}),  # 生成张数
+            }
+        }
+
+    RETURN_TYPES = ("IMAGE",)
+    RETURN_NAMES = ("output",)
+    FUNCTION = "generate"
+    CATEGORY = "🎨MJapiparty/seededit_v3.0"
+
+    def generate(self, image, prompt, cfg_scale, seed, batch_size):
+        # 调用配置管理器获取配置
+        oneapi_url, oneapi_token = config_manager.get_api_config()
+
+        # Convert input tensor to base64
+        pil_image = ImageConverter.tensor2pil(image)
+        buffered = BytesIO()
+        pil_image.save(buffered, format="JPEG")
+        img_base64 = base64.b64encode(buffered.getvalue()).decode("utf-8")
+
+        headers = {
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {oneapi_token}"
+        }
+
+        output_tensors = []
+
+        for i in range(batch_size):  # batch_size=2 时调用两次
+            payload = {
+                "model": "seededit_v3.0",
+                "req_key": "seededit_v3.0",
+                "prompt": prompt,
+                "scale": cfg_scale,
+                "seed": seed+i,  # 避免完全一样
+                "batch_size": 1,  
+                "image_base64": img_base64
+            }
+
+            try:
+                response = requests.post(oneapi_url, headers=headers, json=payload, timeout=120)
+                # 判断状态码是否为 200
+                if response.status_code != 200:
+                    error_msg = ImageConverter.get_status_error_msg(response.status_code)
+                    error_tensor = ImageConverter.create_error_image(error_msg)
+                    output_tensors.append(error_tensor)
+                    continue
+                response.raise_for_status()
+                result = response.json()
+                img_base64_list = result.get('data', {}).get('binary_data_base64', [])
+
+                if not img_base64_list:
+                    raise ValueError("API返回空图像数据.")
+
+                # 正常情况下每次返回1张
+                img_bytes = base64.b64decode(img_base64_list[0])
+                img = Image.open(BytesIO(img_bytes)).convert("RGB")
+                # 直接调用导入的 pil2tensor 函数
+                tensor_img = ImageConverter.pil2tensor(img)
+                output_tensors.append(tensor_img)
+
+                print(f"✅ seededit_v3.0 第{i+1}次调用成功")
+
+            except Exception as e:
+                print(f"❌ seededit_v3.0 错误(第{i+1}次): {str(e)}")
+                error_tensor = ImageConverter.create_error_image("运行异常，请稍后重试")
+                output_tensors.append(error_tensor)
+
+        return (torch.cat(output_tensors, dim=0),)  # 返回(batch_size, H, W, 3)
+
 
 NODE_CLASS_MAPPINGS = {
     "DreaminaI2INode": DreaminaI2INode,
@@ -464,6 +541,7 @@ NODE_CLASS_MAPPINGS = {
     "FluxMaxNode": FluxMaxNode,
     "VolcPicNode": VolcPicNode,
     "ReplaceNode": ReplaceNode,
+    "SeedEdit3": SeedEdit3,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
@@ -472,5 +550,5 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "FluxMaxNode": "Flux-Kontext-max",
     "VolcPicNode": "Dreamina_T2i(即梦)",
     "ReplaceNode": "Redux迁移",
-
+    "SeedEdit3": "seededit_v3.0",
 }
