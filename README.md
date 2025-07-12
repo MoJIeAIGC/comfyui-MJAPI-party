@@ -1,6 +1,7 @@
-<div style="text-align: center;">
+<div style="text-align: center;margin: 20px;;">
     <img src="https://mojie.tos-cn-guangzhou.volces.com/nodes/gitlogo.svg" alt="Logo" style="width: 300px;">
 </div>
+
 
 ***
   由魔诘AI开发的Comfyui自定义节点，为了避免在comfyui中调用外部API时难以管理的情况，mjapi-party将许多优秀常用的API节点做整合，只需要一个API-key即可以调用全网的API接口能力。极大的拓展了comfyui的易用性。更多API节点正逐步添加中。
