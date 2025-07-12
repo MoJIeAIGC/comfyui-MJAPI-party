@@ -1,5 +1,5 @@
 <div style="text-align: center;">
-    <img src="https://mojie.tos-cn-guangzhou.volces.com/nodes/gitlogo.svg" alt="Logo" style="max-width: 300px;">
+    <img src="https://mojie.tos-cn-guangzhou.volces.com/nodes/gitlogo.svg" alt="Logo" style="width: 300px;">
 </div>
 
 ***
