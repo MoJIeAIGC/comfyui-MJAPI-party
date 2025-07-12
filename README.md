@@ -1,6 +1,9 @@
-# ComfyUI MJAPI Party
+<div style="text-align: center;">
+    <img src="https://mojie.tos-cn-guangzhou.volces.com/nodes/gitlogo.svg" alt="Logo" style="max-width: 300px;">
+</div>
 
-由魔诘AI开发的Comfyui自定义节点，为了避免在comfyui中调用外部API时难以管理的情况，mjapi-party将许多优秀常用的API节点做整合，只需要一个API-key即可以调用全网的API接口能力。极大的拓展了comfyui的易用性。更多API节点正逐步添加中。
+***
+  由魔诘AI开发的Comfyui自定义节点，为了避免在comfyui中调用外部API时难以管理的情况，mjapi-party将许多优秀常用的API节点做整合，只需要一个API-key即可以调用全网的API接口能力。极大的拓展了comfyui的易用性。更多API节点正逐步添加中。
 
 ## 安装步骤
 1. 确保你已经安装了ComfyUI。
@@ -24,23 +27,4 @@ BASE_URL = https://www.mojieaigc.com/v1/completions
 请求地址不要动，填入KEY就行了。
 
 ## 使用说明
-### 即梦3.0节点
-#### 文本生成图像 (`VolcPicNode`)
-- **类别**：`🎨MJapiparty/Dreamina(即梦)`
-- **输入参数**：
-  - `prompt`：图像描述文本，默认值为 `A beautiful sunset`。
-  - `width`：图像宽度，默认值为 `512`。
-  - `height`：图像高度，默认值为 `512`。
-  - `cfg_scale`：配置比例，默认值为 `2.5`。
-  - `seed`：随机种子，默认值为 `-1`。
-  - `batch_size`：生成图像数量，范围为 `1-2`，默认值为 `1`。
 
-#### 图像转图像 (`DreaminaI2INode`)
-- **类别**：`🎨MJapiparty/Dreamina(即梦)`
-- **输入参数**：
-  - `image`：输入图像。
-  - `prompt`：图像描述文本，默认值为 `A beautiful sunset`。
-  - `width`：图像宽度，默认值为 `512`。
-  - `height`：图像高度，默认值为 `512`。
-  - `cfg_scale`：配置比例，默认值为 `2.5`。
-  - `prompt`：图像描述文本，默认值为 `
