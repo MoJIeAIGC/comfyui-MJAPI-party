@@ -1,4 +1,4 @@
-<div style="text-align: center;margin: 20px;;">
+<div style="text-align: center; margin: 0 auto;">
     <img src="https://mojie.tos-cn-guangzhou.volces.com/nodes/gitlogo.svg" alt="Logo" style="width: 300px;">
 </div>
 
