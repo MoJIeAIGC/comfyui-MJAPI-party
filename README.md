@@ -65,8 +65,7 @@ BASE_URL = https://www.mojieaigc.com/v1/completions
 ### 联系我们
 wechat:mojie_AIGC
 扫描下方二维码
-![alt text](doc/assets/qr.jpg)
-
+<img src="doc/assets/qr.jpg" alt="QR Code" style="max-width: 300px;">
 ### star
 <div align="center">
     <a href="https://star-history.com/#MoJIeAIGC/comfyui-MJAPI-party&Date">
