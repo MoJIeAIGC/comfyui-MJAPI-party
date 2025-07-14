@@ -6,3 +6,6 @@
 *.fatbin
 config.ini
 .idea
+__pycache__/
+*.pyc
+*.pyo

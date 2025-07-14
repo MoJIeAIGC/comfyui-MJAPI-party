@@ -1,7 +1,7 @@
 [project]
 name = "Mojie-API-Party"
 description = "A node that aggregates many powerful API features,Easier integration into workflows"
-version = "1.1.1"
+version = "1.2.1"
 license = {file = "LICENSE"}
 dependencies = []
 classifiers = ["Operating System :: OS Independent"]
@@ -13,7 +13,7 @@ Repository = "https://github.com/MoJIeAIGC/comfyui-MJAPI-party"
 
 [tool.comfy]
 PublisherId = "mojieaigc"
-DisplayName = "MJapiparty"
+DisplayName = "Mojie-API-Party"
 Icon = "https://mojieaigc.com/static/logo.png"
 includes = []
  
