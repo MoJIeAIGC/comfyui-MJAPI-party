@@ -13,7 +13,7 @@ Repository = "https://github.com/MoJIeAIGC/comfyui-MJAPI-party"
 
 [tool.comfy]
 PublisherId = "mojieaigc"
-DisplayName = "MJapiparty"
+DisplayName = "Mojie-API-Party"
 Icon = "https://mojieaigc.com/static/logo.png"
 includes = []
  
