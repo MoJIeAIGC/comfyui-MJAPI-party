@@ -12,9 +12,12 @@ class ImageConverter:
 
     @staticmethod
     def tensor2pil(tensor):
-        # Tensor (1, H, W, 3) to PIL
-        image = tensor.squeeze().numpy() * 255.0
-        return Image.fromarray(image.astype(np.uint8))
+        try:
+            # Tensor (1, H, W, 3) to PIL
+            image = tensor.squeeze().numpy() * 255.0
+            return Image.fromarray(image.astype(np.uint8))
+        except Exception as e:
+            return None
 
     @staticmethod
     def tensor_to_base64(image_tensor):
@@ -100,18 +103,24 @@ class ImageConverter:
 
     @staticmethod
     def merge_image(image,mask):
+        imageres = ImageConverter.tensor_to_base64(image)
         if mask is None:
-            return ImageConverter.tensor_to_base64(image)
+            return imageres
         # 转为 PIL 图像
         image = ImageConverter.tensor2pil(image).convert("RGB")
         mask = ImageConverter.tensor2pil(mask).convert("L")
+        if mask is None:
+            return ImageConverter.tensor_to_base64(image)
 
         # 生成 Alpha 通道
         alpha = Image.eval(mask, lambda px: 255 - px)
 
         # 合并为 RGBA 图像
-        rgba_image = image.convert("RGBA")
-        rgba_image.putalpha(alpha)
+        try:
+            rgba_image = image.convert("RGBA")
+            rgba_image.putalpha(alpha)
+        except Exception as e:
+            return imageres
         # rgba_image.save("E:\\merged_result.png", format="PNG")
 
         # 将 RGBA 图像转换为 Base64
@@ -120,4 +129,5 @@ class ImageConverter:
         mig_base64 = base64.b64encode(buffered.getvalue()).decode("utf-8")  # 转换为 Base64 字符串
 
         return mig_base64
+
 
