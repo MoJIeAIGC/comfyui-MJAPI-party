@@ -541,9 +541,11 @@ class KouTuNode:
         return {
             "required": {
                 "image": ("IMAGE",),  # 输入图像
-                "mask": ("MASK",),  # 输入遮罩
                 "seed": ("INT", {"default": -1}),  # -1表示随机
             },
+            "optional": {
+                "mask": ("MASK",),  # 可选的图像输入
+            }
 
         }
 
@@ -591,7 +593,7 @@ class KouTuNode:
                 raise ValueError("从 URL 获取图片失败。")
             
             img_bytes = responseurl.content
-            img = Image.open(BytesIO(img_bytes)).convert("RGB")
+            img = Image.open(BytesIO(img_bytes)).convert("RGBA")
             # 直接调用导入的 pil2tensor 函数
             tensor_img = ImageConverter.pil2tensor(img)
             output_tensors.append(tensor_img)
