@@ -9,7 +9,7 @@
     <a href="#" target="_blank">
         <img src="https://img.shields.io/badge/YouTube-油管-red?logo=youtube" alt="YouTube">
     </a>
-    <a href="/README_EN.md" target="_blank">
+    <a href="README_EN.md" target="_blank">
         <img src="https://img.shields.io/badge/Docs-文档-green?logo=readme" alt="Documentation">
     </a>
 </div>
@@ -61,20 +61,12 @@ SeedEdit 3.0 是字节跳动开发的图片编辑工具，能通过文字描述�
 ![alt text](doc/assets/kontext.png)
 Kontext 是一个基于大模型的 AI 绘画工具，它可以通过文字描述生成图像。
 - 加入了翻译开关is_translation,在每个节点中都有，默认是关闭的。打开可以输入中文。
-- aspect_ratio是尺寸控制，默认是default，由kontext自己控制输出图片的尺寸。也可以开启根据自己的需要选择尺寸。
 - max效果更好，pro性价比更高。视频教程可以查看：
 > [Kontext-pro&max详细测评教程](https://www.bilibili.com/video/BV19931zAE4c/?vd_source=25d3add966daa64cbb811354319ec18d#reply268510289936)
 - 使用前请确保你的账户中有足够的余额
 #### Dreamina(即梦)
 ![alt text](doc/assets/Dreamina.png)
-Dreamina是一个基于大模型的AI绘画工具，支持中文输入，中文输出，特地将其加入在mjapiparty中是为了充分发挥comfyui灵活组合的能力，也懒得在即梦中充值了，mojie-api-party节点中有两个即梦节点，文生图与图生图。
-- 即梦文生图支持中文输入，中文输出。对一些偏僻或中文概念理解很好。
-- 即梦图生图有多种参考模式gen_mode选下下
-  - 第一种 creative 是创意模式，可以理解为全图参考
-  - 第二种 reference 人脸参考
-  - 第三种 reference_char 人物参考
-- cfg默认2.5请勿修改
-
+Dreamina是一个基于大模型的AI绘画工具，支持中文输入，中文输出，对一些偏僻或中文概念理解很好。特地将其加入在mjapiparty中是为了充分发挥comfyui灵活组合的能力，也懒得在即梦中充值了，mojie-api-party节点中有两个即梦节点，文生图与图生图。
 ***
 
 
@@ -89,16 +81,20 @@ git clone https://github.com/MoJIeAIGC/comfyui-MJAPI-party.git
 ```bash
 pip install -r requirements.txt
 ```
-6. 在mojieaigc.com网站上注册一个账户
+6. mojieaigc.com网站上注册一个账户
+```url 
+ https://www.mojieaigc.com
+```
+
 7. 登录后获取自己的API-KEY
-8. 创建`config.ini`文件，放在项目根目录下，内容示例如下：
+8. 修改`config.ini`文件，在项目根目录下，内容示例如下：
 ```ini
 [API]
 KEY = your_api_key
 BASE_URL = https://www.mojieaigc.com/v1/completions
 ```
 请求地址不要动，填入KEY就行了。
-填入密钥key后记得重启comfyui
+填入密钥key后记得重启comfyui,才能生效
 
 ### 联系我们
 wechat:mojie_AIGC
