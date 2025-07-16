@@ -87,7 +87,13 @@ pip install -r requirements.txt
 ```
 
 7. 登录后获取自己的API-KEY
+
+![alt text](doc/assets/copykey.png)
+
 8. 修改`config.ini`文件，在项目根目录下，内容示例如下：
+
+![alt text](doc/assets/addkey.png)
+
 ```ini
 [API]
 KEY = your_api_key
