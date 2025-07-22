@@ -3,6 +3,9 @@ import torch
 from PIL import Image, ImageDraw, ImageFont
 import base64
 from io import BytesIO
+import requests
+import logging
+from comfy_api.input_impl.video_types import VideoFromFile
 class ImageConverter:
     @staticmethod
     def pil2tensor(image):
@@ -130,4 +133,33 @@ class ImageConverter:
 
         return mig_base64
 
+    @staticmethod
+    def download_video(video_url: str, save_path: str = "temp_video.mp4") -> str:
+        """
+        下载视频文件到本地
+        :param video_url: 视频URL
+        :param save_path: 本地保存路径
+        :return: 本地视频文件路径
+        """
+        try:
+            response = requests.get(video_url, stream=True)
+            if response.status_code == 200:
+                with open(save_path, 'wb') as f:
+                    for chunk in response.iter_content(chunk_size=1024):
+                        f.write(chunk)
+                logging.info(f"视频下载完成: {save_path}")
+                return save_path
+            else:
+                raise ValueError(f"下载视频失败: {response.status_code}")
+        except Exception as e:
+            logging.error(f"视频下载出错: {str(e)}")
+            raise
 
+    @staticmethod
+    def convert_images_to_base64(image_list):
+        # 转换图像为Base64编码的字符串数组
+        base64_images = []
+        for img in image_list:
+            img_base64 = ImageConverter.tensor_to_base64(img)
+            base64_images.append(img_base64)
+        return base64_images

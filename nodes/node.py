@@ -6,6 +6,7 @@ from torchvision import transforms
 import numpy as np
 import torch
 import os
+from comfy_api.input_impl.video_types import VideoFromFile
 
 from .base import ImageConverter
 from .config import ConfigManager
@@ -605,6 +606,122 @@ class KouTuNode:
         return (torch.cat(output_tensors, dim=0),)  # 返回(batch_size, H, W, 3)
 
 
+class DreaminaT2VNode:
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "prompt": ("STRING", {"default": "A beautiful sunset", "multiline": True}),
+                "aspect_ratio": (["default", "1:1", "3:4", "4:3", "9:16", "16:9", "21:9"], {"default": "default"}),
+                "seed": ("INT", {"default": -1}),
+            }
+        }
+
+    RETURN_TYPES = ("VIDEO",)  # 返回VIDEO类型
+    RETURN_NAMES = ("video",)
+    FUNCTION = "generate"
+    CATEGORY = "🎨MJapiparty/Dreamina(即梦)"
+
+    def generate(self, prompt, seed, aspect_ratio="default"):
+        # 获取配置
+        oneapi_url, oneapi_token = config_manager.get_api_config()
+
+        def call_api(seed_override):
+            payload = {
+                "model": "Dreaminat2vNode",
+                "req_key": "jimeng_vgfm_t2v_l20",
+                "prompt": prompt,
+                "seed": int(seed_override)
+            }
+            if aspect_ratio != "default":
+                payload["aspect_ratio"] = aspect_ratio
+            headers = {
+                "Content-Type": "application/json",
+                "Authorization": f"Bearer {oneapi_token}"
+            }
+            response = requests.post(oneapi_url, headers=headers, json=payload, timeout=240)
+
+            response.raise_for_status()
+
+            result = response.json()
+            print(result)
+
+            video_url = result.get('data', {}).get('video_url', [])
+            if not video_url:
+                raise ValueError("Empty video data from API.")
+            return video_url
+
+        video_url = call_api(seed)
+        print(video_url)
+        # 下载视频并提取帧
+        video_path = ImageConverter.download_video(video_url)
+        # 使用 VideoFromFile 封装视频
+
+        return (VideoFromFile(video_path),)
+
+
+class DreaminaI2VNode:
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "prompt": ("STRING", {"default": "A beautiful sunset", "multiline": True}),
+                "aspect_ratio": (["default", "1:1", "3:4", "4:3", "9:16", "16:9", "21:9"], {"default": "default"}),
+                "seed": ("INT", {"default": -1}),
+                "images": ("IMAGE", {"default": []})  # 接收多个图片
+            }
+        }
+
+    RETURN_TYPES = ("VIDEO",)  # 返回VIDEO类型
+    RETURN_NAMES = ("video",)
+    FUNCTION = "generate"
+    CATEGORY = "🎨MJapiparty/Dreamina(即梦)"
+
+    def generate(self, prompt, seed, aspect_ratio="default", images=[]):
+        # 获取配置
+        oneapi_url, oneapi_token = config_manager.get_api_config()
+
+        def call_api(seed_override, binary_data_base64):
+            payload = {
+                "model": "DreaminaI2VNode",
+                "req_key": "jimeng_vgfm_i2v_l20",
+                "prompt": prompt,
+                "seed": int(seed_override),
+                "binary_data_base64": binary_data_base64  # 添加Base64编码的图片数据
+            }
+            if aspect_ratio != "default":
+                payload["aspect_ratio"] = aspect_ratio
+            headers = {
+                "Content-Type": "application/json",
+                "Authorization": f"Bearer {oneapi_token}"
+            }
+            response = requests.post(oneapi_url, headers=headers, json=payload, timeout=240)
+
+            response.raise_for_status()
+
+            result = response.json()
+            print(result)
+
+            video_url = result.get('data', {}).get('video_url', [])
+            if not video_url:
+                raise ValueError("Empty video data from API.")
+            return video_url
+
+        # 将图像转换为Base64编码
+        binary_data_base64 = ImageConverter.convert_images_to_base64(images)
+
+        # 调用API
+        video_url = call_api(seed, binary_data_base64)
+        print(video_url)
+        # 下载视频并提取帧
+        video_path = ImageConverter.download_video(video_url)
+        # 使用 VideoFromFile 封装视频
+
+        return (VideoFromFile(video_path),)
+
+
+
+
 NODE_CLASS_MAPPINGS = {
     "DreaminaI2INode": DreaminaI2INode,
     "FluxProNode": FluxProNode,
@@ -613,6 +730,8 @@ NODE_CLASS_MAPPINGS = {
     "ReplaceNode": ReplaceNode,
     "SeedEdit3": SeedEdit3,
     "KouTuNode": KouTuNode,
+    "DreaminaT2VNode": DreaminaT2VNode,
+    "DreaminaI2VNode": DreaminaI2VNode,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
@@ -623,4 +742,6 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "ReplaceNode": "Redux迁移",
     "SeedEdit3": "seededit_v3.0",
     "KouTuNode": "自动抠图",
+    "DreaminaT2VNode": "即梦文生视频",
+    "DreaminaI2VNode": "即梦图生视频",
 }
