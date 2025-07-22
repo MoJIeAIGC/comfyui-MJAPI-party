@@ -17,7 +17,7 @@
 
 ***  
 
-  MojieAI开发的Comfyui自定义节点工具。为了避免在comfyui中调用外部API时密钥和地址难以统一管理，以及许多更优秀模型本地算力难以支撑，本地部署耗时耗力，因此mjapi-party将许多优秀常用的API节点做整合，只需要一个API-key即可以调用全网的API接口能力，也能够通过comfyui节点式操作，保留极大的灵活性，极大的拓展了comfyui的易用性。更多API节点正逐步添加中,后续也会逐步增加对扣子和n8n的支持。
+  MojieAI开发的Comfyui自定义节点工具。为了让comfyui更加普及，让本地低配置电脑也同样能顺利的运行comfyui，同时避免在comfyui中调用外部API时密钥和地址难以统一管理，以及许多更优秀模型本地算力难以支撑，本地部署耗时耗力，因此mjapi-party将许多优秀常用的API节点做整合，只需要一个API-key即可以调用全网的API接口能力，也能够通过comfyui节点式操作，保留极大的灵活性，极大的拓展了comfyui的易用性。更多API节点正逐步添加中,后续也会逐步增加对扣子和n8n的支持。
 
 ***
 要使用此节点需前往 [mojieaigc.com](https://www.mojieaigc.com/) 注册账户
@@ -33,6 +33,7 @@
 - [Redux万物迁移](/doc/node_list.md#redux万物迁移)
 - [Kontext-pro&max](/doc/node_list.md#Kontext-pro&max)
 - [自动抠图](/doc/node_list.md#自动抠图)
+- [即梦视频生成](/doc/node_list.md#即梦视频生成)
 
 ### 节点使用说明
 所有的节点说明文档在：
@@ -43,6 +44,12 @@
 
 在comfyui节点列表中找到mjapiparty
 ![alt text](doc/assets/node.png)
+
+- 250722-新增节点
+即梦视频文生视频和图生视频，即梦视频具有高语义遵循：具有极高的“提示词遵循能力”，支持输入很复杂的提示词（例如镜头切换、人物连续动作、情绪演绎、运镜控制）动效流畅：动作效果流畅自然，整体视频效果结构稳定,画面一致性：支持保持风格及主体一致性
+如果你不想经常切换界面，或者在即梦中充值使用，或者批量生成，那么可以试试即梦视频生成工作流。
+![alt text](doc/assets/Dreamina_v.png)
+
 
 - 250714-新增节点：
 seededit3.0
