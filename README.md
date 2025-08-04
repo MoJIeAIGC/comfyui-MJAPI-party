@@ -24,6 +24,10 @@
 详细说明查看
 > [详细安装步骤](#安装步骤)
 
+> [安装视频教程](https://ecn0nfqh6woh.feishu.cn/wiki/NSrhwpEEQis0b8ktIdAcEbN4neh?from=from_copylink)
+
+> [摩诘AI的公开文档地址](https://ecn0nfqh6woh.feishu.cn/wiki/GITRwdanFi6gJHkYA9Nc9lDOnHd?from=from_copylink)
+
 更多节点更新信息请关注B站'摩诘AI'，
 [传送门](https://space.bilibili.com/483532108)
 
