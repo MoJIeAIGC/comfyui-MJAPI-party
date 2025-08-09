@@ -59,7 +59,7 @@ class VolcPicNode:
             response = requests.post(oneapi_url, headers=headers, json=payload, timeout=60)
             # 判断状态码是否为 200
             if response.status_code != 200:
-                error_msg = ImageConverter.get_status_error_msg(response.status_code)
+                error_msg = ImageConverter.get_status_error_msg(response,1)
                 error_tensor = ImageConverter.create_error_image(error_msg, width, height)
                 return error_tensor
 
@@ -155,7 +155,7 @@ class DreaminaI2INode:
                 response = requests.post(oneapi_url, headers=headers, json=payload, timeout=120)
                 # 判断状态码是否为 200
                 if response.status_code != 200:
-                    error_msg = ImageConverter.get_status_error_msg(response.status_code)
+                    error_msg = ImageConverter.get_status_error_msg(response,1)
                     error_tensor = ImageConverter.create_error_image(error_msg)
                     output_tensors.append(error_tensor)
                     continue
@@ -242,7 +242,7 @@ class FluxProNode:
             response = requests.post(oneapi_url, headers=headers, json=payload, timeout=1200)
             # 判断状态码是否为 200
             if response.status_code != 200:
-                error_msg = ImageConverter.get_status_error_msg(response.status_code)
+                error_msg = ImageConverter.get_status_error_msg(response)
                 error_tensor = ImageConverter.create_error_image(error_msg, width=512, height=512)
                 return error_tensor
             response.raise_for_status()
@@ -339,7 +339,7 @@ class FluxMaxNode:
             response = requests.post(oneapi_url, headers=headers, json=payload, timeout=1200)
             # 判断状态码是否为 200
             if response.status_code != 200:
-                error_msg = ImageConverter.get_status_error_msg(response.status_code)
+                error_msg = ImageConverter.get_status_error_msg(response)
                 error_tensor = ImageConverter.create_error_image(error_msg, width=512, height=512)
                 return error_tensor
             response.raise_for_status()
@@ -428,7 +428,7 @@ class ReplaceNode:
             response = requests.post(oneapi_url, headers=headers, json=payload, timeout=300)
             # 判断状态码是否为 200
             if response.status_code != 200:
-                error_msg = ImageConverter.get_status_error_msg(response.status_code)
+                error_msg = ImageConverter.get_status_error_msg(response)
                 error_tensor = ImageConverter.create_error_image(error_msg)
                 output_tensors.append(error_tensor)
                 raise requests.exceptions.HTTPError(f"Request failed with status code {response.status_code}: {error_msg}")
@@ -508,7 +508,7 @@ class SeedEdit3:
                 response = requests.post(oneapi_url, headers=headers, json=payload, timeout=120)
                 # 判断状态码是否为 200
                 if response.status_code != 200:
-                    error_msg = ImageConverter.get_status_error_msg(response.status_code)
+                    error_msg = ImageConverter.get_status_error_msg(response,1)
                     error_tensor = ImageConverter.create_error_image(error_msg)
                     output_tensors.append(error_tensor)
                     continue
@@ -578,7 +578,7 @@ class KouTuNode:
             response = requests.post(oneapi_url, headers=headers, json=payload, timeout=300)
             # 判断状态码是否为 200
             if response.status_code != 200:
-                error_msg = ImageConverter.get_status_error_msg(response.status_code)
+                error_msg = ImageConverter.get_status_error_msg(response)
                 error_tensor = ImageConverter.create_error_image(error_msg)
                 output_tensors.append(error_tensor)
                 raise requests.exceptions.HTTPError(f"Request failed with status code {response.status_code}: {error_msg}")

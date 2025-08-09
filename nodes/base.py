@@ -36,13 +36,14 @@ class ImageConverter:
         return base64.b64encode(buffered.getvalue()).decode("utf-8")
 
     @staticmethod
-    def get_status_error_msg(status_code):
+    def get_status_error_msg(response,cate=0):
         """
-        根据状态码返回对应的错误信息
+        根据响应对象返回对应的错误信息
 
-        :param status_code: HTTP 状态码
+        :param response: requests.Response对象
         :return: 对应的错误信息字符串
         """
+        status_code = response.status_code
         error_msg_map = {
             400: "请求参数错误，请检查输入",
             401: "未授权，请检查 API Token",
@@ -53,10 +54,33 @@ class ImageConverter:
             503: "服务不可用",
             504: "网关超时"
         }
-        return error_msg_map.get(status_code, f"请求失败，状态码: {status_code}")
+        error_msg = error_msg_map.get(status_code, f"请求失败，状态码: {status_code}")
+        # return error_msg_map.get(status_code, f"请求失败，状态码: {status_code}")
+
+        if cate == 1:
+            try:
+                error_data = response.json()
+                error_msg1 = error_data.get("error", {}).get("message", "")
+                # 尝试解析嵌套的JSON字符串
+                import json
+                import re
+                try:
+                    match = re.search(r'^\{.*\}', error_msg1)
+                    if match:
+                        json_part = match.group(0)
+                        outer = json.loads(json_part)
+                        inner_str = outer['error'][2:-1]  # 去掉 b' 和最后的 '
+                        inner_json = json.loads(inner_str)
+                        error_msg = inner_json['message']
+                except:
+                    return error_msg
+            except:
+                pass
+        
+        return error_msg
 
     @staticmethod
-    def create_error_image(text, width=512, height=512, font_size=20):
+    def create_error_image(text, width=512, height=512, font_size=40):
         """
         创建一个红色背景的错误图片，并在上面绘制指定的文字。
 
