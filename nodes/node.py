@@ -720,6 +720,86 @@ class DreaminaI2VNode:
         return (VideoFromFile(video_path),)
 
 
+class QwenImageNode:
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "prompt": ("STRING", {"default": "A beautiful sunset", "multiline": True}),
+                "size": (["1328*1328", "1664*928", "1472*1140", "1140*1472", "928*1664"], {"default": "1328*1328"}),
+                "batch_size": ("INT", {"default": 1, "min": 1, "max": 2}),  # 新增参数，只能是1或2
+            }
+        }
+
+    RETURN_TYPES = ("IMAGE",)  # 返回一个或多个IMAGE
+    RETURN_NAMES = ("output",)  # 保持为一个返回名
+    FUNCTION = "generate"
+    CATEGORY = "🎨MJapiparty/qwen-image"
+
+    def generate(self, prompt, size, batch_size):
+        # 调用配置管理器获取配置
+        oneapi_url, oneapi_token = config_manager.get_api_config()
+
+        prompt_extend = False
+        if len(prompt) > 500:
+            prompt_extend = True
+
+        def call_api():
+            payload = {
+                "model": "qwen-image",
+                "modelr": "qwen-image",
+                "prompt": prompt,
+                "prompt_extend": prompt_extend,
+                "size": size,
+            }
+            headers = {
+                "Content-Type": "application/json",
+                "Authorization": f"Bearer {oneapi_token}"
+            }
+            response = requests.post(oneapi_url, headers=headers, json=payload, timeout=60)
+            # 判断状态码是否为 200
+            if response.status_code != 200:
+                error_msg = ImageConverter.get_status_error_msg(response,1)
+                error_tensor = ImageConverter.create_error_image(error_msg, 512, 512)
+                return error_tensor
+
+            response.raise_for_status()
+            result = response.json()
+            # 处理URL列表获取图片数据
+            img_bytes_list = []
+            url = result.get('output').get('results', [])[0].get('url', None)
+            response = requests.get(url)
+            response.raise_for_status()
+            img_bytes_list.append(response.content)
+            
+            # 转换为Base64格式
+            img_base64_list = [base64.b64encode(img_bytes).decode('utf-8') for img_bytes in img_bytes_list]
+            img_data = img_base64_list[0]  # 取第一张图片
+            img_bytes = base64.b64decode(img_data)
+            img = Image.open(BytesIO(img_bytes)).convert("RGB")
+            return ImageConverter.pil2tensor(img)
+
+        output_tensors = []
+
+        try:
+            for i in range(batch_size):
+                img_tensor = call_api()
+                if isinstance(img_tensor, torch.Tensor):
+                    # 判断是否为错误图像 tensor
+                    if img_tensor.shape[1] == 512 and img_tensor.shape[2] == 512 and img_tensor[0, 0, 0, 0] == 1:
+                        return (img_tensor,)
+                output_tensors.append(img_tensor)
+                print(f"QwenImageNode 第 {i+1} 张图片生成成功: {prompt} ()")
+
+            return (torch.cat(output_tensors, dim=0),)  # 拼接为 (数量, H, W, 3)
+
+        except Exception as e:
+            print(f"QwenImageNode 错误: {str(e)}")
+            error_tensor = ImageConverter.create_error_image(str(e))
+            error_tensors = [error_tensor for _ in range(batch_size)]
+            return (torch.cat(error_tensors, dim=0),)
+
+
 
 
 NODE_CLASS_MAPPINGS = {
@@ -732,6 +812,7 @@ NODE_CLASS_MAPPINGS = {
     "KouTuNode": KouTuNode,
     "DreaminaT2VNode": DreaminaT2VNode,
     "DreaminaI2VNode": DreaminaI2VNode,
+    "QwenImageNode": QwenImageNode,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
@@ -744,4 +825,5 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "KouTuNode": "自动抠图",
     "DreaminaT2VNode": "即梦文生视频",
     "DreaminaI2VNode": "即梦图生视频",
+    "QwenImageNode": "qwen-image文生图",
 }
