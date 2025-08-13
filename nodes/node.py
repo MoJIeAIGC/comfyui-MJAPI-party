@@ -728,6 +728,8 @@ class QwenImageNode:
                 "prompt": ("STRING", {"default": "A beautiful sunset", "multiline": True}),
                 "size": (["1328*1328", "1664*928", "1472*1140", "1140*1472", "928*1664"], {"default": "1328*1328"}),
                 "batch_size": ("INT", {"default": 1, "min": 1, "max": 2}),  # 新增参数，只能是1或2
+                "prompt_extend": ("BOOLEAN", {"default": False}),  # 是否是翻译模式
+                "seed": ("INT", {"default": -1}),
             }
         }
 
@@ -736,13 +738,9 @@ class QwenImageNode:
     FUNCTION = "generate"
     CATEGORY = "🎨MJapiparty/qwen-image"
 
-    def generate(self, prompt, size, batch_size):
+    def generate(self, prompt, size, batch_size,seed,prompt_extend):
         # 调用配置管理器获取配置
         oneapi_url, oneapi_token = config_manager.get_api_config()
-
-        prompt_extend = False
-        if len(prompt) > 500:
-            prompt_extend = True
 
         def call_api():
             payload = {
