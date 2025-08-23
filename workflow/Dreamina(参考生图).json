@@ -1,0 +1,241 @@
+{
+  "id": "dbf43daf-a6f8-467a-a5fd-d8c19c2a3b8b",
+  "revision": 0,
+  "last_node_id": 10,
+  "last_link_id": 7,
+  "nodes": [
+    {
+      "id": 8,
+      "type": "LoadImage",
+      "pos": [
+        579.6439208984375,
+        -166.67135620117188
+      ],
+      "size": [
+        270,
+        314.0000305175781
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            6
+          ]
+        },
+        {
+          "name": "MASK",
+          "type": "MASK",
+          "links": null
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.50",
+        "Node name for S&R": "LoadImage"
+      },
+      "widgets_values": [
+        "pasted/image.png",
+        "image"
+      ]
+    },
+    {
+      "id": 1,
+      "type": "DreaminaI2INode",
+      "pos": [
+        939.6441040039062,
+        -376.6712646484375
+      ],
+      "size": [
+        400,
+        304
+      ],
+      "flags": {},
+      "order": 3,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "link": 6
+        },
+        {
+          "name": "prompt",
+          "type": "STRING",
+          "widget": {
+            "name": "prompt"
+          },
+          "link": 4
+        }
+      ],
+      "outputs": [
+        {
+          "name": "output",
+          "type": "IMAGE",
+          "links": [
+            7
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "Mojie-API-Party",
+        "ver": "5c2fff706e89118c32c8847569e46fe0fac3a173",
+        "Node name for S&R": "DreaminaI2INode"
+      },
+      "widgets_values": [
+        "",
+        1024,
+        1280,
+        0.4,
+        0.3,
+        0,
+        "reference",
+        1271,
+        "randomize",
+        1
+      ]
+    },
+    {
+      "id": 10,
+      "type": "MarkdownNote",
+      "pos": [
+        -3.6082472801208496,
+        -441.4598083496094
+      ],
+      "size": [
+        422.8641662597656,
+        645.0458984375
+      ],
+      "flags": {},
+      "order": 1,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [],
+      "properties": {},
+      "widgets_values": [
+        "#### Dreamina(即梦)\n- 即梦文生图支持中文输入，中文输出。对一些偏僻或中文概念理解很好。\n- 即梦图生图有多种参考模式gen_mode选下下\n  - 第一种 creative 是创意模式，可以理解为全图参考\n  - 第二种 reference 人脸参考\n  - 第三种 reference_char 人物参考\n- cfg默认2.5请勿修改\n\n"
+      ],
+      "color": "#432",
+      "bgcolor": "#653"
+    },
+    {
+      "id": 6,
+      "type": "PrimitiveStringMultiline",
+      "pos": [
+        477.23297119140625,
+        -365.1534423828125
+      ],
+      "size": [
+        417.6236267089844,
+        155.42262268066406
+      ],
+      "flags": {},
+      "order": 2,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "links": [
+            4
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.50",
+        "Node name for S&R": "PrimitiveStringMultiline"
+      },
+      "widgets_values": [
+        "生成一张女孩的全身摄影照片，赛博朋克风格，背景是赛博城市，无数霓虹灯光，她穿着短裙，站在城市的楼顶，俯瞰整个城市。图片上用书法写着几个大字：\"赛博city\""
+      ]
+    },
+    {
+      "id": 9,
+      "type": "PreviewImage",
+      "pos": [
+        1378.3546142578125,
+        -396.77655029296875
+      ],
+      "size": [
+        419.276611328125,
+        581.517578125
+      ],
+      "flags": {},
+      "order": 4,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 7
+        }
+      ],
+      "outputs": [],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.50",
+        "Node name for S&R": "PreviewImage"
+      },
+      "widgets_values": []
+    }
+  ],
+  "links": [
+    [
+      4,
+      6,
+      0,
+      1,
+      1,
+      "STRING"
+    ],
+    [
+      6,
+      8,
+      0,
+      1,
+      0,
+      "IMAGE"
+    ],
+    [
+      7,
+      1,
+      0,
+      9,
+      0,
+      "IMAGE"
+    ]
+  ],
+  "groups": [
+    {
+      "id": 2,
+      "title": "即梦参考生图",
+      "bounding": [
+        467.23297119140625,
+        -470.3765869140625,
+        1340.398193359375,
+        665.1176147460938
+      ],
+      "color": "#b06634",
+      "font_size": 24,
+      "flags": {}
+    }
+  ],
+  "config": {},
+  "extra": {
+    "ds": {
+      "scale": 0.7247295000000082,
+      "offset": [
+        79.7713557800686,
+        658.6247125795362
+      ]
+    },
+    "frontendVersion": "1.23.4"
+  },
+  "version": 0.4
+}
