@@ -6,7 +6,7 @@
     <a href="https://space.bilibili.com/483532108" target="_blank">
         <img src="https://img.shields.io/badge/Bilibili-B站-blue?logo=bilibili" alt="Bilibili">
     </a>
-    <a href="#" target="_blank">
+    <a href="https://www.youtube.com/channel/UCkEziiyOnhvZgwCEk2WAb7Q" target="_blank">
         <img src="https://img.shields.io/badge/YouTube-油管-red?logo=youtube" alt="YouTube">
     </a>
     <a href="README_EN.md" target="_blank">
@@ -26,18 +26,20 @@
 
 > [安装视频教程](https://ecn0nfqh6woh.feishu.cn/wiki/NSrhwpEEQis0b8ktIdAcEbN4neh?from=from_copylink)
 
-> [摩诘AI的公开文档地址](https://ecn0nfqh6woh.feishu.cn/wiki/GITRwdanFi6gJHkYA9Nc9lDOnHd?from=from_copylink)
+> [摩诘AI的公开文档地址](https://ecn0nfqh6woh.feishu.cn/wiki/GITRwdanFi6gJHkYA9Nc9lDOnHd)
 
 更多节点更新信息请关注B站'摩诘AI'，
 [传送门](https://space.bilibili.com/483532108)
 
 ### 目前已支持的节点
+- [Qwen-image](/doc/node_list.md#qwen-image-使用说明)
+- [Qwen-edit-image](/doc/node_list.md#qwen-edit-image-使用说明)
 - [seededit3.0](/doc/node_list.md#seededit30)
-- [Dreamina(即梦)](/doc/node_list.md#Dreamina(即梦)) 
+- [Dreamina(即梦参考生图)](/doc/node_list.md#dreamina即梦参考生图)
 - [Redux万物迁移](/doc/node_list.md#redux万物迁移)
 - [Kontext-pro&max](/doc/node_list.md#Kontext-pro&max)
 - [自动抠图](/doc/node_list.md#自动抠图)
-- [即梦视频生成](/doc/node_list.md#即梦视频生成)
+- [即梦视频生成](/doc/node_list.md#即梦视频生成)（即将下线换成Seedance）
 
 ### 节点使用说明
 所有的节点说明文档在：
@@ -49,11 +51,14 @@
 在comfyui节点列表中找到mjapiparty
 ![alt text](doc/assets/node.png)
 
-- 250722-新增节点
-即梦视频文生视频和图生视频，即梦视频具有高语义遵循：具有极高的“提示词遵循能力”，支持输入很复杂的提示词（例如镜头切换、人物连续动作、情绪演绎、运镜控制）动效流畅：动作效果流畅自然，整体视频效果结构稳定,画面一致性：支持保持风格及主体一致性
-如果你不想经常切换界面，或者在即梦中充值使用，或者批量生成，那么可以试试即梦视频生成工作流。
-![alt text](doc/assets/Dreamina_v.png)
+- 250820-新增节点
+#### Qwen-image 
+Qwen-image是阿里开源的AI绘画工具，对中文的支持非常友好，能够准确的画出细节的小字和排版，支持中文输入，中文输出。
+prompt_extend是提示词扩写参数，默认开启，仅需简单提示词就可以出来非常不错的画面效果。
+#### Qwen-edit-image
+和seededit功能一样能通过文字描述修改图片。各有千秋，价格便宜，支持使用中文提示词，支持输出中文。
 
+![alt text](doc/assets/Qwen-image.png)
 
 - 250714-新增节点：
 seededit3.0
@@ -75,9 +80,8 @@ Kontext 是一个基于大模型的 AI 绘画工具，它可以通过文字描�
 - max效果更好，pro性价比更高。视频教程可以查看：
 > [Kontext-pro&max详细测评教程](https://www.bilibili.com/video/BV19931zAE4c/?vd_source=25d3add966daa64cbb811354319ec18d#reply268510289936)
 - 使用前请确保你的账户中有足够的余额
-#### Dreamina(即梦)
-![alt text](doc/assets/Dreamina.png)
-Dreamina是一个基于大模型的AI绘画工具，支持中文输入，中文输出，对一些偏僻或中文概念理解很好。特地将其加入在mjapiparty中是为了充分发挥comfyui灵活组合的能力，也懒得在即梦中充值了，mojie-api-party节点中有两个即梦节点，文生图与图生图。
+
+
 ***
 
 
@@ -88,20 +92,16 @@ Dreamina是一个基于大模型的AI绘画工具，支持中文输入，中文�
 ```plaintext
 git clone https://github.com/MoJIeAIGC/comfyui-MJAPI-party.git
 ```
-4. 运行requirements安装依赖：
-```bash
-pip install -r requirements.txt
-```
-6. mojieaigc.com网站上注册一个账户
+5. mojieaigc.com网站上注册一个账户
 ```url 
  https://www.mojieaigc.com
 ```
 
-7. 登录后获取自己的API-KEY
+6. 登录后获取自己的API-KEY
 
 ![alt text](doc/assets/copykey.png)
 
-8. 修改`config.ini`文件，在项目根目录下，内容示例如下：
+7. 修改`config.ini`文件，在项目目根目录下，内容示例如下：
 
 ![alt text](doc/assets/addkey.png)
 

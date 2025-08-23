@@ -1,0 +1,274 @@
+{
+  "id": "822d8cab-28fd-4020-a7ca-2129b92cc0fc",
+  "revision": 0,
+  "last_node_id": 22,
+  "last_link_id": 14,
+  "nodes": [
+    {
+      "id": 22,
+      "type": "PreviewImage",
+      "pos": [
+        953.3901977539062,
+        588.851318359375
+      ],
+      "size": [
+        564.9520263671875,
+        493.5439453125
+      ],
+      "flags": {},
+      "order": 5,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 14
+        }
+      ],
+      "outputs": [],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.50",
+        "Node name for S&R": "PreviewImage"
+      },
+      "widgets_values": []
+    },
+    {
+      "id": 21,
+      "type": "LoadImage",
+      "pos": [
+        178.706298828125,
+        574.1728515625
+      ],
+      "size": [
+        310.1808166503906,
+        443.0143737792969
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            13
+          ]
+        },
+        {
+          "name": "MASK",
+          "type": "MASK",
+          "links": null
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.50",
+        "Node name for S&R": "LoadImage"
+      },
+      "widgets_values": [
+        "148b7e274c5a45dc8f607306173346da.jpeg",
+        "image"
+      ]
+    },
+    {
+      "id": 20,
+      "type": "QwenImageEditNode",
+      "pos": [
+        509.2024841308594,
+        584.165283203125
+      ],
+      "size": [
+        400,
+        200
+      ],
+      "flags": {},
+      "order": 3,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "link": 13
+        }
+      ],
+      "outputs": [
+        {
+          "name": "output",
+          "type": "IMAGE",
+          "links": [
+            14
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "Mojie-API-Party",
+        "ver": "5c2fff706e89118c32c8847569e46fe0fac3a173",
+        "Node name for S&R": "QwenImageEditNode"
+      },
+      "widgets_values": [
+        "将人物的衣服改成白色裙子",
+        1,
+        58,
+        "randomize"
+      ]
+    },
+    {
+      "id": 19,
+      "type": "MarkdownNote",
+      "pos": [
+        -249.8396759033203,
+        -129.8044891357422
+      ],
+      "size": [
+        343.3768310546875,
+        511.4752197265625
+      ],
+      "flags": {},
+      "order": 1,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [],
+      "properties": {},
+      "widgets_values": [
+        "#### Qwen-image\n- Qwen-image文生图支持中文输入，中文输出。对一些偏僻或中文概念理解很好，支持全文中文小字。\n- prompt_extend是提示词扩写，默认是开启的。\n\n#### Qwen-image-edit（图片编辑）\n- 一句话的图片编辑工具"
+      ],
+      "color": "#432",
+      "bgcolor": "#653"
+    },
+    {
+      "id": 15,
+      "type": "QwenImageNode",
+      "pos": [
+        187.6018829345703,
+        -129.96339416503906
+      ],
+      "size": [
+        404.3713073730469,
+        267.01239013671875
+      ],
+      "flags": {},
+      "order": 2,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "output",
+          "type": "IMAGE",
+          "links": [
+            12
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "Mojie-API-Party",
+        "ver": "5c2fff706e89118c32c8847569e46fe0fac3a173",
+        "Node name for S&R": "QwenImageNode"
+      },
+      "widgets_values": [
+        "《长安的荔枝》影视化视觉，海报上用书法写着大字：“长安的荔枝”,画风融合新中式美学，以细腻笔触绘荔枝，色彩温润和谐，红粉渐变显果实饱满。以大面积红色为背景简化干扰，巨大荔枝滚落在赤红山峦，有一个唐朝蓝色朝服官员正在上面策马奔腾，跋涉山路，金粉飞溅，云雾缭绕的山峰做背景。构图简洁，突出主题，既有传统工笔的精致，又融入现代插画的清新感，传递出东方诗意与雅致，借荔枝这一传统意象，展现独特的东方视觉审美 。史诗感的构图，画风柔美，细节丰富，电影海报级叙事感。",
+        "928*1664",
+        1,
+        true,
+        1984,
+        "randomize"
+      ]
+    },
+    {
+      "id": 16,
+      "type": "PreviewImage",
+      "pos": [
+        623.0210571289062,
+        -162.7117156982422
+      ],
+      "size": [
+        425.4918518066406,
+        560.9678955078125
+      ],
+      "flags": {},
+      "order": 4,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 12
+        }
+      ],
+      "outputs": [],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.50",
+        "Node name for S&R": "PreviewImage"
+      },
+      "widgets_values": []
+    }
+  ],
+  "links": [
+    [
+      12,
+      15,
+      0,
+      16,
+      0,
+      "IMAGE"
+    ],
+    [
+      13,
+      21,
+      0,
+      20,
+      0,
+      "IMAGE"
+    ],
+    [
+      14,
+      20,
+      0,
+      22,
+      0,
+      "IMAGE"
+    ]
+  ],
+  "groups": [
+    {
+      "id": 1,
+      "title": "Qwen文生图",
+      "bounding": [
+        123.96365356445312,
+        -236.20985412597656,
+        1480.6800537109375,
+        667.5759887695312
+      ],
+      "color": "#3f789e",
+      "font_size": 24,
+      "flags": {}
+    },
+    {
+      "id": 2,
+      "title": "Qwen-图片编辑",
+      "bounding": [
+        124.6403579711914,
+        450.195068359375,
+        1468.879150390625,
+        650.45703125
+      ],
+      "color": "#b06634",
+      "font_size": 24,
+      "flags": {}
+    }
+  ],
+  "config": {},
+  "extra": {
+    "ds": {
+      "scale": 0.7513148009015778,
+      "offset": [
+        476.5498516747296,
+        148.3243514178751
+      ]
+    },
+    "frontendVersion": "1.23.4"
+  },
+  "version": 0.4
+}

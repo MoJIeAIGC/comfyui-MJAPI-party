@@ -1,16 +1,23 @@
 #### 所有API节点列表
 所有的节点示例工作流都可以在workflow目录下找到
+- [Qwen-image](#qwen-image-使用说明)
+- [Qwen-edit-image](#qwen-edit-image-使用说明)
 - [seededit3.0](#seededit30)
 - [Redux万物迁移](#redux万物迁移)
 - [Kontext-pro&max](#Kontext-pro&max)
-- [Dreamina(即梦)](#Dreamina(即梦)) 
 - [自动抠图](#自动抠图)
-- [即梦视频生成](#即梦视频生成)
+- [Dreamina(即梦参考生图)](#dreamina即梦参考生图)
+- [即梦视频生成](#即梦视频生成)(即将下线换成Seedance)
 ***
-#### 即梦视频生成 使用说明
-即梦视频文生视频和图生视频，即梦视频具有高语义遵循：具有极高的“提示词遵循能力”，支持输入很复杂的提示词（例如镜头切换、人物连续动作、情绪演绎、运镜控制）动效流畅：动作效果流畅自然，整体视频效果结构稳定,画面一致性：支持保持风格及主体一致性
-如果你不想经常切换界面，或者在即梦中充值使用，或者批量生成，那么可以试试即梦视频生成工作流。
-![alt text](assets/Dreamina_v.png)
+
+
+#### Qwen-image 使用说明
+Qwen-image是阿里开源的AI绘画工具，对中文的支持非常友好，能够准确的画出细节的小字和排版，支持中文输入，中文输出。
+prompt_extend是提示词扩写参数，默认开启，仅需简单提示词就可以出来非常不错的画面效果。
+#### Qwen-edit-image 使用说明
+和seededit功能一样能通过文字描述修改图片。各有千秋，价格便宜，支持使用中文提示词，支持输出中文。具体使用方法和标准提示词可以参考seededit
+
+![alt text](assets/Qwen-image.png)
 
 #### seededit3.0 使用说明
 SeedEdit 3.0 是字节跳动开发的图片编辑工具，
@@ -49,15 +56,18 @@ Kontext 是一个基于大模型的 AI 绘画工具，它可以通过文字描�
 - max效果更好，pro性价比更高。视频教程可以查看：
 > [Kontext-pro&max详细测评教程](https://www.bilibili.com/video/BV19931zAE4c/?vd_source=25d3add966daa64cbb811354319ec18d#reply268510289936)
 - 使用前请确保你的账户中有足够的余额
-#### Dreamina(即梦)
+
+#### Dreamina(即梦参考生图)
+加入Qwen-image后，即梦文身图就没有太多存在的意义了，完全可以平替即梦。但是即梦的参考生图还是非常不错的，在人像还原上也非常准确。
+
 ![alt text](assets/Dreamina.png)
-Dreamina是一个基于大模型的AI绘画工具，支持中文输入，中文输出，特地将其加入在mjapiparty中是为了充分发挥comfyui灵活组合的能力，也懒得在即梦中充值了，mojie-api-party节点中有两个即梦节点，文生图与图生图。
-- 即梦文生图支持中文输入，中文输出。对一些偏僻或中文概念理解很好。
-- 即梦图生图有多种参考模式gen_mode选下下
-  - 第一种 creative 是创意模式，可以理解为全图参考
-  - 第二种 reference 人脸参考
-  - 第三种 reference_char 人物参考
-- cfg默认2.5请勿修改
+
+即梦图生图有多种参考模式gen_mode选下下
+第一种 creative 是创意模式，可以理解为全图参考
+第二种 reference 人脸参考
+第三种 reference_char 人物参考
+cfg默认2.5请勿修改
+
 ##### 自动抠图
 图片上传最大不超过10M
 用就行了，没啥参数。

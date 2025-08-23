@@ -14,85 +14,6 @@ from .config import ConfigManager
 # 初始化配置管理器
 config_manager = ConfigManager()
 
-class VolcPicNode:
-    @classmethod
-    def INPUT_TYPES(cls):
-        return {
-            "required": {
-                "prompt": ("STRING", {"default": "A beautiful sunset", "multiline": True}),
-                "width": ("INT", {"default": 512}),
-                "height": ("INT", {"default": 512}),
-                "cfg_scale": ("FLOAT", {"default": 2.5}),
-                "seed": ("INT", {"default": -1}),
-                "batch_size": ("INT", {"default": 1, "min": 1, "max": 2}),  # 新增参数，只能是1或2
-            }
-        }
-
-    RETURN_TYPES = ("IMAGE",)  # 返回一个或多个IMAGE
-    RETURN_NAMES = ("output",)  # 保持为一个返回名
-    FUNCTION = "generate"
-    CATEGORY = "🎨MJapiparty/Dreamina(即梦)"
-
-    def generate(self, prompt, width, height, cfg_scale, seed, batch_size):
-        # 调用配置管理器获取配置
-        oneapi_url, oneapi_token = config_manager.get_api_config()
-
-        use_pre_llm = False
-        if len(prompt) > 500:
-            use_pre_llm = True
-
-        def call_api(seed_override):
-            payload = {
-                "model": "volc-pic-3.0",
-                "req_key": "high_aes_general_v30l_zt2i",
-                "prompt": prompt,
-                "width": width,
-                "use_pre_llm": use_pre_llm,
-                "height": height,
-                "cfg_scale": cfg_scale,
-                "seed": int(seed_override)
-            }
-            headers = {
-                "Content-Type": "application/json",
-                "Authorization": f"Bearer {oneapi_token}"
-            }
-            response = requests.post(oneapi_url, headers=headers, json=payload, timeout=60)
-            # 判断状态码是否为 200
-            if response.status_code != 200:
-                error_msg = ImageConverter.get_status_error_msg(response,1)
-                error_tensor = ImageConverter.create_error_image(error_msg, width, height)
-                return error_tensor
-
-            response.raise_for_status()
-            result = response.json()
-            img_base64_list = result.get('data', {}).get('binary_data_base64', [])
-            if not img_base64_list:
-                raise ValueError("Empty image data from API.")
-            img_data = img_base64_list[0]
-            img_bytes = base64.b64decode(img_data)
-            img = Image.open(BytesIO(img_bytes)).convert("RGB")
-            return ImageConverter.pil2tensor(img)
-
-        output_tensors = []
-
-        try:
-            for i in range(batch_size):
-                # 如果两次请求用同一个seed也行，可改为 seed+i 实现不同seed
-                img_tensor = call_api(seed + i)
-                if isinstance(img_tensor, torch.Tensor):
-                    # 判断是否为错误图像 tensor
-                    if img_tensor.shape[1] == height and img_tensor.shape[2] == width and img_tensor[0, 0, 0, 0] == 1:
-                        return (img_tensor,)
-                output_tensors.append(img_tensor)
-                print(f"🔥 VolcPicNode 第 {i+1} 张图片生成成功: {prompt} ({width}x{height})")
-
-            return (torch.cat(output_tensors, dim=0),)  # 拼接为 (数量, H, W, 3)
-
-        except Exception as e:
-            print(f"🔥 VolcPicNode 错误: {str(e)}")
-            error_tensor = ImageConverter.create_error_image(str(e), width, height)
-            error_tensors = [error_tensor for _ in range(batch_size)]
-            return (torch.cat(error_tensors, dim=0),)
 
 class DreaminaI2INode:
     @classmethod
@@ -116,7 +37,7 @@ class DreaminaI2INode:
     RETURN_TYPES = ("IMAGE",)
     RETURN_NAMES = ("output",)
     FUNCTION = "generate"
-    CATEGORY = "🎨MJapiparty/Dreamina(即梦)"
+    CATEGORY = "🎨MJapiparty/ImageCreat"
 
     def generate(self, image, prompt, width, height, gpen, skin, skin_unifi, gen_mode, seed, batch_size):
         # 调用配置管理器获取配置
@@ -474,7 +395,7 @@ class SeedEdit3:
     RETURN_TYPES = ("IMAGE",)
     RETURN_NAMES = ("output",)
     FUNCTION = "generate"
-    CATEGORY = "🎨MJapiparty/seededit_v3.0"
+    CATEGORY = "🎨MJapiparty/ImageCreat"
 
     def generate(self, image, prompt, cfg_scale, seed, batch_size):
         # 调用配置管理器获取配置
@@ -720,28 +641,184 @@ class DreaminaI2VNode:
         return (VideoFromFile(video_path),)
 
 
+class QwenImageNode:
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "prompt": ("STRING", {"default": "A beautiful sunset", "multiline": True}),
+                "size": (["1328*1328", "1664*928", "1472*1140", "1140*1472", "928*1664"], {"default": "1328*1328"}),
+                "batch_size": ("INT", {"default": 1, "min": 1, "max": 2}),  # 新增参数，只能是1或2
+                "prompt_extend": ("BOOLEAN", {"default": True}),  # 是否开启prompt智能改写
+                "seed": ("INT", {"default": -1}),
+            }
+        }
+
+    RETURN_TYPES = ("IMAGE",)  # 返回一个或多个IMAGE
+    RETURN_NAMES = ("output",)  # 保持为一个返回名
+    FUNCTION = "generate"
+    CATEGORY = "🎨MJapiparty/ImageCreat"
+
+    def generate(self, prompt, size, batch_size,seed,prompt_extend):
+        # 调用配置管理器获取配置
+        oneapi_url, oneapi_token = config_manager.get_api_config()
+
+        def call_api():
+            payload = {
+                "model": "qwen-image",
+                "modelr": "qwen-image",
+                "prompt": prompt,
+                "prompt_extend": prompt_extend,
+                "size": size,
+            }
+            headers = {
+                "Content-Type": "application/json",
+                "Authorization": f"Bearer {oneapi_token}"
+            }
+            response = requests.post(oneapi_url, headers=headers, json=payload, timeout=60)
+            # 判断状态码是否为 200
+            if response.status_code != 200:
+                error_msg = ImageConverter.get_status_error_msg(response,1)
+                error_tensor = ImageConverter.create_error_image(error_msg, 512, 512)
+                return error_tensor
+
+            response.raise_for_status()
+            result = response.json()
+            # 处理URL列表获取图片数据
+            img_bytes_list = []
+            url = result.get('output').get('results', [])[0].get('url', None)
+            response = requests.get(url)
+            response.raise_for_status()
+            img_bytes_list.append(response.content)
+            
+            # 转换为Base64格式
+            img_base64_list = [base64.b64encode(img_bytes).decode('utf-8') for img_bytes in img_bytes_list]
+            img_data = img_base64_list[0]  # 取第一张图片
+            img_bytes = base64.b64decode(img_data)
+            img = Image.open(BytesIO(img_bytes)).convert("RGB")
+            return ImageConverter.pil2tensor(img)
+
+        output_tensors = []
+
+        try:
+            for i in range(batch_size):
+                img_tensor = call_api()
+                if isinstance(img_tensor, torch.Tensor):
+                    # 判断是否为错误图像 tensor
+                    if img_tensor.shape[1] == 512 and img_tensor.shape[2] == 512 and img_tensor[0, 0, 0, 0] == 1:
+                        return (img_tensor,)
+                output_tensors.append(img_tensor)
+                print(f"QwenImageNode 第 {i+1} 张图片生成成功: {prompt} ()")
+
+            return (torch.cat(output_tensors, dim=0),)  # 拼接为 (数量, H, W, 3)
+
+        except Exception as e:
+            print(f"QwenImageNode 错误: {str(e)}")
+            error_tensor = ImageConverter.create_error_image(str(e))
+            error_tensors = [error_tensor for _ in range(batch_size)]
+            return (torch.cat(error_tensors, dim=0),)
+
+
+class QwenImageEditNode:
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "prompt": ("STRING", {"default": "", "multiline": True}),
+                "image": ("IMAGE",),  # 输入图像
+                "batch_size": ("INT", {"default": 1, "min": 1, "max": 2}),  # 新增参数，只能是1或2
+                "seed": ("INT", {"default": -1}),
+            }
+        }
+
+    RETURN_TYPES = ("IMAGE",)  # 返回一个或多个IMAGE
+    RETURN_NAMES = ("output",)  # 保持为一个返回名
+    FUNCTION = "generate"
+    CATEGORY = "🎨MJapiparty/ImageCreat"
+
+    def generate(self, prompt,image, batch_size,seed):
+        # 调用配置管理器获取配置
+        oneapi_url, oneapi_token = config_manager.get_api_config()
+
+        image_base64 = ImageConverter.tensor_to_base64(image)
+
+        def call_api():
+            payload = {
+                "model": "qwen-image-edit",
+                "prompt": prompt,
+                "image": image_base64,
+            }
+            headers = {
+                "Content-Type": "application/json",
+                "Authorization": f"Bearer {oneapi_token}"
+            }
+            response = requests.post(oneapi_url, headers=headers, json=payload, timeout=60)
+            # 判断状态码是否为 200
+            if response.status_code != 200:
+                error_msg = ImageConverter.get_status_error_msg(response,1)
+                error_tensor = ImageConverter.create_error_image(error_msg, 512, 512)
+                return error_tensor
+
+            response.raise_for_status()
+            result = response.json()
+            # 处理URL列表获取图片数据
+            img_bytes_list = []
+            url = result.get('output', {}).get('choices', [{}])[0].get('message', {}).get('content', [{}])[0].get('image', None)
+            response = requests.get(url)
+            response.raise_for_status()
+            img_bytes_list.append(response.content)
+            
+            # 转换为Base64格式
+            img_base64_list = [base64.b64encode(img_bytes).decode('utf-8') for img_bytes in img_bytes_list]
+            img_data = img_base64_list[0]  # 取第一张图片
+            img_bytes = base64.b64decode(img_data)
+            img = Image.open(BytesIO(img_bytes)).convert("RGB")
+            return ImageConverter.pil2tensor(img)
+
+        output_tensors = []
+
+        try:
+            for i in range(batch_size):
+                img_tensor = call_api()
+                if isinstance(img_tensor, torch.Tensor):
+                    # 判断是否为错误图像 tensor
+                    if img_tensor.shape[1] == 512 and img_tensor.shape[2] == 512 and img_tensor[0, 0, 0, 0] == 1:
+                        return (img_tensor,)
+                output_tensors.append(img_tensor)
+                print(f"QwenImageNode 第 {i+1} 张图片生成成功: {prompt} ()")
+
+            return (torch.cat(output_tensors, dim=0),)  # 拼接为 (数量, H, W, 3)
+
+        except Exception as e:
+            print(f"QwenImageNode 错误: {str(e)}")
+            error_tensor = ImageConverter.create_error_image(str(e))
+            error_tensors = [error_tensor for _ in range(batch_size)]
+            return (torch.cat(error_tensors, dim=0),)
+
 
 
 NODE_CLASS_MAPPINGS = {
     "DreaminaI2INode": DreaminaI2INode,
     "FluxProNode": FluxProNode,
     "FluxMaxNode": FluxMaxNode,
-    "VolcPicNode": VolcPicNode,
     "ReplaceNode": ReplaceNode,
     "SeedEdit3": SeedEdit3,
     "KouTuNode": KouTuNode,
     "DreaminaT2VNode": DreaminaT2VNode,
     "DreaminaI2VNode": DreaminaI2VNode,
+    "QwenImageNode": QwenImageNode,
+    "QwenImageEditNode": QwenImageEditNode,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
-    "DreaminaI2INode": "Dreamina_I2i(即梦)",
+    "DreaminaI2INode": "Dreamina参考生图",
     "FluxProNode": "Flux-Kontext-pro",
     "FluxMaxNode": "Flux-Kontext-max",
-    "VolcPicNode": "Dreamina_T2i(即梦)",
     "ReplaceNode": "Redux迁移",
     "SeedEdit3": "seededit_v3.0",
     "KouTuNode": "自动抠图",
     "DreaminaT2VNode": "即梦文生视频",
     "DreaminaI2VNode": "即梦图生视频",
+    "QwenImageNode": "Qwen-image文生图",
+    "QwenImageEditNode": "Qwen-image-edit图片编辑",
 }
