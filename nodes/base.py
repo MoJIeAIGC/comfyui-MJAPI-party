@@ -162,17 +162,6 @@ class ImageConverter:
         buffered = BytesIO()
         rgba_image.save(buffered, format="PNG", pnginfo=meta)
 
-        # 新增：保存到D盘
-        try:
-            import os
-            save_path = "D:/merged_result.png"
-            os.makedirs(os.path.dirname(save_path), exist_ok=True)
-            with open(save_path, "wb") as f:
-                f.write(buffered.getvalue())
-        except Exception as e:
-            print(f"保存图片到D盘失败: {e}")
-
-
         return base64.b64encode(buffered.getvalue()).decode("utf-8")
 
 
