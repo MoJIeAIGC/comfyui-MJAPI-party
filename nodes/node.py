@@ -10,7 +10,7 @@ from comfy_api.input_impl.video_types import VideoFromFile
 
 from .base import ImageConverter
 from .config import ConfigManager
-
+import random
 # 初始化配置管理器
 config_manager = ConfigManager()
 
@@ -796,6 +796,80 @@ class QwenImageEditNode:
             return (torch.cat(error_tensors, dim=0),)
 
 
+class GetDressing:
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "image": ("IMAGE",),  # 输入图像
+                "prompt": ("STRING", {"default": "Extract the clothes", "multiline": True}),
+                "seed": ("INT", {"default": -1}),  # -1表示随机
+                "prompt_extend": ("BOOLEAN", {"default": True}), 
+            }
+        }
+
+    RETURN_TYPES = ("IMAGE",)
+    RETURN_NAMES = ("output",)
+    FUNCTION = "generate"
+    CATEGORY = "🎨MJapiparty/Tools_api"
+
+    def generate(self,  image, seed,  prompt, prompt_extend):
+        # 调用配置管理器获取配置
+        oneapi_url, oneapi_token = config_manager.get_api_config()
+
+        mig_base64 = ImageConverter.tensor_to_base64(image)
+
+        headers = {
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {oneapi_token}"
+        }
+
+        output_tensors = []
+        if seed == -1:
+            seed = random.randint(0, 999999)
+
+
+        payload = {
+            "model": "mojie_get_dressing",
+            "seed": seed, 
+            "image": mig_base64,
+        }
+        
+        if not prompt_extend:
+            payload["prompt"] = prompt
+        
+
+        try:
+            response = requests.post(oneapi_url, headers=headers, json=payload, timeout=300)
+            # 判断状态码是否为 200
+            if response.status_code != 200:
+                error_msg = ImageConverter.get_status_error_msg(response)
+                error_tensor = ImageConverter.create_error_image(error_msg)
+                output_tensors.append(error_tensor)
+                raise requests.exceptions.HTTPError(f"Request failed with status code {response.status_code}: {error_msg}")
+            response.raise_for_status()
+            result = response.json()
+            result_url = result.get('data')[0].get('fileUrl')
+
+            if not result_url:
+                raise ValueError("API返回空图像数据.")
+
+            responseurl = requests.get(result_url)
+            if responseurl.status_code != 200:
+                raise ValueError("从 URL 获取图片失败。")
+            
+            img_bytes = responseurl.content
+            img = Image.open(BytesIO(img_bytes)).convert("RGBA")
+            # 直接调用导入的 pil2tensor 函数
+            tensor_img = ImageConverter.pil2tensor(img)
+            output_tensors.append(tensor_img)
+
+            print(f"✅ GetDressing 调用成功")
+
+        except Exception as e:
+            print(f"❌ GetDressing 错误: {str(e)}")
+        return (torch.cat(output_tensors, dim=0),)  # 返回(batch_size, H, W, 3)
+
 
 NODE_CLASS_MAPPINGS = {
     "DreaminaI2INode": DreaminaI2INode,
@@ -808,6 +882,7 @@ NODE_CLASS_MAPPINGS = {
     "DreaminaI2VNode": DreaminaI2VNode,
     "QwenImageNode": QwenImageNode,
     "QwenImageEditNode": QwenImageEditNode,
+    "GetDressing": GetDressing,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
@@ -821,4 +896,5 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "DreaminaI2VNode": "即梦图生视频",
     "QwenImageNode": "qwen-image文生图",
     "QwenImageEditNode": "qwen-image-edit图片编辑",
+    "GetDressing": "AI服装提取",
 }
