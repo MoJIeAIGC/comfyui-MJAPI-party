@@ -1,6 +1,6 @@
 import numpy as np
 import torch
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw, ImageFont, PngImagePlugin
 import base64
 from io import BytesIO
 import requests
@@ -129,33 +129,52 @@ class ImageConverter:
 
 
     @staticmethod
-    def merge_image(image,mask):
+    def merge_image(image, mask):
         imageres = ImageConverter.tensor_to_base64(image)
         if mask is None:
             return imageres
-        # 转为 PIL 图像
-        image = ImageConverter.tensor2pil(image).convert("RGB")
-        mask = ImageConverter.tensor2pil(mask).convert("L")
-        if mask is None:
-            return ImageConverter.tensor_to_base64(image)
 
-        # 生成 Alpha 通道
+        # 转 PIL
+        image = ImageConverter.tensor2pil(image).convert("RGB")  # 保留原图
+        mask = ImageConverter.tensor2pil(mask).convert("L")
+
+        # alpha 通道 = 255 - mask（保持透明显示）
         alpha = Image.eval(mask, lambda px: 255 - px)
 
-        # 合并为 RGBA 图像
-        try:
-            rgba_image = image.convert("RGBA")
-            rgba_image.putalpha(alpha)
-        except Exception as e:
-            return imageres
-        # rgba_image.save("E:\\merged_result.png", format="PNG")
+        # 合成 RGBA（但不清理 RGB 内容！）
+        rgba_image = image.copy()
+        rgba_image.putalpha(alpha)
 
-        # 将 RGBA 图像转换为 Base64
+        # ---关键：额外保存一份原始 RGB 和 mask 到 PNG metadata---
+        meta = PngImagePlugin.PngInfo()
+
+        # 原始 RGB
+        buf_rgb = BytesIO()
+        image.save(buf_rgb, format="PNG")
+        meta.add_text("raw_rgb_base64", base64.b64encode(buf_rgb.getvalue()).decode("utf-8"))
+
+        # 原始 Mask
+        buf_mask = BytesIO()
+        mask.save(buf_mask, format="PNG")
+        meta.add_text("raw_mask_base64", base64.b64encode(buf_mask.getvalue()).decode("utf-8"))
+
+        # 保存 PNG
         buffered = BytesIO()
-        rgba_image.save(buffered, format="PNG")  # 保存为 PNG 格式到内存中
-        mig_base64 = base64.b64encode(buffered.getvalue()).decode("utf-8")  # 转换为 Base64 字符串
+        rgba_image.save(buffered, format="PNG", pnginfo=meta)
 
-        return mig_base64
+        # 新增：保存到D盘
+        try:
+            import os
+            save_path = "D:/merged_result.png"
+            os.makedirs(os.path.dirname(save_path), exist_ok=True)
+            with open(save_path, "wb") as f:
+                f.write(buffered.getvalue())
+        except Exception as e:
+            print(f"保存图片到D盘失败: {e}")
+
+
+        return base64.b64encode(buffered.getvalue()).decode("utf-8")
+
 
     @staticmethod
     def download_video(video_url: str, save_path: str = "temp_video.mp4") -> str:
