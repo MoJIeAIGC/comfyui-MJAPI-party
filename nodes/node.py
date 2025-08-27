@@ -37,7 +37,7 @@ class DreaminaI2INode:
     RETURN_TYPES = ("IMAGE",)
     RETURN_NAMES = ("output",)
     FUNCTION = "generate"
-    CATEGORY = "🎨MJapiparty/Dreamina(即梦)"
+    CATEGORY = "🎨MJapiparty/ImageCreat"
 
     def generate(self, image, prompt, width, height, gpen, skin, skin_unifi, gen_mode, seed, batch_size):
         # 调用配置管理器获取配置
@@ -395,7 +395,7 @@ class SeedEdit3:
     RETURN_TYPES = ("IMAGE",)
     RETURN_NAMES = ("output",)
     FUNCTION = "generate"
-    CATEGORY = "🎨MJapiparty/seededit_v3.0"
+    CATEGORY = "🎨MJapiparty/ImageCreat"
 
     def generate(self, image, prompt, cfg_scale, seed, batch_size):
         # 调用配置管理器获取配置
@@ -649,7 +649,7 @@ class QwenImageNode:
                 "prompt": ("STRING", {"default": "A beautiful sunset", "multiline": True}),
                 "size": (["1328*1328", "1664*928", "1472*1140", "1140*1472", "928*1664"], {"default": "1328*1328"}),
                 "batch_size": ("INT", {"default": 1, "min": 1, "max": 2}),  # 新增参数，只能是1或2
-                "prompt_extend": ("BOOLEAN", {"default": False}),  # 是否是翻译模式
+                "prompt_extend": ("BOOLEAN", {"default": True}),  # 是否开启prompt智能改写
                 "seed": ("INT", {"default": -1}),
             }
         }
@@ -657,7 +657,7 @@ class QwenImageNode:
     RETURN_TYPES = ("IMAGE",)  # 返回一个或多个IMAGE
     RETURN_NAMES = ("output",)  # 保持为一个返回名
     FUNCTION = "generate"
-    CATEGORY = "🎨MJapiparty/qwen-image"
+    CATEGORY = "🎨MJapiparty/ImageCreat"
 
     def generate(self, prompt, size, batch_size,seed,prompt_extend):
         # 调用配置管理器获取配置
@@ -734,7 +734,7 @@ class QwenImageEditNode:
     RETURN_TYPES = ("IMAGE",)  # 返回一个或多个IMAGE
     RETURN_NAMES = ("output",)  # 保持为一个返回名
     FUNCTION = "generate"
-    CATEGORY = "🎨MJapiparty/qwen-image-edit"
+    CATEGORY = "🎨MJapiparty/ImageCreat"
 
     def generate(self, prompt,image, batch_size,seed):
         # 调用配置管理器获取配置
@@ -886,7 +886,7 @@ NODE_CLASS_MAPPINGS = {
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
-    "DreaminaI2INode": "Dreamina_I2i(即梦)",
+    "DreaminaI2INode": "Dreamina参考生图",
     "FluxProNode": "Flux-Kontext-pro",
     "FluxMaxNode": "Flux-Kontext-max",
     "ReplaceNode": "Redux迁移",
@@ -894,7 +894,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "KouTuNode": "自动抠图",
     "DreaminaT2VNode": "即梦文生视频",
     "DreaminaI2VNode": "即梦图生视频",
-    "QwenImageNode": "qwen-image文生图",
-    "QwenImageEditNode": "qwen-image-edit图片编辑",
+    "QwenImageNode": "Qwen-image文生图",
+    "QwenImageEditNode": "Qwen-image-edit图片编辑",
     "GetDressing": "AI服装提取",
 }
