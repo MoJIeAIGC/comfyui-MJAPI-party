@@ -870,6 +870,151 @@ class GetDressing:
             print(f"❌ GetDressing 错误: {str(e)}")
         return (torch.cat(output_tensors, dim=0),)  # 返回(batch_size, H, W, 3)
 
+class ViduNode:
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "prompt": ("STRING", {"default": "A beautiful sunset", "multiline": True}),
+                "model": (["default", "viduq1", "vidu1.5", "vidu2.0"], {"default": "viduq1"}),
+                "aspect_ratio": ([ "16:9", "9:16", "1:1"], {"default": "16:9"}),
+                "seed": ("INT", {"default": -1}),
+                "images": ("IMAGE", {"default": []})  # 接收多个图片
+            }
+        }
+
+    RETURN_TYPES = ("VIDEO",)  # 返回VIDEO类型
+    RETURN_NAMES = ("video",)
+    FUNCTION = "generate"
+    CATEGORY = "🎨MJapiparty/Dreamina(即梦)"
+
+    def generate(self, prompt, seed,model, aspect_ratio="16:9", images=[]):
+        # 获取配置
+        oneapi_url, oneapi_token = config_manager.get_api_config()
+
+        if model == "viduq1":
+            duration = 5
+        else:
+            duration = 5
+
+        def call_api(seed_override, binary_data_base64):
+            payload = {
+                "model": "vidu_video",
+                "modelr": model,
+                "aspect_ratio": aspect_ratio,
+                "prompt": prompt,
+                "duration": duration,
+                "seed": 0,
+                "images": binary_data_base64  # 添加Base64编码的图片数据
+            }
+            headers = {
+                "Content-Type": "application/json",
+                "Authorization": f"Bearer {oneapi_token}"
+            }
+            response = requests.post(oneapi_url, headers=headers, json=payload, timeout=240)
+
+            response.raise_for_status()
+
+            result = response.json()
+            print(result)
+
+            video_url = result.get('creations', [])[0].get('url', '')
+            if not video_url:
+                raise ValueError("Empty video data from API.")
+            return video_url
+
+        # 将图像转换为Base64编码
+        binary_data_base64 = ImageConverter.convert_images_to_base64(images)
+
+        # 调用API
+        video_url = call_api(0, binary_data_base64)
+        print(video_url)
+        # 下载视频并提取帧
+        video_path = ImageConverter.download_video(video_url)
+        # 使用 VideoFromFile 封装视频
+
+        return (VideoFromFile(video_path),)
+
+
+class GeminiNode:
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "prompt": ("STRING", {"default": "A beautiful sunset", "multiline": True}),
+                "is_translation": ("BOOLEAN", {"default": False}),  # 是否是翻译模式
+                "seed": ("INT", {"default": -1}),
+            },
+            "optional": {
+                "image_input": ("IMAGE", {"default": None}),  # 可选的图像输入
+            }
+        }
+
+    RETURN_TYPES = ("IMAGE",)  # 返回一个或多个IMAGE
+    RETURN_NAMES = ("output",)  # 保持为一个返回名
+    FUNCTION = "generate"
+    CATEGORY = "🎨MJapiparty/Flux"
+
+    def generate(self, prompt, seed, image_input=None, is_translation=False,):
+        # 调用配置管理器获取配置
+        oneapi_url, oneapi_token = config_manager.get_api_config()
+
+        def call_api(seed_override):
+            payload = {
+                "model": "gemini-2.5-flash-image",
+                "prompt": prompt,
+                "is_translation": is_translation,  # 传递翻译模式参数
+                "seed": int(seed_override),
+            }
+            # 如果有图像输入，加入到payload中
+            if image_input is not None:
+                payload["input_image"] = ImageConverter.tensor_to_base64(image_input)
+
+            headers = {
+                "Content-Type": "application/json",
+                "Authorization": f"Bearer {oneapi_token}"
+            }
+            response = requests.post(oneapi_url, headers=headers, json=payload, timeout=1200)
+            # 判断状态码是否为 200
+            if response.status_code != 200:
+                error_msg = ImageConverter.get_status_error_msg(response)
+                error_tensor = ImageConverter.create_error_image(error_msg, width=512, height=512)
+                return error_tensor
+            response.raise_for_status()
+            result = response.json()
+
+            # 从返回的结果中提取图片 URL
+            image_url = result.get("res_url")
+
+            if not image_url:
+                raise ValueError("未找到图片 URL")
+            # 下载图片
+            response = requests.get(image_url)
+            response.raise_for_status()
+            # 将图片数据转换为 PIL 图像对象
+            img = Image.open(BytesIO(response.content)).convert("RGB")
+            return ImageConverter.pil2tensor(img)
+
+        output_tensors = []
+
+        try:
+            for i in range(1):
+                # 如果两次请求用同一个seed也行，可改为 seed+i 实现不同seed
+                img = call_api(seed + i)
+                # 直接调用导入的 pil2tensor 函数
+                # tensor_img = ImageConverter.pil2tensor(img)
+                output_tensors.append(img)
+                print(f"Gemini 第 {i+1} 张图片生成成功: {prompt}")
+
+            return (torch.cat(output_tensors, dim=0),)  # 拼接为 (数量, H, W, 3)
+
+        except Exception as e:
+            print(f"Gemini: {str(e)}")
+            error_tensor = ImageConverter.create_error_image("运行异常，请稍后重试")
+            # 返回指定数量错误图
+            error_tensors = [error_tensor for _ in range(1)]
+            return (torch.cat(error_tensors, dim=0),)
+
 
 NODE_CLASS_MAPPINGS = {
     "DreaminaI2INode": DreaminaI2INode,
@@ -883,6 +1028,8 @@ NODE_CLASS_MAPPINGS = {
     "QwenImageNode": QwenImageNode,
     "QwenImageEditNode": QwenImageEditNode,
     "GetDressing": GetDressing,
+    "ViduNode": ViduNode,
+    "GeminiNode": GeminiNode,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
@@ -897,4 +1044,6 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "QwenImageNode": "Qwen-image文生图",
     "QwenImageEditNode": "Qwen-image-edit图片编辑",
     "GetDressing": "AI服装提取",
+    "ViduNode": "Vidu参考生视频",
+    "GeminiNode": "gemini-2.5-flash-image",
 }
