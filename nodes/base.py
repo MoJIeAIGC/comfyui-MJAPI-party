@@ -137,7 +137,9 @@ class ImageConverter:
         # 转 PIL
         image = ImageConverter.tensor2pil(image).convert("RGB")  # 保留原图
         mask = ImageConverter.tensor2pil(mask).convert("L")
-
+        if image.size != mask.size:
+            # 调整mask尺寸以匹配图像
+            mask = mask.resize(image.size, Image.BILINEAR)
         # alpha 通道 = 255 - mask（保持透明显示）
         alpha = Image.eval(mask, lambda px: 255 - px)
 
