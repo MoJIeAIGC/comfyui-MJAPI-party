@@ -953,7 +953,7 @@ class GeminiEditNode:
     RETURN_TYPES = ("IMAGE",)  # 返回一个或多个IMAGE
     RETURN_NAMES = ("output",)  # 保持为一个返回名
     FUNCTION = "generate"
-    CATEGORY = "🎨MJapiparty/Gemini-NanoBanana图片编辑"
+    CATEGORY = "🎨MJapiparty/ImageCreat"
 
     def generate(self, prompt, seed, image_input=None, is_translation=False,):
         # 调用配置管理器获取配置
@@ -1045,5 +1045,5 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "QwenImageEditNode": "Qwen-image-edit图片编辑",
     "GetDressing": "AI服装提取",
     "ViduNode": "Vidu参考生视频",
-    "GeminiNode": "Gemini-NanoBanana图片编辑",
+    "GeminiEditNode": "Gemini-NanoBanana图片编辑",
 }
