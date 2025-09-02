@@ -541,7 +541,7 @@ class DreaminaT2VNode:
     RETURN_TYPES = ("VIDEO",)  # 返回VIDEO类型
     RETURN_NAMES = ("video",)
     FUNCTION = "generate"
-    CATEGORY = "🎨MJapiparty/Dreamina(即梦)"
+    CATEGORY = "🎨MJapiparty/VideoCreat"
 
     def generate(self, prompt, seed, aspect_ratio="default"):
         # 获取配置
@@ -596,7 +596,7 @@ class DreaminaI2VNode:
     RETURN_TYPES = ("VIDEO",)  # 返回VIDEO类型
     RETURN_NAMES = ("video",)
     FUNCTION = "generate"
-    CATEGORY = "🎨MJapiparty/Dreamina(即梦)"
+    CATEGORY = "🎨MJapiparty/VideoCreat"
 
     def generate(self, prompt, seed, aspect_ratio="default", images=[]):
         # 获取配置
@@ -884,7 +884,7 @@ class ViduNode:
     RETURN_TYPES = ("VIDEO",)  # 返回VIDEO类型
     RETURN_NAMES = ("video",)
     FUNCTION = "generate"
-    CATEGORY = "🎨MJapiparty/Dreamina(即梦)"
+    CATEGORY = "🎨MJapiparty/VideoCreat"
 
     def generate(self, prompt, seed,model, aspect_ratio="16:9", images=[]):
         # 获取配置
@@ -934,7 +934,7 @@ class ViduNode:
         return (VideoFromFile(video_path),)
 
 
-class GeminiNode:
+class GeminiEditNode:
     @classmethod
     def INPUT_TYPES(cls):
         return {
@@ -951,7 +951,7 @@ class GeminiNode:
     RETURN_TYPES = ("IMAGE",)  # 返回一个或多个IMAGE
     RETURN_NAMES = ("output",)  # 保持为一个返回名
     FUNCTION = "generate"
-    CATEGORY = "🎨MJapiparty/Flux"
+    CATEGORY = "🎨MJapiparty/ImageCreat"
 
     def generate(self, prompt, seed, image_input=None, is_translation=False,):
         # 调用配置管理器获取配置
@@ -1027,7 +1027,7 @@ NODE_CLASS_MAPPINGS = {
     "QwenImageEditNode": QwenImageEditNode,
     "GetDressing": GetDressing,
     "ViduNode": ViduNode,
-    "GeminiNode": GeminiNode,
+    "GeminiEditNode": GeminiEditNode,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
@@ -1037,11 +1037,11 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "ReplaceNode": "Redux迁移",
     "SeedEdit3": "seededit_v3.0",
     "KouTuNode": "自动抠图",
-    "DreaminaT2VNode": "即梦文生视频",
-    "DreaminaI2VNode": "即梦图生视频",
+    "DreaminaT2VNode": "Seedance文生视频",
+    "DreaminaI2VNode": "Seedance图生视频",
     "QwenImageNode": "Qwen-image文生图",
     "QwenImageEditNode": "Qwen-image-edit图片编辑",
     "GetDressing": "AI服装提取",
     "ViduNode": "Vidu参考生视频",
-    "GeminiNode": "gemini-2.5-flash-image",
+    "GeminiEditNode": "Gemini-NanoBanana图片编辑",
 }
