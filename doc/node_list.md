@@ -1,5 +1,6 @@
 #### 所有API节点列表
 所有的节点示例工作流都可以在workflow目录下找到
+- [Gemini-NanoBanana](#gemini-nanobanana使用说明)
 - [Qwen-image](#qwen-image-使用说明)
 - [Qwen-edit-image](#qwen-edit-image-使用说明)
 - [seededit3.0](#seededit30)
@@ -10,6 +11,10 @@
 - [即梦视频生成](#即梦视频生成)(即将下线换成Seedance)
 ***
 
+#### Gemini-NanoBanana使用说明
+Gemini 2.5 Flash Image Preview又名NanoBanana是一款强大的图片编辑模型。
+支持中文输入，不支持中文输出，同时也自带了翻译开关is_translation默认关闭
+![alt text](assets/NanoBanana.png)
 
 #### Qwen-image 使用说明
 Qwen-image是阿里开源的AI绘画工具，对中文的支持非常友好，能够准确的画出细节的小字和排版，支持中文输入，中文输出。

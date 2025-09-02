@@ -32,6 +32,7 @@
 [传送门](https://space.bilibili.com/483532108)
 
 ### 目前已支持的节点
+- [Gemini-NanoBanana](/doc/node_list.md#gemini-nanobanana使用说明)
 - [Qwen-image](/doc/node_list.md#qwen-image-使用说明)
 - [Qwen-edit-image](/doc/node_list.md#qwen-edit-image-使用说明)
 - [seededit3.0](/doc/node_list.md#seededit30)
@@ -50,6 +51,12 @@
 
 在comfyui节点列表中找到mjapiparty
 ![alt text](doc/assets/node.png)
+
+- 250902-新增节点
+#### Gemini-NanoBanana使用说明
+Gemini 2.5 Flash Image Preview又名NanoBanana是一款强大的图片编辑模型。
+支持中文输入，不支持中文输出，同时也自带了翻译开关is_translation默认关闭
+![alt text](assets/NanoBanana.png)
 
 - 250820-新增节点
 #### Qwen-image 

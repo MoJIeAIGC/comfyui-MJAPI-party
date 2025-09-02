@@ -942,7 +942,7 @@ class GeminiEditNode:
         return {
             "required": {
                 "prompt": ("STRING", {"default": "A beautiful sunset", "multiline": True}),
-                "is_translation": ("BOOLEAN", {"default": True}),  # 是否是翻译模式
+                "is_translation": ("BOOLEAN", {"default": False}),  # 是否是翻译模式
                 "seed": ("INT", {"default": -1}),
             },
             "optional": {
