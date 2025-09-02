@@ -56,7 +56,7 @@
 #### Gemini-NanoBanana使用说明
 Gemini 2.5 Flash Image Preview又名NanoBanana是一款强大的图片编辑模型。
 支持中文输入，不支持中文输出，同时也自带了翻译开关is_translation默认关闭
-![alt text](assets/NanoBanana.png)
+![alt text](doc/assets/NanoBanana.png)
 
 - 250820-新增节点
 #### Qwen-image 
