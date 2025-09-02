@@ -802,9 +802,8 @@ class GetDressing:
         return {
             "required": {
                 "image": ("IMAGE",),  # 输入图像
-                "prompt": ("STRING", {"default": "Extract the clothes", "multiline": True}),
+                "extend_prompt": ([ "全身", "上装", "下装","外套"], {"default": "全身"}),
                 "seed": ("INT", {"default": -1}),  # -1表示随机
-                "prompt_extend": ("BOOLEAN", {"default": True}), 
             }
         }
 
@@ -813,7 +812,7 @@ class GetDressing:
     FUNCTION = "generate"
     CATEGORY = "🎨MJapiparty/Tools_api"
 
-    def generate(self,  image, seed,  prompt, prompt_extend):
+    def generate(self,  image, seed,  extend_prompt):
         # 调用配置管理器获取配置
         oneapi_url, oneapi_token = config_manager.get_api_config()
 
@@ -828,16 +827,15 @@ class GetDressing:
         if seed == -1:
             seed = random.randint(0, 999999)
 
+        if extend_prompt == "全身":
+            extend_prompt = "人物"
 
         payload = {
             "model": "mojie_get_dressing",
             "seed": seed, 
             "image": mig_base64,
+            "extend_prompt": extend_prompt
         }
-        
-        if not prompt_extend:
-            payload["prompt"] = prompt
-        
 
         try:
             response = requests.post(oneapi_url, headers=headers, json=payload, timeout=300)

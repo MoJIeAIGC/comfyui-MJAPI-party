@@ -45,14 +45,14 @@ class ImageConverter:
         """
         status_code = response.status_code
         error_msg_map = {
-            400: "请求参数错误，请检查输入",
-            401: "未授权，请检查 API Token",
-            403: "权限不足，请检查余额或令牌权限",
-            404: "请求资源不存在",
-            500: "服务器繁忙，请稍后再试",
-            502: "网关错误",
-            503: "服务不可用",
-            504: "网关超时"
+            400: "请求参数错误，请检查输入 (Bad request, check input)",
+            401: "未授权，请检查 API Token (Unauthorized, check API Token)",
+            403: "权限不足，请检查余额或令牌权限 (Forbidden, check balance or permissions)",
+            404: "请求资源不存在 (Resource not found)",
+            500: "服务器繁忙，请稍后再试 (Server busy, try later)",
+            502: "网关错误 (Bad gateway)",
+            503: "服务不可用 (Service unavailable)",
+            504: "网关超时 (Gateway timeout)"
         }
         error_msg = error_msg_map.get(status_code, f"请求失败，状态码: {status_code}")
         # return error_msg_map.get(status_code, f"请求失败，状态码: {status_code}")
