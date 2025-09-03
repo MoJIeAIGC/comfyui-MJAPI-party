@@ -24,7 +24,17 @@ async def set_key(request):
 @routes.get('/my_node/get_key')
 async def get_key(request):
     oneapi_url, oneapi_token = config_manager.get_api_config()
-    return web.json_response({"msg": oneapi_token})
+    # 读取pyproject.toml中的version
+    import toml
+    pyproject_path = os.path.join(os.path.dirname(__file__), "pyproject.toml")
+    with open(pyproject_path, "r", encoding="utf-8") as f:
+        pyproject_data = toml.load(f)
+    version = pyproject_data["project"]["version"]
+    
+    return web.json_response({
+        "msg": oneapi_token,
+        "version": version
+    })
 
 @routes.post('/my_node/update')
 async def update(request):

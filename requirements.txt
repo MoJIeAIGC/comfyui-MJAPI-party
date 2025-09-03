@@ -3,3 +3,4 @@ torch
 requests>=2.32.3
 pillow>=10.4.0
 aiohttp>=3.11.13
+toml
