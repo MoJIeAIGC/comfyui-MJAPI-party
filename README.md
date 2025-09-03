@@ -59,6 +59,7 @@ Gemini 2.5 Flash Image Preview又名NanoBanana是一款强大的图片编辑模�
 ![alt text](doc/assets/NanoBanana.png)
 ![alt text](doc/assets/NanoBanana2.png)
 
+
 - 250820-新增节点
 #### Qwen-image 
 Qwen-image是阿里开源的AI绘画工具，对中文的支持非常友好，能够准确的画出细节的小字和排版，支持中文输入，中文输出。
