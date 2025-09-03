@@ -12,9 +12,10 @@
 ***
 
 #### Gemini-NanoBanana使用说明
-Gemini 2.5 Flash Image Preview又名NanoBanana是一款强大的图片编辑模型。
-支持中文输入，不支持中文输出，同时也自带了翻译开关is_translation默认关闭
+NanoBanana又名Gemini 2.5 Flash Image Preview,是google旗下的图片编辑工具。提示词遵循强度很高。基本不需要特别的提示词格式，支持中英文输入，但是不支持中文输出，可输出英文字体。
+is_translation是翻译开关，如果中文输入效果不理想，可以把翻译开关打开，翻译过后再试。
 ![alt text](assets/NanoBanana.png)
+![alt text](assets/NanoBanana2.png)
 
 #### Qwen-image 使用说明
 Qwen-image是阿里开源的AI绘画工具，对中文的支持非常友好，能够准确的画出细节的小字和排版，支持中文输入，中文输出。
