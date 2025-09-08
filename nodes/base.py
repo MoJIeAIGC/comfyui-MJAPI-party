@@ -77,6 +77,12 @@ class ImageConverter:
             except:
                 pass
         
+        error_data = response.json()
+        print("Error data:", error_data)  # 调试输出
+        print("Error type:", type(error_data.get("error")))  # 调试输出
+        if error_data.get("error") and type(error_data.get("error")) is not dict:
+            error_msg = error_data.get("error")
+        
         return error_msg
 
     @staticmethod
@@ -109,16 +115,30 @@ class ImageConverter:
                         # 若都失败，使用默认字体
                         font = ImageFont.load_default()
 
+            # 根据图片宽度和字体大小计算每行最大字符数
+            max_chars_per_line = width // (font_size // 2)  # 根据字体大小动态计算
+            max_chars_per_line = max(20, min(max_chars_per_line, 50))  # 限制在20-50字符之间
+            
             # 将错误信息分行，避免单行过长
-            max_chars_per_line = 30
             lines = []
-            for i in range(0, len(text), max_chars_per_line):
-                lines.append(text[i:i+max_chars_per_line])
+            words = text.split()
+            current_line = ""
+            
+            for word in words:
+                if len(current_line + word) <= max_chars_per_line:
+                    current_line += word + " "
+                else:
+                    lines.append(current_line.strip())
+                    current_line = word + " "
+            if current_line:
+                lines.append(current_line.strip())
 
             # 在图像上逐行绘制错误信息
             y_text = 10
             line_height = font_size + 4
-            for line in lines:
+            max_lines = (height - 20) // line_height  # 计算图片能容纳的最大行数
+            
+            for line in lines[:max_lines]:  # 只显示能容纳的行数
                 draw.text((10, y_text), line, font=font, fill=(255, 255, 255))
                 y_text += line_height
 
