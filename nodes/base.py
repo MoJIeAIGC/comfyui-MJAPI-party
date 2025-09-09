@@ -23,6 +23,56 @@ class ImageConverter:
             return None
 
     @staticmethod
+    def prepare_and_stitch_images(model_image, cloth_image):
+        """
+        准备并拼接模特图和服装图
+        1. 模特图(右图)单边超过1280则等比缩小至1280
+        2. 服装图(左图)保持原尺寸
+        3. 合并左右图，保持等高，短边图等比拉伸
+        """
+        # 转换模特图为PIL
+        model_pil = ImageConverter.tensor2pil(model_image)
+        # 转换服装图为PIL
+        cloth_pil = ImageConverter.tensor2pil(cloth_image)
+        
+        # 1. 处理模特图 - 如果单边超过1280则等比缩小
+        max_size = 1280
+        if max(model_pil.size) > max_size:
+            ratio = max_size / max(model_pil.size)
+            new_width = int(model_pil.width * ratio)
+            new_height = int(model_pil.height * ratio)
+            model_pil = model_pil.resize((new_width, new_height), Image.LANCZOS)
+        
+        # 2. 处理服装图 - 保持原尺寸
+        
+        # 3. 合并图片 - 保持等高
+        # 确定目标高度(取两者中较大的高度)
+        target_height = max(model_pil.height, cloth_pil.height)
+        
+        # 调整模特图高度
+        if model_pil.height != target_height:
+            ratio = target_height / model_pil.height
+            new_width = int(model_pil.width * ratio)
+            model_pil = model_pil.resize((new_width, target_height), Image.LANCZOS)
+        
+        # 调整服装图高度
+        if cloth_pil.height != target_height:
+            ratio = target_height / cloth_pil.height
+            new_width = int(cloth_pil.width * ratio)
+            cloth_pil = cloth_pil.resize((new_width, target_height), Image.LANCZOS)
+        
+        # 创建新图片(宽度为两者之和)
+        new_img = Image.new('RGB', (cloth_pil.width + model_pil.width, target_height))
+        new_img.paste(cloth_pil, (0, 0))  # 左图
+        new_img.paste(model_pil, (cloth_pil.width, 0))  # 右图
+        
+        # 转换为base64
+        buffered = BytesIO()
+        new_img.save(buffered, format="JPEG")
+        return base64.b64encode(buffered.getvalue()).decode("utf-8")
+
+
+    @staticmethod
     def tensor_to_base64(image_tensor):
         """
         将图像张量转换为 base64 编码的字符串
