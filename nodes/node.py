@@ -1122,7 +1122,6 @@ class DoubaoSeedreamNode:
                 "model": "doubao-seedream-4.0",
                 "prompt": prompt,
                 "size": size, 
-                "response_format": "url",
                 "seed": int(seed_override),
             }
             # 如果有图像输入，加入到payload中
