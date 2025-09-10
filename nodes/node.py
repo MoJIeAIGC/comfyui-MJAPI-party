@@ -1094,6 +1094,87 @@ class GeminiEditNode:
             return (torch.cat(error_tensors, dim=0),)
 
 
+class DoubaoSeedreamNode:
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "prompt": ("STRING", {"default": "A beautiful sunset", "multiline": True}),
+                "seed": ("INT", {"default": -1}),
+                "size": (["2048x2048", "2304x1728", "1728x2304", "2560x1440", "1440x2560", "2496x1664", "1664x2496", "3024x1296"], {"default": "2048x2048"}),
+            },
+            "optional": {
+                "image_input": ("IMAGE", {"default": None}),  # 可选的图像输入
+            }
+        }
+
+    RETURN_TYPES = ("IMAGE",)  # 返回一个或多个IMAGE
+    RETURN_NAMES = ("output",)  # 保持为一个返回名
+    FUNCTION = "generate"
+    CATEGORY = "🎨MJapiparty/ImageCreat"
+
+    def generate(self, prompt, seed, image_input=None, size=False,):
+        # 调用配置管理器获取配置
+        oneapi_url, oneapi_token = config_manager.get_api_config()
+
+        def call_api(seed_override):
+            payload = {
+                "model": "doubao-seedream-4.0",
+                "prompt": prompt,
+                "size": size, 
+                "response_format": "url",
+                "seed": int(seed_override),
+            }
+            # 如果有图像输入，加入到payload中
+            if image_input is not None:
+                payload["input_image"] = ImageConverter.tensor_to_base64(image_input)
+
+            headers = {
+                "Content-Type": "application/json",
+                "Authorization": f"Bearer {oneapi_token}"
+            }
+            response = requests.post(oneapi_url, headers=headers, json=payload, timeout=1200)
+            # 判断状态码是否为 200
+            if response.status_code != 200:
+                error_msg = ImageConverter.get_status_error_msg(response)
+                error_tensor = ImageConverter.create_error_image(error_msg, width=512, height=512)
+                return error_tensor
+            response.raise_for_status()
+            result = response.json()
+
+            # 从返回的结果中提取图片 URL
+            image_url = result.get("res_url")
+
+            if not image_url:
+                raise ValueError("未找到图片 URL")
+            # 下载图片
+            response = requests.get(image_url)
+            response.raise_for_status()
+            # 将图片数据转换为 PIL 图像对象
+            img = Image.open(BytesIO(response.content)).convert("RGB")
+            return ImageConverter.pil2tensor(img)
+
+        output_tensors = []
+
+        try:
+            for i in range(1):
+                # 如果两次请求用同一个seed也行，可改为 seed+i 实现不同seed
+                img = call_api(seed + i)
+                # 直接调用导入的 pil2tensor 函数
+                # tensor_img = ImageConverter.pil2tensor(img)
+                output_tensors.append(img)
+                print(f"Gemini 第 {i+1} 张图片生成成功: {prompt}")
+
+            return (torch.cat(output_tensors, dim=0),)  # 拼接为 (数量, H, W, 3)
+
+        except Exception as e:
+            print(f"Gemini: {str(e)}")
+            error_tensor = ImageConverter.create_error_image("运行异常，请稍后重试")
+            # 返回指定数量错误图
+            error_tensors = [error_tensor for _ in range(1)]
+            return (torch.cat(error_tensors, dim=0),)
+
+
 NODE_CLASS_MAPPINGS = {
     "DreaminaI2INode": DreaminaI2INode,
     "FluxProNode": FluxProNode,
@@ -1109,6 +1190,7 @@ NODE_CLASS_MAPPINGS = {
     "ViduNode": ViduNode,
     "GeminiEditNode": GeminiEditNode,
     "ReplaceClothesNode": ReplaceClothesNode,
+    "DoubaoSeedreamNode": DoubaoSeedreamNode,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
@@ -1126,4 +1208,5 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "ViduNode": "Vidu参考生视频",
     "GeminiEditNode": "Gemini-NanoBanana图片编辑",
     "ReplaceClothesNode": "AI同款服装替换",
+    "DoubaoSeedreamNode": "doubao-seedream-4.0",
 }
