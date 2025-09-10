@@ -72,6 +72,69 @@ class ImageConverter:
         return base64.b64encode(buffered.getvalue()).decode("utf-8")
 
 
+
+    @staticmethod
+    def process_images(face_image, cloths_image):
+        """
+        处理服装图片和脸部图片，根据脸部图片是否存在执行不同的处理逻辑，最后返回 base64 数据。
+        :param face_image: 脸部图片
+        :param cloths_image: 服装图片
+        :return: 处理后图片的 base64 数据
+        """
+        if face_image is None:
+            # 将服装图片转换为 PIL 图像
+            cloth_pil = ImageConverter.tensor2pil(cloths_image)
+            # 如果单边超过1536则等比缩小至1536
+            if max(cloth_pil.size) > 1536:
+                ratio = 1536 / max(cloth_pil.size)
+                new_width = int(cloth_pil.width * ratio)
+                new_height = int(cloth_pil.height * ratio)
+                cloth_pil = cloth_pil.resize((new_width, new_height), Image.LANCZOS)
+
+            # 如果是1:1正方形或横向长方形，则上下填充黑色，使高度达到1536
+            if cloth_pil.width >= cloth_pil.height:
+                if cloth_pil.height < 1536:
+                    new_img = Image.new('RGB', (cloth_pil.width, 1536), (0, 0, 0))
+                    paste_y = (1536 - cloth_pil.height) // 2
+                    new_img.paste(cloth_pil, (0, paste_y))
+                    cloth_pil = new_img
+
+            # 转换为 base64
+            buffered = BytesIO()
+            cloth_pil.save(buffered, format="JPEG")
+            return base64.b64encode(buffered.getvalue()).decode("utf-8")
+        else:
+            # 将人脸和服装图片转换为 PIL 图像
+            face_pil = ImageConverter.tensor2pil(face_image)
+            cloth_pil = ImageConverter.tensor2pil(cloths_image)
+
+            # 上下合并图片
+            new_width = max(face_pil.width, cloth_pil.width)
+            new_height = face_pil.height + cloth_pil.height
+            new_img = Image.new('RGB', (new_width, new_height), (0, 0, 0))
+            new_img.paste(face_pil, ((new_width - face_pil.width) // 2, 0))
+            new_img.paste(cloth_pil, ((new_width - cloth_pil.width) // 2, face_pil.height))
+
+            # 再次缩小图片尺寸最大不超过1536，长宽比不超过4:1
+            if max(new_img.size) > 1536:
+                ratio = 1536 / max(new_img.size)
+                new_width = int(new_img.width * ratio)
+                new_height = int(new_img.height * ratio)
+                new_img = new_img.resize((new_width, new_height), Image.LANCZOS)
+
+            width, height = new_img.size
+            if width / height > 4:
+                new_width = int(height * 4)
+                new_img = new_img.resize((new_width, height), Image.LANCZOS)
+            elif height / width > 4:
+                new_height = int(width * 4)
+                new_img = new_img.resize((width, new_height), Image.LANCZOS)
+
+            # 转换为 base64
+            buffered = BytesIO()
+            new_img.save(buffered, format="JPEG")
+            return base64.b64encode(buffered.getvalue()).decode("utf-8")
+
     @staticmethod
     def tensor_to_base64(image_tensor):
         """
