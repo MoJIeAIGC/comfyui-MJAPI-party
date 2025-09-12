@@ -802,7 +802,7 @@ class GetDressing:
         return {
             "required": {
                 "image": ("IMAGE",),  # 输入图像
-                "extend_prompt": ([ "全身", "上装", "下装","外套"], {"default": "全身"}),
+                "extend_prompt": ([ "全身", "上身", "下身","外套"], {"default": "全身"}),
                 "seed": ("INT", {"default": -1}),  # -1表示随机
             }
         }
@@ -827,13 +827,11 @@ class GetDressing:
         if seed == -1:
             seed = random.randint(0, 999999)
 
-        if extend_prompt == "全身":
-            extend_prompt = "人物"
-
         payload = {
             "model": "mojie_get_dressing",
             "seed": seed, 
-            "image": mig_base64,
+            "input_image": [mig_base64],
+            "watermark": False,
             "extend_prompt": extend_prompt
         }
 
@@ -847,7 +845,7 @@ class GetDressing:
                 raise requests.exceptions.HTTPError(f"Request failed with status code {response.status_code}: {error_msg}")
             response.raise_for_status()
             result = response.json()
-            result_url = result.get('data')[0].get('fileUrl')
+            result_url = result.get("res_url")
 
             if not result_url:
                 raise ValueError("API返回空图像数据.")
@@ -956,26 +954,20 @@ class ReplaceClothesNode:
         # 调用配置管理器获取配置
         oneapi_url, oneapi_token = config_manager.get_api_config()
 
-        # pro_base64 = ImageConverter.tensor_to_base64(model_image)
-        # mig_base64 = ImageConverter.tensor_to_base64(cloths_image)
-
         merged_base64 = ImageConverter.prepare_and_stitch_images(model_image, cloths_image)
 
-        pro_prompt = "Have the model in second picture wear the clothing from first picture,Keep the model's posture, facial expression, background, and overall sense of realism unchanged. Only change the clothing.Ensure the new clothing looks natural, well-fitted, and consistent with the lighting and shadows. "
-        if not Custom_prompt and prompt != "":
-            pro_prompt = prompt
         headers = {
             "Content-Type": "application/json",
             "Authorization": f"Bearer {oneapi_token}"
         }
 
         output_tensors = []
-        prompt = "This is a collage picture，in the left Objects replaces the Objects in the right picture." + prompt
 
         payload = {
             "model": "dressV2ing_diffusion",
-            "prompt": pro_prompt,
+            "prompt": prompt,
             "is_translation": True,
+            "Custom_prompt": Custom_prompt,
             "seed": seed, 
             "input_image": merged_base64,
         }
@@ -1001,6 +993,8 @@ class ReplaceClothesNode:
             
             img_bytes = responseurl.content
             img = Image.open(BytesIO(img_bytes)).convert("RGB")
+
+            img = ImageConverter.get_right_part_of_image(img)
             # 直接调用导入的 pil2tensor 函数
             tensor_img = ImageConverter.pil2tensor(img)
             output_tensors.append(tensor_img)
@@ -1101,6 +1095,8 @@ class DoubaoSeedreamNode:
             "required": {
                 "prompt": ("STRING", {"default": "A beautiful sunset", "multiline": True}),
                 "seed": ("INT", {"default": -1}),
+                "custom_size": ("BOOLEAN", {"default": True}),  # 是否是翻译模式
+                "size": (["2048x2048", "2304x1728", "1728x2304", "2560x1440", "1440x2560", "2496x1664", "1664x2496", "3024x1296"], {"default": "2048x2048"}),
                 "width": ("INT", {"default": 1024, "min": 1024, "max": 4096}),  # 生成张数
                 "height": ("INT", {"default": 1024, "min": 1024, "max": 4096}),  # 生成张数
             },
@@ -1114,17 +1110,20 @@ class DoubaoSeedreamNode:
     FUNCTION = "generate"
     CATEGORY = "🎨MJapiparty/ImageCreat"
 
-    def generate(self, prompt, seed, image_input=None,width=1024,height=1024,):
+    def generate(self, prompt, seed, image_input=None,width=1024,height=1024,custom_size=True,size="1024x1024"):
         # 调用配置管理器获取配置
         oneapi_url, oneapi_token = config_manager.get_api_config()
 
-        size = f"{width}x{height}"
+        if custom_size:
+            resl_size = size
+        else:
+            resl_size = f"{width}x{height}"
 
         def call_api(seed_override):
             payload = {
                 "model": "doubao-seedream-4.0",
                 "prompt": prompt,
-                "size": size, 
+                "size": resl_size, 
                 "seed": int(seed_override),
                 "watermark": False
             }
@@ -1205,17 +1204,15 @@ class ModelGenNode:
 
         image_base64 = ImageConverter.process_images(face_image, cloths_image)
 
-        base_prompt = ",wearing this clothing,selfie in front of the mirror indoors,instagram style,with a black beret on her head, The background is a simple indoor environment, and the style is personalized sweet and cool style,All it takes is one whole picture"
-        if face_image is not None:
-            prompt = "this " + race_class +" "+ gender_class +" "+ base_prompt
-        else:
-            prompt = "a " + race_class +" "+ gender_class +" "+ base_prompt
+        is_face = True if face_image is not None else False
 
         def call_api(seed_override):
             payload = {
                 "model": "mojie-output-moter",
-                "prompt": prompt,
+                "gender_class": gender_class,
+                "race_class": race_class,
                 "seed": int(seed_override),
+                "is_face": is_face,
                 "input_image": image_base64
             }
 
@@ -1253,12 +1250,90 @@ class ModelGenNode:
                 # 直接调用导入的 pil2tensor 函数
                 # tensor_img = ImageConverter.pil2tensor(img)
                 output_tensors.append(img)
-                print(f"Gemini 第 {i+1} 张图片生成成功: {prompt}")
+                print(f"Gemini 第 {i+1} 张图片生成成功")
 
             return (torch.cat(output_tensors, dim=0),)  # 拼接为 (数量, H, W, 3)
 
         except Exception as e:
             print(f"Gemini: {str(e)}")
+            error_tensor = ImageConverter.create_error_image("运行异常，请稍后重试")
+            # 返回指定数量错误图
+            error_tensors = [error_tensor for _ in range(1)]
+            return (torch.cat(error_tensors, dim=0),)
+
+
+class MoterPoseNode:
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "image_input": ("IMAGE", {"default": None}),  # 可选的图像输入
+                "prompt": ("STRING", {"default": "", "multiline": True}),
+                "extent_prompt": ("BOOLEAN", {"default": True}),  # 是否是翻译模式
+                "out_batch": ("INT", {"default": 1, "min": 1, "max": 2}),  # 生成张数
+                "seed": ("INT", {"default": -1}),
+            }
+        }
+
+    RETURN_TYPES = ("IMAGE",)  # 返回一个或多个IMAGE
+    RETURN_NAMES = ("output",)  # 保持为一个返回名
+    FUNCTION = "generate"
+    CATEGORY = "🎨MJapiparty/ImageCreat"
+
+    def generate(self, prompt, seed, image_input=None, extent_prompt=False,out_batch=1):
+        # 调用配置管理器获取配置
+        oneapi_url, oneapi_token = config_manager.get_api_config()
+
+        def call_api(seed_override):
+            payload = {
+                "model": "moter-pose-change",
+                "prompt": prompt,
+                "extent_prompt": extent_prompt,  # 传递翻译模式参数
+                "seed": int(seed_override),
+                "watermark": False,
+                "input_image": ImageConverter.tensor_to_base64(image_input)
+            }
+
+            headers = {
+                "Content-Type": "application/json",
+                "Authorization": f"Bearer {oneapi_token}"
+            }
+            response = requests.post(oneapi_url, headers=headers, json=payload, timeout=1200)
+            # 判断状态码是否为 200
+            if response.status_code != 200:
+                error_msg = ImageConverter.get_status_error_msg(response)
+                error_tensor = ImageConverter.create_error_image(error_msg, width=512, height=512)
+                return error_tensor
+            response.raise_for_status()
+            result = response.json()
+
+            # 从返回的结果中提取图片 URL
+            image_url = result.get("res_url")
+
+            if not image_url:
+                raise ValueError("未找到图片 URL")
+            # 下载图片
+            response = requests.get(image_url)
+            response.raise_for_status()
+            # 将图片数据转换为 PIL 图像对象
+            img = Image.open(BytesIO(response.content)).convert("RGB")
+            return ImageConverter.pil2tensor(img)
+
+        output_tensors = []
+
+        try:
+            for i in range(out_batch):
+                # 如果两次请求用同一个seed也行，可改为 seed+i 实现不同seed
+                img = call_api(seed + i)
+                # 直接调用导入的 pil2tensor 函数
+                # tensor_img = ImageConverter.pil2tensor(img)
+                output_tensors.append(img)
+                print(f" 第 {i+1} 张图片生成成功: {prompt}")
+
+            return (torch.cat(output_tensors, dim=0),)  # 拼接为 (数量, H, W, 3)
+
+        except Exception as e:
+            print(f": {str(e)}")
             error_tensor = ImageConverter.create_error_image("运行异常，请稍后重试")
             # 返回指定数量错误图
             error_tensors = [error_tensor for _ in range(1)]
@@ -1283,6 +1358,7 @@ NODE_CLASS_MAPPINGS = {
     "ReplaceClothesNode": ReplaceClothesNode,
     "DoubaoSeedreamNode": DoubaoSeedreamNode,
     "ModelGenNode": ModelGenNode,
+    "MoterPoseNode": MoterPoseNode,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
@@ -1302,4 +1378,5 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "ReplaceClothesNode": "AI同款服装替换",
     "DoubaoSeedreamNode": "doubao-seedream-4.0",
     "ModelGenNode": "服装模特生成",
+    "MoterPoseNode": "模特姿势更改",
 }

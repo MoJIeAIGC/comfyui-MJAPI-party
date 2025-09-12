@@ -333,3 +333,28 @@ class ImageConverter:
             img_base64 = ImageConverter.tensor_to_base64(img)
             base64_images.append(img_base64)
         return base64_images
+
+    @staticmethod
+    def get_right_part_of_image(img):
+        """
+        从输入图片中找到分割线并仅保留右边部分
+        
+        :param img: PIL 图像对象
+        :return: 仅包含右边部分的 PIL 图像对象
+        """
+        # 简单的边缘检测找分割线，计算每列的像素差异
+        width, height = img.size
+        diff_values = []
+        for x in range(1, width):
+            diff = 0
+            for y in range(height):
+                left_pixel = img.getpixel((x - 1, y))
+                right_pixel = img.getpixel((x, y))
+                diff += sum(abs(a - b) for a, b in zip(left_pixel, right_pixel))
+            diff_values.append(diff)
+
+        # 找到差异最大的位置作为分割线
+        split_x = diff_values.index(max(diff_values)) + 1
+
+        # 只保留右边部分图片
+        return img.crop((split_x, 0, width, height))
