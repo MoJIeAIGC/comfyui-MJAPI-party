@@ -803,6 +803,8 @@ class GetDressing:
             "required": {
                 "image": ("IMAGE",),  # 输入图像
                 "extend_prompt": ([ "全身", "上身", "下身","外套"], {"default": "全身"}),
+                "width": ("INT", {"default": 1024, "min": 1024, "max": 4096}),  # 生成张数
+                "height": ("INT", {"default": 1024, "min": 1024, "max": 4096}),  # 生成张数
                 "seed": ("INT", {"default": -1}),  # -1表示随机
             }
         }
@@ -812,7 +814,7 @@ class GetDressing:
     FUNCTION = "generate"
     CATEGORY = "🎨MJapiparty/Tools_api"
 
-    def generate(self,  image, seed,  extend_prompt):
+    def generate(self,  image, seed,  extend_prompt,width=1024,height=1024):
         # 调用配置管理器获取配置
         oneapi_url, oneapi_token = config_manager.get_api_config()
 
@@ -830,6 +832,7 @@ class GetDressing:
         payload = {
             "model": "mojie_get_dressing",
             "seed": seed, 
+            "size": f"{width}x{height}",
             "input_image": [mig_base64],
             "watermark": False,
             "extend_prompt": extend_prompt
