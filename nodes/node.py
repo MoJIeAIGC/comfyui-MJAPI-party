@@ -939,8 +939,6 @@ class ReplaceClothesNode:
             "required": {
                 "cloths_image": ("IMAGE",),  # 输入图像
                 "model_image": ("IMAGE",),  # 输入图像
-                "prompt": ("STRING", {"default": "", "multiline": True}),
-                "Custom_prompt": ("BOOLEAN", {"default": False}),
                 "seed": ("INT", {"default": -1}),  # -1表示随机
             }
         }
@@ -950,7 +948,7 @@ class ReplaceClothesNode:
     FUNCTION = "generate"
     CATEGORY = "🎨MJapiparty/Tools_api"
 
-    def generate(self, cloths_image, prompt, model_image, seed, Custom_prompt):
+    def generate(self, cloths_image, model_image, seed):
         # 调用配置管理器获取配置
         oneapi_url, oneapi_token = config_manager.get_api_config()
 
@@ -965,13 +963,10 @@ class ReplaceClothesNode:
 
         payload = {
             "model": "dressV2ing_diffusion",
-            "is_translation": True,
-            "Custom_prompt": Custom_prompt,
+            "Custom_prompt": False,
             "seed": seed, 
             "input_image": merged_base64,
         }
-        if prompt:
-            payload["prompt"] = prompt
 
         try:
             response = requests.post(oneapi_url, headers=headers, json=payload, timeout=300)
@@ -1271,7 +1266,6 @@ class MoterPoseNode:
         return {
             "required": {
                 "image_input": ("IMAGE", {"default": None}),  # 可选的图像输入
-                "prompt": ("STRING", {"default": "", "multiline": True}),
                 "extent_prompt": ("BOOLEAN", {"default": True}),  # 是否是翻译模式
                 "out_batch": ("INT", {"default": 1, "min": 1, "max": 2}),  # 生成张数
                 "seed": ("INT", {"default": -1}),
@@ -1283,7 +1277,7 @@ class MoterPoseNode:
     FUNCTION = "generate"
     CATEGORY = "🎨MJapiparty/ImageCreat"
 
-    def generate(self, prompt, seed, image_input=None, extent_prompt=False,out_batch=1):
+    def generate(self,  seed, image_input=None, extent_prompt=False,out_batch=1):
         # 调用配置管理器获取配置
         oneapi_url, oneapi_token = config_manager.get_api_config()
 
@@ -1295,8 +1289,6 @@ class MoterPoseNode:
                 "watermark": False,
                 "input_image": ImageConverter.tensor_to_base64(image_input)
             }
-            if prompt:
-                payload["prompt"] = prompt
 
             headers = {
                 "Content-Type": "application/json",
@@ -1332,7 +1324,7 @@ class MoterPoseNode:
                 # 直接调用导入的 pil2tensor 函数
                 # tensor_img = ImageConverter.pil2tensor(img)
                 output_tensors.append(img)
-                print(f" 第 {i+1} 张图片生成成功: {prompt}")
+                print(f" 第 {i+1} 张图片生成成功")
 
             return (torch.cat(output_tensors, dim=0),)  # 拼接为 (数量, H, W, 3)
 
