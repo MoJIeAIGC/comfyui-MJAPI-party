@@ -965,12 +965,13 @@ class ReplaceClothesNode:
 
         payload = {
             "model": "dressV2ing_diffusion",
-            "prompt": prompt,
             "is_translation": True,
             "Custom_prompt": Custom_prompt,
             "seed": seed, 
             "input_image": merged_base64,
         }
+        if prompt:
+            payload["prompt"] = prompt
 
         try:
             response = requests.post(oneapi_url, headers=headers, json=payload, timeout=300)
@@ -1186,6 +1187,7 @@ class ModelGenNode:
                 "cloths_image": ("IMAGE",),  # 输入图像
                 "race_class": (["Asia", "black", "Ukraine"], {"default": "Asia"}),
                 "gender_class": (["man", "woman", "little boy","little girl"], {"default": "woman"}),
+                "style_prompt": (["INS自拍风", "女装涉谷街拍风"], {"default": "INS自拍风"}),
                 "seed": ("INT", {"default": -1}),
             },
             "optional": {
@@ -1198,7 +1200,7 @@ class ModelGenNode:
     FUNCTION = "generate"
     CATEGORY = "🎨MJapiparty/ImageCreat"
 
-    def generate(self , seed, face_image=None, cloths_image=None,race_class="Asia",gender_class="woman"):
+    def generate(self , seed, face_image=None, cloths_image=None,race_class="Asia",gender_class="woman",style_prompt="INS自拍风"):
         # 调用配置管理器获取配置
         oneapi_url, oneapi_token = config_manager.get_api_config()
 
@@ -1213,6 +1215,7 @@ class ModelGenNode:
                 "race_class": race_class,
                 "seed": int(seed_override),
                 "is_face": is_face,
+                "style_prompt": style_prompt,
                 "input_image": image_base64
             }
 
@@ -1287,12 +1290,13 @@ class MoterPoseNode:
         def call_api(seed_override):
             payload = {
                 "model": "moter-pose-change",
-                "prompt": prompt,
                 "extent_prompt": extent_prompt,  # 传递翻译模式参数
                 "seed": int(seed_override),
                 "watermark": False,
                 "input_image": ImageConverter.tensor_to_base64(image_input)
             }
+            if prompt:
+                payload["prompt"] = prompt
 
             headers = {
                 "Content-Type": "application/json",
