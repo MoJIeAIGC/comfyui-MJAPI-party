@@ -23,6 +23,119 @@ class ImageConverter:
             return None
 
     @staticmethod
+    def prepare_and_stitch_images(model_image, cloth_image):
+        """
+        准备并拼接模特图和服装图
+        1. 模特图(右图)单边超过1280则等比缩小至1280
+        2. 服装图(左图)保持原尺寸
+        3. 合并左右图，保持等高，短边图等比拉伸
+        """
+        # 转换模特图为PIL
+        model_pil = ImageConverter.tensor2pil(model_image)
+        # 转换服装图为PIL
+        cloth_pil = ImageConverter.tensor2pil(cloth_image)
+        
+        # 1. 处理模特图 - 如果单边超过1280则等比缩小
+        max_size = 1280
+        if max(model_pil.size) > max_size:
+            ratio = max_size / max(model_pil.size)
+            new_width = int(model_pil.width * ratio)
+            new_height = int(model_pil.height * ratio)
+            model_pil = model_pil.resize((new_width, new_height), Image.LANCZOS)
+        
+        # 2. 处理服装图 - 保持原尺寸
+        
+        # 3. 合并图片 - 保持等高
+        # 确定目标高度(取两者中较大的高度)
+        target_height = max(model_pil.height, cloth_pil.height)
+        
+        # 调整模特图高度
+        if model_pil.height != target_height:
+            ratio = target_height / model_pil.height
+            new_width = int(model_pil.width * ratio)
+            model_pil = model_pil.resize((new_width, target_height), Image.LANCZOS)
+        
+        # 调整服装图高度
+        if cloth_pil.height != target_height:
+            ratio = target_height / cloth_pil.height
+            new_width = int(cloth_pil.width * ratio)
+            cloth_pil = cloth_pil.resize((new_width, target_height), Image.LANCZOS)
+        
+        # 创建新图片(宽度为两者之和)
+        new_img = Image.new('RGB', (cloth_pil.width + model_pil.width, target_height))
+        new_img.paste(cloth_pil, (0, 0))  # 左图
+        new_img.paste(model_pil, (cloth_pil.width, 0))  # 右图
+        
+        # 转换为base64
+        buffered = BytesIO()
+        new_img.save(buffered, format="JPEG")
+        return base64.b64encode(buffered.getvalue()).decode("utf-8")
+
+
+
+    @staticmethod
+    def process_images(face_image, cloths_image):
+        """
+        处理服装图片和脸部图片，根据脸部图片是否存在执行不同的处理逻辑，最后返回 base64 数据。
+        :param face_image: 脸部图片
+        :param cloths_image: 服装图片
+        :return: 处理后图片的 base64 数据
+        """
+        if face_image is None:
+            # 将服装图片转换为 PIL 图像
+            cloth_pil = ImageConverter.tensor2pil(cloths_image)
+            # 如果单边超过1536则等比缩小至1536
+            if max(cloth_pil.size) > 1536:
+                ratio = 1536 / max(cloth_pil.size)
+                new_width = int(cloth_pil.width * ratio)
+                new_height = int(cloth_pil.height * ratio)
+                cloth_pil = cloth_pil.resize((new_width, new_height), Image.LANCZOS)
+
+            # 如果是1:1正方形或横向长方形，则上下填充黑色，使高度达到1536
+            if cloth_pil.width >= cloth_pil.height:
+                if cloth_pil.height < 1536:
+                    new_img = Image.new('RGB', (cloth_pil.width, 1536), (0, 0, 0))
+                    paste_y = (1536 - cloth_pil.height) // 2
+                    new_img.paste(cloth_pil, (0, paste_y))
+                    cloth_pil = new_img
+
+            # 转换为 base64
+            buffered = BytesIO()
+            cloth_pil.save(buffered, format="JPEG")
+            return base64.b64encode(buffered.getvalue()).decode("utf-8")
+        else:
+            # 将人脸和服装图片转换为 PIL 图像
+            face_pil = ImageConverter.tensor2pil(face_image)
+            cloth_pil = ImageConverter.tensor2pil(cloths_image)
+
+            # 上下合并图片
+            new_width = max(face_pil.width, cloth_pil.width)
+            new_height = face_pil.height + cloth_pil.height
+            new_img = Image.new('RGB', (new_width, new_height), (0, 0, 0))
+            new_img.paste(face_pil, ((new_width - face_pil.width) // 2, 0))
+            new_img.paste(cloth_pil, ((new_width - cloth_pil.width) // 2, face_pil.height))
+
+            # 再次缩小图片尺寸最大不超过1536，长宽比不超过4:1
+            if max(new_img.size) > 1536:
+                ratio = 1536 / max(new_img.size)
+                new_width = int(new_img.width * ratio)
+                new_height = int(new_img.height * ratio)
+                new_img = new_img.resize((new_width, new_height), Image.LANCZOS)
+
+            width, height = new_img.size
+            if width / height > 4:
+                new_width = int(height * 4)
+                new_img = new_img.resize((new_width, height), Image.LANCZOS)
+            elif height / width > 4:
+                new_height = int(width * 4)
+                new_img = new_img.resize((width, new_height), Image.LANCZOS)
+
+            # 转换为 base64
+            buffered = BytesIO()
+            new_img.save(buffered, format="JPEG")
+            return base64.b64encode(buffered.getvalue()).decode("utf-8")
+
+    @staticmethod
     def tensor_to_base64(image_tensor):
         """
         将图像张量转换为 base64 编码的字符串
@@ -77,6 +190,12 @@ class ImageConverter:
             except:
                 pass
         
+        error_data = response.json()
+        print("Error data:", error_data)  # 调试输出
+        print("Error type:", type(error_data.get("error")))  # 调试输出
+        if error_data.get("error") and type(error_data.get("error")) is not dict:
+            error_msg = error_data.get("error")
+        
         return error_msg
 
     @staticmethod
@@ -109,16 +228,30 @@ class ImageConverter:
                         # 若都失败，使用默认字体
                         font = ImageFont.load_default()
 
+            # 根据图片宽度和字体大小计算每行最大字符数
+            max_chars_per_line = width // (font_size // 2)  # 根据字体大小动态计算
+            max_chars_per_line = max(20, min(max_chars_per_line, 50))  # 限制在20-50字符之间
+            
             # 将错误信息分行，避免单行过长
-            max_chars_per_line = 30
             lines = []
-            for i in range(0, len(text), max_chars_per_line):
-                lines.append(text[i:i+max_chars_per_line])
+            words = text.split()
+            current_line = ""
+            
+            for word in words:
+                if len(current_line + word) <= max_chars_per_line:
+                    current_line += word + " "
+                else:
+                    lines.append(current_line.strip())
+                    current_line = word + " "
+            if current_line:
+                lines.append(current_line.strip())
 
             # 在图像上逐行绘制错误信息
             y_text = 10
             line_height = font_size + 4
-            for line in lines:
+            max_lines = (height - 20) // line_height  # 计算图片能容纳的最大行数
+            
+            for line in lines[:max_lines]:  # 只显示能容纳的行数
                 draw.text((10, y_text), line, font=font, fill=(255, 255, 255))
                 y_text += line_height
 
@@ -137,9 +270,12 @@ class ImageConverter:
         # 转 PIL
         image = ImageConverter.tensor2pil(image).convert("RGB")  # 保留原图
         mask = ImageConverter.tensor2pil(mask).convert("L")
+
+        # 确保图像和mask尺寸一致
         if image.size != mask.size:
             # 调整mask尺寸以匹配图像
             mask = mask.resize(image.size, Image.BILINEAR)
+
         # alpha 通道 = 255 - mask（保持透明显示）
         alpha = Image.eval(mask, lambda px: 255 - px)
 
@@ -197,3 +333,28 @@ class ImageConverter:
             img_base64 = ImageConverter.tensor_to_base64(img)
             base64_images.append(img_base64)
         return base64_images
+
+    @staticmethod
+    def get_right_part_of_image(img):
+        """
+        从输入图片中找到分割线并仅保留右边部分
+        
+        :param img: PIL 图像对象
+        :return: 仅包含右边部分的 PIL 图像对象
+        """
+        # 简单的边缘检测找分割线，计算每列的像素差异
+        width, height = img.size
+        diff_values = []
+        for x in range(1, width):
+            diff = 0
+            for y in range(height):
+                left_pixel = img.getpixel((x - 1, y))
+                right_pixel = img.getpixel((x, y))
+                diff += sum(abs(a - b) for a, b in zip(left_pixel, right_pixel))
+            diff_values.append(diff)
+
+        # 找到差异最大的位置作为分割线
+        split_x = diff_values.index(max(diff_values)) + 1
+
+        # 只保留右边部分图片
+        return img.crop((split_x, 0, width, height))

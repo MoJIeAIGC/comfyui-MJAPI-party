@@ -6,6 +6,29 @@ app.registerExtension({
     async setup() {
 
         app.ui.settings.addSetting({
+            id: "Mjapi.version",
+            name: "当前版本",
+            type: () => {
+                const container = document.createElement("div");
+
+                const versionText = document.createElement("span");
+                versionText.className = "comfy-text";
+                versionText.style.fontWeight = "bold";
+
+                // 获取版本信息
+                api.fetchApi("/my_node/get_key").then(async (resp) => {
+                    const data = await resp.json();
+                    console.log(data);
+                    versionText.textContent = `v${data.version}`;  // 显示版本号
+                });
+
+                container.appendChild(versionText);
+
+                return container; // ✅ 注意这里，不要 return <tr>
+            },
+        });
+
+        app.ui.settings.addSetting({
             id: "Mjapi.api_key",
             name: "Mojie API Key (重启生效)",
             type: () => {
