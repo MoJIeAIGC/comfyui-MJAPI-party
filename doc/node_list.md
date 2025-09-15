@@ -1,5 +1,6 @@
 #### 所有API节点列表
 所有的节点示例工作流都可以在workflow目录下找到
+- [seedream-4.0](#seedream-4使用说明)
 - [Gemini-NanoBanana](#gemini-nanobanana使用说明)
 - [Qwen-image](#qwen-image-使用说明)
 - [Qwen-edit-image](#qwen-edit-image-使用说明)
@@ -9,7 +10,13 @@
 - [自动抠图](#自动抠图)
 - [Dreamina(即梦参考生图)](#dreamina即梦参考生图)
 - [即梦视频生成](#即梦视频生成)(即将下线换成Seedance)
+
 ***
+
+#### seedream-4使用说明
+seedream-4.0是字节跳动开发的图片编辑工具，能通过文字描述修改图片。比如你说 “把背景换成海边”。支持使用中文提示词，支持输出中文。
+![alt text](assets/seedream.png)
+
 
 #### Gemini-NanoBanana使用说明
 NanoBanana又名Gemini 2.5 Flash Image Preview,是google旗下的图片编辑工具。提示词遵循强度很高。基本不需要特别的提示词格式，支持中英文输入，但是不支持中文输出，可输出英文字体。

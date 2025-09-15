@@ -811,7 +811,7 @@ class GetDressing:
     RETURN_TYPES = ("IMAGE",)
     RETURN_NAMES = ("output",)
     FUNCTION = "generate"
-    CATEGORY = "🎨MJapiparty/Tools_api"
+    CATEGORY = "🎨MJapiparty/clothCreat"
 
     def generate(self,  image, seed,  extend_prompt,size="1:1"):
         # 调用配置管理器获取配置
@@ -954,7 +954,7 @@ class ReplaceClothesNode:
     RETURN_TYPES = ("IMAGE",)
     RETURN_NAMES = ("output",)
     FUNCTION = "generate"
-    CATEGORY = "🎨MJapiparty/Tools_api"
+    CATEGORY = "🎨MJapiparty/clothCreat"
 
     def generate(self, cloths_image, model_image, seed):
         # 调用配置管理器获取配置
@@ -1201,7 +1201,7 @@ class ModelGenNode:
     RETURN_TYPES = ("IMAGE",)  # 返回一个或多个IMAGE
     RETURN_NAMES = ("output",)  # 保持为一个返回名
     FUNCTION = "generate"
-    CATEGORY = "🎨MJapiparty/ImageCreat"
+    CATEGORY = "🎨MJapiparty/clothCreat"
 
     def generate(self , seed, face_image=None, cloths_image=None,race_class="Asia",gender_class="woman",style_prompt="INS自拍风"):
         # 调用配置管理器获取配置
@@ -1283,7 +1283,7 @@ class MoterPoseNode:
     RETURN_TYPES = ("IMAGE",)  # 返回一个或多个IMAGE
     RETURN_NAMES = ("output",)  # 保持为一个返回名
     FUNCTION = "generate"
-    CATEGORY = "🎨MJapiparty/ImageCreat"
+    CATEGORY = "🎨MJapiparty/clothCreat"
 
     def generate(self,  seed, image_input=None, extent_prompt=False,out_batch=1):
         # 调用配置管理器获取配置
@@ -1380,7 +1380,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "ViduNode": "Vidu参考生视频",
     "GeminiEditNode": "Gemini-NanoBanana图片编辑",
     "ReplaceClothesNode": "AI同款服装替换",
-    "DoubaoSeedreamNode": "doubao-seedream-4.0",
+    "DoubaoSeedreamNode": "seedream-4.0",
     "ModelGenNode": "服装模特生成",
     "MoterPoseNode": "模特姿势更改",
 }
