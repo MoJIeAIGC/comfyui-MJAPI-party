@@ -1103,6 +1103,7 @@ class DoubaoSeedreamNode:
                 "size": (["2048x2048", "2304x1728", "1728x2304", "2560x1440", "1440x2560", "2496x1664", "1664x2496", "3024x1296"], {"default": "2048x2048"}),
                 "width": ("INT", {"default": 1024, "min": 1024, "max": 4096}),  # 生成张数
                 "height": ("INT", {"default": 1024, "min": 1024, "max": 4096}),  # 生成张数
+                "max_SetImage": ([1, 15], {"default": 1}),  
             },
             "optional": {
                 "image_input": ("IMAGE", {"default": []}),  # 可选的图像输入
@@ -1114,7 +1115,7 @@ class DoubaoSeedreamNode:
     FUNCTION = "generate"
     CATEGORY = "🎨MJapiparty/ImageCreat"
 
-    def generate(self, prompt, seed, image_input=None,width=1024,height=1024,custom_size=True,size="1024x1024"):
+    def generate(self, prompt, seed, image_input=None,width=1024,height=1024,custom_size=True,size="1024x1024",max_SetImage=1):
         # 调用配置管理器获取配置
         oneapi_url, oneapi_token = config_manager.get_api_config()
 
@@ -1123,63 +1124,60 @@ class DoubaoSeedreamNode:
         else:
             resl_size = f"{width}x{height}"
 
-        def call_api(seed_override):
-            payload = {
-                "model": "doubao-seedream-4.0",
-                "prompt": prompt,
-                "size": resl_size, 
-                "seed": int(seed_override),
-                "watermark": False
-            }
-            # 如果有图像输入，加入到payload中
-            if image_input is not None:
-                binary_data_base64 = ImageConverter.convert_images_to_base64(image_input)
-                payload["input_image"] = binary_data_base64
+        payload = {
+            "model": "doubao-seedream-4.0",
+            "prompt": prompt,
+            "size": resl_size, 
+            "seed": int(seed+6),
+            "watermark": False,
+            "max_SetImage": max_SetImage,
+        }
+        # 如果有图像输入，加入到payload中
+        if image_input is not None:
+            binary_data_base64 = ImageConverter.convert_images_to_base64(image_input)
+            payload["input_image"] = binary_data_base64
 
-            headers = {
-                "Content-Type": "application/json",
-                "Authorization": f"Bearer {oneapi_token}"
-            }
-            response = requests.post(oneapi_url, headers=headers, json=payload, timeout=1200)
-            # 判断状态码是否为 200
-            if response.status_code != 200:
-                error_msg = ImageConverter.get_status_error_msg(response)
-                error_tensor = ImageConverter.create_error_image(error_msg, width=512, height=512)
-                return error_tensor
-            response.raise_for_status()
-            result = response.json()
+        headers = {
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {oneapi_token}"
+        }
+        response = requests.post(oneapi_url, headers=headers, json=payload, timeout=1200)
+        # 判断状态码是否为 200
+        if response.status_code != 200:
+            error_msg = ImageConverter.get_status_error_msg(response)
+            error_tensor = ImageConverter.create_error_image(error_msg, width=512, height=512)
+            return error_tensor
+        response.raise_for_status()
+        result = response.json()
 
-            # 从返回的结果中提取图片 URL
-            image_url = result.get("res_url")
+        # 从返回的结果中提取图片 URL
+        res_url = result.get("res_url", "")
+        if not res_url:
+            raise ValueError("未找到图片 URL")
+        image_urls = res_url.split("|") if res_url else []
 
+        api_tensors = []
+        print(image_urls)
+        for image_url in image_urls:
             if not image_url:
-                raise ValueError("未找到图片 URL")
-            # 下载图片
-            response = requests.get(image_url)
-            response.raise_for_status()
-            # 将图片数据转换为 PIL 图像对象
-            img = Image.open(BytesIO(response.content)).convert("RGB")
-            return ImageConverter.pil2tensor(img)
+                continue
+            try:
+                # 下载图片
+                response = requests.get(image_url)
+                response.raise_for_status()
+                # 将图片数据转换为 PIL 图像对象
+                img = Image.open(BytesIO(response.content)).convert("RGB")
+                api_tensors.append(ImageConverter.pil2tensor(img))
+            except Exception as e:
+                print(f"下载图片 {image_url} 失败: {str(e)}")
+                error_tensor = ImageConverter.create_error_image("下载图片失败")
+                api_tensors.append(error_tensor)
 
-        output_tensors = []
+        if not api_tensors:
+            error_tensor = ImageConverter.create_error_image("未获取到有效图片 URL")
+            api_tensors.append(error_tensor)
 
-        try:
-            for i in range(1):
-                # 如果两次请求用同一个seed也行，可改为 seed+i 实现不同seed
-                img = call_api(seed + i)
-                # 直接调用导入的 pil2tensor 函数
-                # tensor_img = ImageConverter.pil2tensor(img)
-                output_tensors.append(img)
-                print(f"Gemini 第 {i+1} 张图片生成成功: {prompt}")
-
-            return (torch.cat(output_tensors, dim=0),)  # 拼接为 (数量, H, W, 3)
-
-        except Exception as e:
-            print(f"Gemini: {str(e)}")
-            error_tensor = ImageConverter.create_error_image("运行异常，请稍后重试")
-            # 返回指定数量错误图
-            error_tensors = [error_tensor for _ in range(1)]
-            return (torch.cat(error_tensors, dim=0),)
+        return (torch.cat(api_tensors, dim=0),)
 
 
 class ModelGenNode:
@@ -1188,9 +1186,9 @@ class ModelGenNode:
         return {
             "required": {
                 "cloths_image": ("IMAGE",),  # 输入图像
-                "race_class": (["Asia", "black", "Ukraine"], {"default": "Asia"}),
+                "race_class": (["亚裔", "黑人", "白人"], {"default": "亚裔"}),
                 "gender_class": (["man", "woman", "little boy","little girl"], {"default": "woman"}),
-                "style_prompt": (["INS自拍风", "女装涉谷街拍风"], {"default": "INS自拍风"}),
+                "style_prompt": (["INS自拍风", "女装涉谷街拍风", "简约风", "清新室内风", "靠墙特写","露营风"], {"default": "INS自拍风"}),
                 "seed": ("INT", {"default": -1}),
             },
             "optional": {
@@ -1208,6 +1206,13 @@ class ModelGenNode:
         oneapi_url, oneapi_token = config_manager.get_api_config()
 
         image_base64 = ImageConverter.process_images(face_image, cloths_image)
+
+        races = {
+            "亚裔": "Asia",
+            "黑人": "black",
+            "白人": "Ukraine"
+        }
+        race_class = races.get(race_class, "Asia")
 
         is_face = True if face_image is not None else False
 
