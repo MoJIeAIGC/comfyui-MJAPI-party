@@ -1103,7 +1103,7 @@ class DoubaoSeedreamNode:
                 "size": (["2048x2048", "2304x1728", "1728x2304", "2560x1440", "1440x2560", "2496x1664", "1664x2496", "3024x1296"], {"default": "2048x2048"}),
                 "width": ("INT", {"default": 1024, "min": 1024, "max": 4096}),  # 生成张数
                 "height": ("INT", {"default": 1024, "min": 1024, "max": 4096}),  # 生成张数
-                "max_SetImage": ([1, 15], {"default": 1}),  
+                "max_SetImage": (["off", 'auto'], {"default": "off"}),  
             },
             "optional": {
                 "image_input": ("IMAGE", {"default": []}),  # 可选的图像输入
@@ -1115,7 +1115,7 @@ class DoubaoSeedreamNode:
     FUNCTION = "generate"
     CATEGORY = "🎨MJapiparty/ImageCreat"
 
-    def generate(self, prompt, seed, image_input=None,width=1024,height=1024,custom_size=True,size="1024x1024",max_SetImage=1):
+    def generate(self, prompt, seed, image_input=None,width=1024,height=1024,custom_size=True,size="1024x1024",max_SetImage="off"):
         # 调用配置管理器获取配置
         oneapi_url, oneapi_token = config_manager.get_api_config()
 
@@ -1124,13 +1124,15 @@ class DoubaoSeedreamNode:
         else:
             resl_size = f"{width}x{height}"
 
+        count = 1 if max_SetImage == 'off' else 15
+
         payload = {
             "model": "doubao-seedream-4.0",
             "prompt": prompt,
             "size": resl_size, 
             "seed": int(seed+6),
             "watermark": False,
-            "max_SetImage": max_SetImage,
+            "max_SetImage": count,
         }
         # 如果有图像输入，加入到payload中
         if image_input is not None:
