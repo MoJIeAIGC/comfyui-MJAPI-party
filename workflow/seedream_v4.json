@@ -1,0 +1,431 @@
+{
+  "id": "bf0ea790-aba4-413e-80ca-68a5bbb521bb",
+  "revision": 0,
+  "last_node_id": 38,
+  "last_link_id": 39,
+  "nodes": [
+    {
+      "id": 35,
+      "type": "ImageBatch",
+      "pos": [
+        -4878.46923828125,
+        -388.9235534667969
+      ],
+      "size": [
+        140,
+        46
+      ],
+      "flags": {},
+      "order": 5,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "image1",
+          "type": "IMAGE",
+          "link": 35
+        },
+        {
+          "name": "image2",
+          "type": "IMAGE",
+          "link": 36
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            37
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.51",
+        "Node name for S&R": "ImageBatch"
+      }
+    },
+    {
+      "id": 29,
+      "type": "LoadImage",
+      "pos": [
+        -5250,
+        -1150
+      ],
+      "size": [
+        250.01931762695312,
+        413.90338134765625
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            34
+          ]
+        },
+        {
+          "name": "MASK",
+          "type": "MASK",
+          "links": null
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.51",
+        "Node name for S&R": "LoadImage"
+      },
+      "widgets_values": [
+        "volcengine_20250529170517.png",
+        "image"
+      ]
+    },
+    {
+      "id": 31,
+      "type": "DoubaoSeedreamNode",
+      "pos": [
+        -4960,
+        -1150
+      ],
+      "size": [
+        400,
+        232
+      ],
+      "flags": {},
+      "order": 4,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "image_input",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": 34
+        }
+      ],
+      "outputs": [
+        {
+          "name": "output",
+          "type": "IMAGE",
+          "links": [
+            39
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "Mojie-API-Party",
+        "ver": "eb9562ca0e1e81de255034ad1bfe0b06aa40d385",
+        "Node name for S&R": "DoubaoSeedreamNode"
+      },
+      "widgets_values": [
+        "把端午安康改成中秋快乐",
+        623,
+        "randomize",
+        true,
+        "2048x2048",
+        1024,
+        1024
+      ]
+    },
+    {
+      "id": 32,
+      "type": "MarkdownNote",
+      "pos": [
+        -5670.4453125,
+        -1168.5592041015625
+      ],
+      "size": [
+        340.12933349609375,
+        401.5765686035156
+      ],
+      "flags": {},
+      "order": 1,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [],
+      "properties": {},
+      "widgets_values": [
+        "### seedream_v4即梦4.0同款\n\nSeedream 4.0 原生支持文本、单图和多图输入，实现基于主体一致性的多图融合创作、图像编辑、组图生成等多样玩法，实现包括组图生成、多参考图生图等图片生成能力。支持中文输入输出，支持多照片组合输入。\n\nseedream_v4支持4k高清输出，节点中配置了预设尺寸。\n也可以通过自定义宽高来控制输出尺寸。custom_size是自定义尺寸的开关。\n\n多图组合和Nano的不一样，无需拼接，可直接组合批次输入，seedream会自动拼接。最多可支持10张图片进行组合。"
+      ],
+      "color": "#432",
+      "bgcolor": "#653"
+    },
+    {
+      "id": 36,
+      "type": "LoadImage",
+      "pos": [
+        -5253.26318359375,
+        29.419052124023438
+      ],
+      "size": [
+        284.58203125,
+        366.2306823730469
+      ],
+      "flags": {},
+      "order": 2,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            36
+          ]
+        },
+        {
+          "name": "MASK",
+          "type": "MASK",
+          "links": null
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.51",
+        "Node name for S&R": "LoadImage"
+      },
+      "widgets_values": [
+        "src=http___cbu01.alicdn.com_img_ibank_O1CN01xrkCnz1TYUtUapOQ8_!!2211000902394-0-cib.jpg&refer=http___cbu01.alicdn.jpg",
+        "image"
+      ]
+    },
+    {
+      "id": 34,
+      "type": "LoadImage",
+      "pos": [
+        -5250.05419921875,
+        -443.3621520996094
+      ],
+      "size": [
+        288.49237060546875,
+        427.131591796875
+      ],
+      "flags": {},
+      "order": 3,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            35
+          ]
+        },
+        {
+          "name": "MASK",
+          "type": "MASK",
+          "links": null
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.51",
+        "Node name for S&R": "LoadImage"
+      },
+      "widgets_values": [
+        "my (1).png",
+        "image"
+      ]
+    },
+    {
+      "id": 38,
+      "type": "SaveImage",
+      "pos": [
+        -4518.818359375,
+        -1160.507568359375
+      ],
+      "size": [
+        403.2499694824219,
+        586.240966796875
+      ],
+      "flags": {},
+      "order": 6,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 39
+        }
+      ],
+      "outputs": [],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.51"
+      },
+      "widgets_values": [
+        "ComfyUI"
+      ]
+    },
+    {
+      "id": 33,
+      "type": "DoubaoSeedreamNode",
+      "pos": [
+        -4695.333984375,
+        -396.2373046875
+      ],
+      "size": [
+        400,
+        232
+      ],
+      "flags": {},
+      "order": 7,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "image_input",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": 37
+        }
+      ],
+      "outputs": [
+        {
+          "name": "output",
+          "type": "IMAGE",
+          "links": [
+            38
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "Mojie-API-Party",
+        "ver": "eb9562ca0e1e81de255034ad1bfe0b06aa40d385",
+        "Node name for S&R": "DoubaoSeedreamNode"
+      },
+      "widgets_values": [
+        "图1的女士坐在图2的椅子上.",
+        1406,
+        "randomize",
+        true,
+        "1664x2496",
+        1024,
+        1024
+      ]
+    },
+    {
+      "id": 37,
+      "type": "SaveImage",
+      "pos": [
+        -4238.7958984375,
+        -422.50244140625
+      ],
+      "size": [
+        732.0910034179688,
+        802.4579467773438
+      ],
+      "flags": {},
+      "order": 8,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 38
+        }
+      ],
+      "outputs": [],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.51"
+      },
+      "widgets_values": [
+        "ComfyUI"
+      ]
+    }
+  ],
+  "links": [
+    [
+      34,
+      29,
+      0,
+      31,
+      0,
+      "IMAGE"
+    ],
+    [
+      35,
+      34,
+      0,
+      35,
+      0,
+      "IMAGE"
+    ],
+    [
+      36,
+      36,
+      0,
+      35,
+      1,
+      "IMAGE"
+    ],
+    [
+      37,
+      35,
+      0,
+      33,
+      0,
+      "IMAGE"
+    ],
+    [
+      38,
+      33,
+      0,
+      37,
+      0,
+      "IMAGE"
+    ],
+    [
+      39,
+      31,
+      0,
+      38,
+      0,
+      "IMAGE"
+    ]
+  ],
+  "groups": [
+    {
+      "id": 1,
+      "title": "单图输入",
+      "bounding": [
+        -5266.33935546875,
+        -1242.972412109375,
+        1181.684814453125,
+        708.481201171875
+      ],
+      "color": "#3f789e",
+      "font_size": 24,
+      "flags": {}
+    },
+    {
+      "id": 2,
+      "title": "多图组合输入",
+      "bounding": [
+        -5263.26318359375,
+        -516.9620361328125,
+        1780.517822265625,
+        922.61181640625
+      ],
+      "color": "#a1309b",
+      "font_size": 24,
+      "flags": {}
+    }
+  ],
+  "config": {},
+  "extra": {
+    "ds": {
+      "scale": 0.6303940863128816,
+      "offset": [
+        5837.721776744542,
+        1230.9888460166862
+      ]
+    },
+    "frontendVersion": "1.25.9"
+  },
+  "version": 0.4
+}
