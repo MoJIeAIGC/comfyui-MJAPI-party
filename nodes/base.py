@@ -358,3 +358,49 @@ class ImageConverter:
 
         # 只保留右边部分图片
         return img.crop((split_x, 0, width, height))
+
+
+    @staticmethod
+    def crop_white_borders(img, tolerance=30):
+        """
+        判断并裁剪图片上下的白色部分
+
+        :param img: PIL 图像对象
+        :param tolerance: 颜色容差，值越大允许的色差范围越广，默认为 30
+        :return: 裁剪后的 PIL 图像对象
+        """
+        width, height = img.size
+        top = 0
+        bottom = height
+
+        def is_white(pixel, tolerance):
+            """
+            判断像素是否接近白色，考虑颜色容差
+
+            :param pixel: 像素值
+            :param tolerance: 颜色容差
+            :return: 如果接近白色返回 True，否则返回 False
+            """
+            if len(pixel) == 4:  # 处理带透明度的图像
+                r, g, b, a = pixel
+            else:
+                r, g, b = pixel
+            return all(255 - x <= tolerance for x in (r, g, b))
+
+        # 查找顶部白色区域结束位置
+        for y in range(height):
+            # 检查每行的第一个和最后一个像素
+            if not is_white(img.getpixel((0, y)), tolerance) or not is_white(img.getpixel((width - 1, y)), tolerance):
+                top = y
+                break
+
+        # 查找底部白色区域开始位置
+        for y in range(height - 1, -1, -1):
+            # 检查每行的第一个和最后一个像素
+            if not is_white(img.getpixel((0, y)), tolerance) or not is_white(img.getpixel((width - 1, y)), tolerance):
+                bottom = y + 1
+                break
+
+        # 执行裁剪
+        return img.crop((0, top, width, bottom))
+
