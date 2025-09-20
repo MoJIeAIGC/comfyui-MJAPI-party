@@ -32,6 +32,7 @@
 [传送门](https://space.bilibili.com/483532108)
 
 ### 目前已支持的节点
+- [服装系列节点](/doc/node_list.md#服装系列节点)
 - [seedream-4](/doc/node_list.md#seedream-4使用说明)
 - [Gemini-NanoBanana](/doc/node_list.md#gemini-nanobanana使用说明)
 - [Qwen-image](/doc/node_list.md#qwen-image-使用说明)
@@ -52,6 +53,14 @@
 
 在comfyui节点列表中找到mjapiparty
 ![alt text](doc/assets/node.png)
+
+- 250920-新增服装系列节点
+#### 服装系列节点
+该节点是系列节点，也是摩诘AI首个集成工作流，因此无需复杂操作即可完成服装类的大部分工作，涵盖服装系列全流程工作流。其中有：服装模特生成，服装白底图提取，姿势更改和服装替换。详细操作教程参考工作流。工作流共有2个，1个是4功能合计，另一个是串联后的组图生成。工作流在workflow目录下，拖入comfyui即可使用.
+4功能合集：
+![alt text](doc/assets/cloth_1.png)
+组图生成工作流：
+![alt text](doc/assets/cloth_2.png)
 
 - 250915-新增节点
 #### seedream-4使用说明

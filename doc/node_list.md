@@ -1,5 +1,6 @@
 #### 所有API节点列表
 所有的节点示例工作流都可以在workflow目录下找到
+- [服装系列节点](#服装系列节点)
 - [seedream-4.0](#seedream-4使用说明)
 - [Gemini-NanoBanana](#gemini-nanobanana使用说明)
 - [Qwen-image](#qwen-image-使用说明)
@@ -13,13 +14,19 @@
 
 ***
 
+#### 服装系列节点
+该节点是系列节点，涵盖服装系列全流程工作流。其中有：服装模特生成，服装白底图提取，姿势更改和服装替换。详细操作教程参考工作流。工作流共有2个，1个是4功能合计，另一个是串联后的组图生成。
+4功能合集：
+![alt text](assets/cloth_1.png)
+组图生成工作流：
+![alt text](assets/cloth_2.png)
+
 #### seedream-4使用说明
 Seedream 4.0 原生支持文本、单图和多图输入，实现基于主体一致性的多图融合创作、图像编辑、组图生成等多样玩法，实现包括组图生成、多参考图生图等图片生成能力。支持中文输入输出，支持多照片组合输入。seedream_v4支持4k高清输出，节点中配置了预设尺寸。
 也可以通过自定义宽高来控制输出尺寸。custom_size是自定义尺寸的开关。
 多图组合和Nano的不一样，无需拼接，可直接组合批次输入，seedream会自动拼接。最多可支持10张图片进行组合。
 
 ![alt text](assets/seedream_v4.png)
-
 
 #### Gemini-NanoBanana使用说明
 NanoBanana又名Gemini 2.5 Flash Image Preview,是google旗下的图片编辑工具。提示词遵循强度很高。基本不需要特别的提示词格式，支持中英文输入，但是不支持中文输出，可输出英文字体。
