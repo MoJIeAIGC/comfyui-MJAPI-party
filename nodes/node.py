@@ -819,8 +819,8 @@ class GetDressing:
 
         sizes = {
             "1:1": "2048x2048",
-            "3:4": "2304x1728",
-            "4:3": "1728x2304"
+            "3:4": "1728x2304",
+            "4:3": "2304x1728"
         }
 
         mig_base64 = ImageConverter.tensor_to_base64(image)
@@ -1147,8 +1147,11 @@ class DoubaoSeedreamNode:
         # 判断状态码是否为 200
         if response.status_code != 200:
             error_msg = ImageConverter.get_status_error_msg(response)
-            error_tensor = ImageConverter.create_error_image(error_msg, width=512, height=512)
-            return error_tensor
+            print("错误信息",error_msg)
+            output_tensors = []
+            error_tensor = ImageConverter.create_error_image(error_msg)
+            output_tensors.append(error_tensor)
+            return (torch.cat(output_tensors, dim=0),)
         response.raise_for_status()
         result = response.json()
 
