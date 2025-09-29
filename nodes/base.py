@@ -3,6 +3,7 @@ import torch
 from PIL import Image, ImageDraw, ImageFont, PngImagePlugin
 import base64
 from io import BytesIO
+import os
 import requests
 import logging
 from comfy_api.input_impl.video_types import VideoFromFile
@@ -72,68 +73,63 @@ class ImageConverter:
         return base64.b64encode(buffered.getvalue()).decode("utf-8")
 
 
-
     @staticmethod
-    def process_images(face_image, cloths_image):
+    def process_images(face_image, cloths_image, save_filename="output.jpg"):
         """
-        处理服装图片和脸部图片，根据脸部图片是否存在执行不同的处理逻辑，最后返回 base64 数据。
-        :param face_image: 脸部图片
-        :param cloths_image: 服装图片
-        :return: 处理后图片的 base64 数据
+        新逻辑：
+        - 有脸：832x1248 白色画布，上 1/3 区域放脸，下 2/3 区域放衣服，等比缩放居中
+        - 无脸：衣服图单独居中缩放到 832x1248，等比缩放，不强行填满
+        - 保存到项目目录并返回 base64
         """
-        if face_image is None:
-            # 将服装图片转换为 PIL 图像
-            cloth_pil = ImageConverter.tensor2pil(cloths_image)
-            # 如果单边超过1536则等比缩小至1536
-            if max(cloth_pil.size) > 1536:
-                ratio = 1536 / max(cloth_pil.size)
-                new_width = int(cloth_pil.width * ratio)
-                new_height = int(cloth_pil.height * ratio)
-                cloth_pil = cloth_pil.resize((new_width, new_height), Image.LANCZOS)
+        canvas_width, canvas_height = 832, 1248
+        face_area_height = canvas_height // 3        # 416
+        cloth_area_height = canvas_height - face_area_height  # 832
 
-            # 如果是1:1正方形或横向长方形，则上下填充黑色，使高度达到1536
-            if cloth_pil.width >= cloth_pil.height:
-                if cloth_pil.height < 1536:
-                    new_img = Image.new('RGB', (cloth_pil.width, 1536), (0, 0, 0))
-                    paste_y = (1536 - cloth_pil.height) // 2
-                    new_img.paste(cloth_pil, (0, paste_y))
-                    cloth_pil = new_img
+        # 创建白色背景
+        new_img = Image.new('RGB', (canvas_width, canvas_height), (255, 255, 255))
 
-            # 转换为 base64
-            buffered = BytesIO()
-            cloth_pil.save(buffered, format="JPEG")
-            return base64.b64encode(buffered.getvalue()).decode("utf-8")
-        else:
-            # 将人脸和服装图片转换为 PIL 图像
+        if face_image is not None:
+            # 有脸部图
             face_pil = ImageConverter.tensor2pil(face_image)
             cloth_pil = ImageConverter.tensor2pil(cloths_image)
 
-            # 上下合并图片
-            new_width = max(face_pil.width, cloth_pil.width)
-            new_height = face_pil.height + cloth_pil.height
-            new_img = Image.new('RGB', (new_width, new_height), (0, 0, 0))
-            new_img.paste(face_pil, ((new_width - face_pil.width) // 2, 0))
-            new_img.paste(cloth_pil, ((new_width - cloth_pil.width) // 2, face_pil.height))
+            # --- 处理脸部 (放在上方 1/3 区域，等比缩放) ---
+            ratio = min(canvas_width / face_pil.width, face_area_height / face_pil.height, 1.0)
+            new_width = int(face_pil.width * ratio)
+            new_height = int(face_pil.height * ratio)
+            face_pil = face_pil.resize((new_width, new_height), Image.LANCZOS)
+            paste_x = (canvas_width - new_width) // 2
+            paste_y = (face_area_height - new_height) // 2
+            new_img.paste(face_pil, (paste_x, paste_y))
 
-            # 再次缩小图片尺寸最大不超过1536，长宽比不超过4:1
-            if max(new_img.size) > 1536:
-                ratio = 1536 / max(new_img.size)
-                new_width = int(new_img.width * ratio)
-                new_height = int(new_img.height * ratio)
-                new_img = new_img.resize((new_width, new_height), Image.LANCZOS)
+            # --- 处理服装 (放在下方 2/3 区域，等比缩放) ---
+            ratio = min(canvas_width / cloth_pil.width, cloth_area_height / cloth_pil.height, 1.0)
+            new_width = int(cloth_pil.width * ratio)
+            new_height = int(cloth_pil.height * ratio)
+            cloth_pil = cloth_pil.resize((new_width, new_height), Image.LANCZOS)
+            paste_x = (canvas_width - new_width) // 2
+            paste_y = face_area_height + (cloth_area_height - new_height) // 2
+            new_img.paste(cloth_pil, (paste_x, paste_y))
 
-            width, height = new_img.size
-            if width / height > 4:
-                new_width = int(height * 4)
-                new_img = new_img.resize((new_width, height), Image.LANCZOS)
-            elif height / width > 4:
-                new_height = int(width * 4)
-                new_img = new_img.resize((width, new_height), Image.LANCZOS)
+        else:
+            # 没有脸部图 → 衣服图单独居中缩放到整个画布
+            cloth_pil = ImageConverter.tensor2pil(cloths_image)
+            ratio = min(canvas_width / cloth_pil.width, canvas_height / cloth_pil.height, 1.0)
+            new_width = int(cloth_pil.width * ratio)
+            new_height = int(cloth_pil.height * ratio)
+            cloth_pil = cloth_pil.resize((new_width, new_height), Image.LANCZOS)
+            paste_x = (canvas_width - new_width) // 2
+            paste_y = (canvas_height - new_height) // 2
+            new_img.paste(cloth_pil, (paste_x, paste_y))
 
-            # 转换为 base64
-            buffered = BytesIO()
-            new_img.save(buffered, format="JPEG")
-            return base64.b64encode(buffered.getvalue()).decode("utf-8")
+        # 保存到项目目录
+        # save_path = os.path.join(os.getcwd(), save_filename)
+        # new_img.save(save_path, format="JPEG")
+
+        # 转 base64
+        buffered = BytesIO()
+        new_img.save(buffered, format="JPEG")
+        return base64.b64encode(buffered.getvalue()).decode("utf-8")
 
     @staticmethod
     def tensor_to_base64(image_tensor):

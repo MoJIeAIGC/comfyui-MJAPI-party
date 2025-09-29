@@ -32,6 +32,7 @@
 [传送门](https://space.bilibili.com/483532108)
 
 ### 目前已支持的节点
+- [seedance视频生成](/doc/node_list.md#seedance视频生成)
 - [服装系列节点](/doc/node_list.md#服装系列节点)
 - [seedream-4](/doc/node_list.md#seedream-4使用说明)
 - [Gemini-NanoBanana](/doc/node_list.md#gemini-nanobanana使用说明)
@@ -42,7 +43,6 @@
 - [Redux万物迁移](/doc/node_list.md#redux万物迁移)
 - [Kontext-pro&max](/doc/node_list.md#Kontext-pro&max)
 - [自动抠图](/doc/node_list.md#自动抠图)
-- [即梦视频生成](/doc/node_list.md#即梦视频生成)（即将下线换成Seedance）
 
 ### 节点使用说明
 所有的节点说明文档在：
@@ -53,6 +53,16 @@
 
 在comfyui节点列表中找到mjapiparty
 ![alt text](doc/assets/node.png)
+
+- 250929-新增seedance视频生成节点，原有即梦视频生成已下线.
+#### seedance 视频生成节点使用说明
+该模型语义理解与指令遵循能力强。运镜专业。支持多种视频风格，可以丝滑兼容各种风格的首图。分辨率支持480P、720P、1080P，时长支持3-10s，帧率24fps
+camerafixed是固定镜头开关，开启后将忽略镜头运镜提示词。
+duration是生成时长选项
+![alt text](doc/assets/seedance_1.png)
+last_image不是必须的，接入了之后就是首尾帧，没有接入就是图生视频。
+![alt text](doc/assets/seedance_2.png)
+
 
 - 250920-新增服装系列节点
 #### 服装系列节点
