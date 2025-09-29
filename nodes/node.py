@@ -526,6 +526,148 @@ class KouTuNode:
             print(f"❌ KouTuNode 错误: {str(e)}")
         return (torch.cat(output_tensors, dim=0),)  # 返回(batch_size, H, W, 3)
 
+# vidu文生视频
+class ViduT2VNode:
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "prompt": ("STRING", {"default": "", "multiline": True}),
+                "model": (["viduq1", "vidu1.5"], {"default": "viduq1"}),
+                "style": (["general", "anime"], {"default": "general"}),
+                "duration": ("INT", {"default": 5, "min": 4, "max": 5, "readonly": True}),
+                "resolution": (["360P", "720P", "1080p"], {"default": "1080p"}),
+                "movement_amplitude": (["auto", "small", "medium", "large"], {"default": "auto"}),
+                "Size": (["1:1", "9:16", "16:9"], {"default": "16:9"}),
+                "bgm": ("BOOLEAN", {"default": False}),  # 是否是翻译模式
+                "seed": ("INT", {"default": -1}),
+            }
+        }
+
+    RETURN_TYPES = ("VIDEO",)  # 返回VIDEO类型
+    RETURN_NAMES = ("video",)
+    FUNCTION = "generate"
+    CATEGORY = "🎨MJapiparty/VideoCreat"
+
+    def generate(self, prompt, model, seed, style="general", duration=5, resolution="1080p", Size="16:9", movement_amplitude="auto", bgm=False):
+        # 获取配置
+        oneapi_url, oneapi_token = config_manager.get_api_config()
+
+        def call_api(seed_override):
+            payload = {
+                "model": "vidut2vNode",
+                "modelr": model,
+                "prompt": prompt,
+                "seed": int(seed_override),
+                "resolution": resolution,
+                "aspect_ratio": Size,
+                "duration": duration,
+                "movement_amplitude": movement_amplitude,
+                "bgm": bgm,
+                "style": style,
+            }
+
+            headers = {
+                "Content-Type": "application/json",
+                "Authorization": f"Bearer {oneapi_token}"
+            }
+            response = requests.post(oneapi_url, headers=headers, json=payload, timeout=240)
+
+            response.raise_for_status()
+
+            result = response.json()
+            print(result)
+
+            video_url = result.get("content").get("video_url")
+            if not video_url:
+                raise ValueError("Empty video data from API.")
+            return video_url
+
+        video_url = call_api(seed)
+        print(video_url)
+        # 下载视频并提取帧
+        video_path = ImageConverter.download_video(video_url)
+        # 使用 VideoFromFile 封装视频
+
+        return (VideoFromFile(video_path),)
+
+# vidu首尾帧视频
+class ViduI2VNode:
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "first_image": ("IMAGE",),  # 接收多个图片
+                "prompt": ("STRING", {"default": "", "multiline": True}),
+                "model": (["viduq1", "vidu1.5", "viduq1-classic", "vidu2.0"], {"default": "viduq1-classic"}),
+                "style": (["general", "anime"], {"default": "general"}),
+                "duration": ("INT", {"default": 5, "min": 4, "max": 5, "readonly": True}),
+                "resolution": (["360P", "720P", "1080p"], {"default": "1080p"}),
+                "movement_amplitude": (["auto", "small", "medium", "large"], {"default": "auto"}),
+                "Size": (["1:1", "9:16", "16:9"], {"default": "16:9"}),
+                "bgm": ("BOOLEAN", {"default": False}),  # 是否是翻译模式
+                "seed": ("INT", {"default": -1}),
+            },
+            "optional": {
+                "last_image": ("IMAGE",),  # 接收多个图片
+            }
+        }
+
+    RETURN_TYPES = ("VIDEO",)  # 返回VIDEO类型
+    RETURN_NAMES = ("video",)
+    FUNCTION = "generate"
+    CATEGORY = "🎨MJapiparty/VideoCreat"
+
+    def generate(self, prompt, model, seed, style="general", duration=5, resolution="1080p", Size="16:9", movement_amplitude="auto", bgm=False, first_image=None, last_image=None):
+        # 获取配置
+        oneapi_url, oneapi_token = config_manager.get_api_config()
+        images = []
+        first_image_base64 = ImageConverter.tensor_to_base64(first_image)
+        images.append(first_image_base64)
+        if last_image is not None:
+            last_image_base64 = ImageConverter.tensor_to_base64(last_image)
+            images.append(last_image_base64)
+        
+        def call_api(seed_override):
+            payload = {
+                "model": "vidui2vNode",
+                "modelr": model,
+                "prompt": prompt,
+                "seed": int(seed_override),
+                "resolution": resolution,
+                "aspect_ratio": Size,
+                "duration": duration,
+                "movement_amplitude": movement_amplitude,
+                "bgm": bgm,
+                "style": style,
+                "images": images,
+            }
+
+            headers = {
+                "Content-Type": "application/json",
+                "Authorization": f"Bearer {oneapi_token}"
+            }
+            response = requests.post(oneapi_url, headers=headers, json=payload, timeout=240)
+
+            response.raise_for_status()
+
+            result = response.json()
+            print(result)
+
+            video_url = result.get("content").get("video_url")
+            if not video_url:
+                raise ValueError("Empty video data from API.")
+            return video_url
+
+        video_url = call_api(seed)
+        print(video_url)
+        # 下载视频并提取帧
+        video_path = ImageConverter.download_video(video_url)
+        # 使用 VideoFromFile 封装视频
+
+        return (VideoFromFile(video_path),)
+
+
 # seedance文生视频
 class DreaminaT2VNode:
     @classmethod
@@ -584,6 +726,8 @@ class DreaminaT2VNode:
         # 使用 VideoFromFile 封装视频
 
         return (VideoFromFile(video_path),)
+
+
 
 # seedance图生视频 + seedance首尾帧视频
 class DreaminaI2VNode:

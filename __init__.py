@@ -6,6 +6,7 @@ from aiohttp import web
 config_manager = ConfigManager()
 import os
 import subprocess
+import logging
 
 
 routes = PromptServer.instance.routes
