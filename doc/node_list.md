@@ -1,5 +1,6 @@
 #### 所有API节点列表
 所有的节点示例工作流都可以在workflow目录下找到
+- [seedance 视频生成节点](#seedance-视频生成节点使用说明)
 - [服装系列节点](#服装系列节点)
 - [seedream-4.0](#seedream-4使用说明)
 - [Gemini-NanoBanana](#gemini-nanobanana使用说明)
@@ -10,10 +11,15 @@
 - [Kontext-pro&max](#Kontext-pro&max)
 - [自动抠图](#自动抠图)
 - [Dreamina(即梦参考生图)](#dreamina即梦参考生图)
-- [即梦视频生成](#即梦视频生成)(即将下线换成Seedance)
 
 ***
-
+#### seedance 视频生成节点使用说明
+该模型语义理解与指令遵循能力强。运镜专业。支持多种视频风格，可以丝滑兼容各种风格的首图。分辨率支持480P、720P、1080P，时长支持3-10s，帧率24fps
+camerafixed是固定镜头开关，开启后将忽略镜头运镜提示词。
+duration是生成时长选项
+![alt text](assets/seedance_1.png)
+last_image不是必须的，接入了之后就是首尾帧，没有接入就是图生视频。
+![alt text](assets/seedance_2.png)
 #### 服装系列节点
 该节点是系列节点，涵盖服装系列全流程工作流。其中有：服装模特生成，服装白底图提取，姿势更改和服装替换。详细操作教程参考工作流。工作流共有2个，1个是4功能合计，另一个是串联后的组图生成。
 4功能合集：
