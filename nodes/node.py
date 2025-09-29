@@ -571,14 +571,14 @@ class ViduT2VNode:
                 "Content-Type": "application/json",
                 "Authorization": f"Bearer {oneapi_token}"
             }
-            response = requests.post(oneapi_url, headers=headers, json=payload, timeout=240)
+            response = requests.post(oneapi_url, headers=headers, json=payload, timeout=400)
 
             response.raise_for_status()
 
             result = response.json()
             print(result)
 
-            video_url = result.get("content").get("video_url")
+            video_url = result.get('creations', [])[0].get('url', '')
             if not video_url:
                 raise ValueError("Empty video data from API.")
             return video_url
@@ -598,18 +598,15 @@ class ViduI2VNode:
         return {
             "required": {
                 "first_image": ("IMAGE",),  # 接收多个图片
+                "last_image": ("IMAGE",),  # 接收多个图片
                 "prompt": ("STRING", {"default": "", "multiline": True}),
                 "model": (["viduq1", "vidu1.5", "viduq1-classic", "vidu2.0"], {"default": "viduq1-classic"}),
-                "style": (["general", "anime"], {"default": "general"}),
                 "duration": ("INT", {"default": 5, "min": 4, "max": 5, "readonly": True}),
                 "resolution": (["360P", "720P", "1080p"], {"default": "1080p"}),
                 "movement_amplitude": (["auto", "small", "medium", "large"], {"default": "auto"}),
                 "Size": (["1:1", "9:16", "16:9"], {"default": "16:9"}),
                 "bgm": ("BOOLEAN", {"default": False}),  # 是否是翻译模式
                 "seed": ("INT", {"default": -1}),
-            },
-            "optional": {
-                "last_image": ("IMAGE",),  # 接收多个图片
             }
         }
 
@@ -618,7 +615,7 @@ class ViduI2VNode:
     FUNCTION = "generate"
     CATEGORY = "🎨MJapiparty/VideoCreat"
 
-    def generate(self, prompt, model, seed, style="general", duration=5, resolution="1080p", Size="16:9", movement_amplitude="auto", bgm=False, first_image=None, last_image=None):
+    def generate(self, prompt, model, seed,duration=5, resolution="1080p", Size="16:9", movement_amplitude="auto", bgm=False, first_image=None, last_image=None):
         # 获取配置
         oneapi_url, oneapi_token = config_manager.get_api_config()
         images = []
@@ -639,7 +636,6 @@ class ViduI2VNode:
                 "duration": duration,
                 "movement_amplitude": movement_amplitude,
                 "bgm": bgm,
-                "style": style,
                 "images": images,
             }
 
@@ -647,14 +643,14 @@ class ViduI2VNode:
                 "Content-Type": "application/json",
                 "Authorization": f"Bearer {oneapi_token}"
             }
-            response = requests.post(oneapi_url, headers=headers, json=payload, timeout=240)
+            response = requests.post(oneapi_url, headers=headers, json=payload, timeout=400)
 
             response.raise_for_status()
 
             result = response.json()
             print(result)
 
-            video_url = result.get("content").get("video_url")
+            video_url =  result.get('creations', [])[0].get('url', '')
             if not video_url:
                 raise ValueError("Empty video data from API.")
             return video_url
@@ -1531,6 +1527,9 @@ NODE_CLASS_MAPPINGS = {
     "DoubaoSeedreamNode": DoubaoSeedreamNode,
     "ModelGenNode": ModelGenNode,
     "MoterPoseNode": MoterPoseNode,
+    "ViduT2VNode": ViduT2VNode,
+    "ViduI2VNode": ViduI2VNode,
+
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
@@ -1551,4 +1550,6 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "DoubaoSeedreamNode": "seedream-4.0",
     "ModelGenNode": "服装模特生成",
     "MoterPoseNode": "模特姿势更改",
+    "ViduT2VNode": "Vidu文生视频",
+    "ViduI2VNode": "Vidu首尾帧视频",
 }
