@@ -526,14 +526,17 @@ class KouTuNode:
             print(f"❌ KouTuNode 错误: {str(e)}")
         return (torch.cat(output_tensors, dim=0),)  # 返回(batch_size, H, W, 3)
 
-
+# seedance文生视频
 class DreaminaT2VNode:
     @classmethod
     def INPUT_TYPES(cls):
         return {
             "required": {
-                "prompt": ("STRING", {"default": "A beautiful sunset", "multiline": True}),
-                "aspect_ratio": (["default", "1:1", "3:4", "4:3", "9:16", "16:9", "21:9"], {"default": "default"}),
+                "prompt": ("STRING", {"default": "", "multiline": True}),
+                "resolution": (["480P", "720P", "1080p"], {"default": "1080p"}),
+                "Size": (["1:1", "3:4", "4:3", "9:16", "16:9", "21:9"], {"default": "16:9"}),
+                "duration": ("INT", {"default": 10, "min": 3, "max": 12}),  # 新增参数，只能是1或2
+                "camerafixed": ("BOOLEAN", {"default": False}),  # 是否是翻译模式
                 "seed": ("INT", {"default": -1}),
             }
         }
@@ -543,19 +546,21 @@ class DreaminaT2VNode:
     FUNCTION = "generate"
     CATEGORY = "🎨MJapiparty/VideoCreat"
 
-    def generate(self, prompt, seed, aspect_ratio="default"):
+    def generate(self, prompt, seed,  resolution="1080p", Size="16:9", duration=10, camerafixed=False):
         # 获取配置
         oneapi_url, oneapi_token = config_manager.get_api_config()
 
         def call_api(seed_override):
             payload = {
                 "model": "Dreaminat2vNode",
-                "req_key": "jimeng_vgfm_t2v_l20",
                 "prompt": prompt,
-                "seed": int(seed_override)
+                "seed": int(seed_override),
+                "resolution": resolution,
+                "Size": Size,
+                "duration": duration,
+                "camerafixed": camerafixed,
             }
-            if aspect_ratio != "default":
-                payload["aspect_ratio"] = aspect_ratio
+
             headers = {
                 "Content-Type": "application/json",
                 "Authorization": f"Bearer {oneapi_token}"
@@ -567,7 +572,7 @@ class DreaminaT2VNode:
             result = response.json()
             print(result)
 
-            video_url = result.get('data', {}).get('video_url', [])
+            video_url = result.get("content").get("video_url")
             if not video_url:
                 raise ValueError("Empty video data from API.")
             return video_url
@@ -580,16 +585,22 @@ class DreaminaT2VNode:
 
         return (VideoFromFile(video_path),)
 
-
+# seedance图生视频 + seedance首尾帧视频
 class DreaminaI2VNode:
     @classmethod
     def INPUT_TYPES(cls):
         return {
             "required": {
-                "prompt": ("STRING", {"default": "A beautiful sunset", "multiline": True}),
-                "aspect_ratio": (["default", "1:1", "3:4", "4:3", "9:16", "16:9", "21:9"], {"default": "default"}),
+                "first_image": ("IMAGE",),  # 接收多个图片
+                "prompt": ("STRING", {"default": "", "multiline": True}),
+                "resolution": (["480P", "720P", "1080p"], {"default": "1080p"}),
+                "Size": (["1:1", "3:4", "4:3", "9:16", "16:9", "21:9"], {"default": "16:9"}),
+                "duration": ("INT", {"default": 10, "min": 3, "max": 12}),  # 新增参数，只能是1或2
+                "camerafixed": ("BOOLEAN", {"default": False}),  # 是否是翻译模式
                 "seed": ("INT", {"default": -1}),
-                "images": ("IMAGE", {"default": []})  # 接收多个图片
+            },
+            "optional": {
+                "last_image": ("IMAGE",),  # 接收多个图片
             }
         }
 
@@ -598,20 +609,24 @@ class DreaminaI2VNode:
     FUNCTION = "generate"
     CATEGORY = "🎨MJapiparty/VideoCreat"
 
-    def generate(self, prompt, seed, aspect_ratio="default", images=[]):
+    def generate(self, prompt, seed, first_image, resolution="1080p", Size="16:9", duration=10, camerafixed=False, last_image=None):
         # 获取配置
         oneapi_url, oneapi_token = config_manager.get_api_config()
-
-        def call_api(seed_override, binary_data_base64):
+        first_image_base64 = ImageConverter.tensor_to_base64(first_image)
+        def call_api(seed_override):
             payload = {
                 "model": "DreaminaI2VNode",
-                "req_key": "jimeng_vgfm_i2v_l20",
                 "prompt": prompt,
+                "resolution": resolution,
+                "Size": Size,
+                "duration": duration,
+                "camerafixed": camerafixed,
                 "seed": int(seed_override),
-                "binary_data_base64": binary_data_base64  # 添加Base64编码的图片数据
+                "first_image_base64": first_image_base64,
             }
-            if aspect_ratio != "default":
-                payload["aspect_ratio"] = aspect_ratio
+            if last_image is not None:
+                last_image_base64 = ImageConverter.tensor_to_base64(last_image)
+                payload["last_image_base64"] = last_image_base64
             headers = {
                 "Content-Type": "application/json",
                 "Authorization": f"Bearer {oneapi_token}"
@@ -623,16 +638,13 @@ class DreaminaI2VNode:
             result = response.json()
             print(result)
 
-            video_url = result.get('data', {}).get('video_url', [])
+            video_url = result.get("content").get("video_url")
             if not video_url:
                 raise ValueError("Empty video data from API.")
             return video_url
 
-        # 将图像转换为Base64编码
-        binary_data_base64 = ImageConverter.convert_images_to_base64(images)
-
         # 调用API
-        video_url = call_api(seed, binary_data_base64)
+        video_url = call_api(seed)
         print(video_url)
         # 下载视频并提取帧
         video_path = ImageConverter.download_video(video_url)
