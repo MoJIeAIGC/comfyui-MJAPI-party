@@ -32,6 +32,7 @@
 [传送门](https://space.bilibili.com/483532108)
 
 ### 目前已支持的节点
+- [seedance视频生成](/doc/node_list.md#seedance视频生成)
 - [服装系列节点](/doc/node_list.md#服装系列节点)
 - [seedream-4](/doc/node_list.md#seedream-4使用说明)
 - [Gemini-NanoBanana](/doc/node_list.md#gemini-nanobanana使用说明)
