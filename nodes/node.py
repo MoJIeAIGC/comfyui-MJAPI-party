@@ -1171,6 +1171,7 @@ class GeminiEditNode:
             "required": {
                 "prompt": ("STRING", {"default": "A beautiful sunset", "multiline": True}),
                 "is_translation": ("BOOLEAN", {"default": False}),  # 是否是翻译模式
+                "Size": (["1:1", "3:4", "4:3", "9:16", "16:9"], {"default": "3:4"}),
                 "seed": ("INT", {"default": -1}),
             },
             "optional": {
@@ -1183,7 +1184,7 @@ class GeminiEditNode:
     FUNCTION = "generate"
     CATEGORY = "🎨MJapiparty/ImageCreat"
 
-    def generate(self, prompt, seed, image_input=None, is_translation=False,):
+    def generate(self, prompt, seed, image_input=None, is_translation=False, Size="3:4"):
         # 调用配置管理器获取配置
         oneapi_url, oneapi_token = config_manager.get_api_config()
 
@@ -1192,6 +1193,7 @@ class GeminiEditNode:
                 "model": "gemini-2.5-flash-image",
                 "prompt": prompt,
                 "is_translation": is_translation,  # 传递翻译模式参数
+                "aspect_ratio": Size,  # 传递尺寸参数
                 "seed": int(seed_override),
             }
             # 如果有图像输入，加入到payload中
