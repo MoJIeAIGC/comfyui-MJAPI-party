@@ -1,52 +1,9 @@
 {
   "id": "9595610a-a68a-4922-a51e-a8ce7e616335",
   "revision": 0,
-  "last_node_id": 43,
-  "last_link_id": 31,
+  "last_node_id": 45,
+  "last_link_id": 35,
   "nodes": [
-    {
-      "id": 24,
-      "type": "GeminiEditNode",
-      "pos": [
-        -587.48779296875,
-        -399.90814208984375
-      ],
-      "size": [
-        400,
-        200
-      ],
-      "flags": {},
-      "order": 7,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "image_input",
-          "shape": 7,
-          "type": "IMAGE",
-          "link": 15
-        }
-      ],
-      "outputs": [
-        {
-          "name": "output",
-          "type": "IMAGE",
-          "links": [
-            16
-          ]
-        }
-      ],
-      "properties": {
-        "cnr_id": "Mojie-API-Party",
-        "ver": "9118360ad066d1f9e6ea7db6c2bac0507d22098b",
-        "Node name for S&R": "GeminiEditNode"
-      },
-      "widgets_values": [
-        "制作一个图中角色的商业化1/7比例手办，风格写实，环境逼真。手办放置在电脑桌上，配有一个圆形透明亚克力底座，底座上没有文字。电脑屏幕上显示着手办的Zbrush建模过程。电脑屏幕旁边是一个万代风格的玩具盒，上面印有原始画作。",
-        false,
-        991,
-        "randomize"
-      ]
-    },
     {
       "id": 25,
       "type": "LoadImage",
@@ -67,7 +24,7 @@
           "name": "IMAGE",
           "type": "IMAGE",
           "links": [
-            15
+            32
           ]
         },
         {
@@ -104,7 +61,7 @@
         {
           "name": "images",
           "type": "IMAGE",
-          "link": 16
+          "link": 33
         }
       ],
       "outputs": [],
@@ -206,7 +163,7 @@
         258
       ],
       "flags": {},
-      "order": 12,
+      "order": 11,
       "mode": 0,
       "inputs": [
         {
@@ -255,8 +212,8 @@
           "name": "IMAGE",
           "type": "IMAGE",
           "links": [
-            21,
-            22
+            22,
+            34
           ]
         }
       ],
@@ -270,49 +227,6 @@
         true,
         0,
         "white"
-      ]
-    },
-    {
-      "id": 27,
-      "type": "GeminiEditNode",
-      "pos": [
-        -304.7855529785156,
-        449.2019348144531
-      ],
-      "size": [
-        400,
-        200
-      ],
-      "flags": {},
-      "order": 11,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "image_input",
-          "shape": 7,
-          "type": "IMAGE",
-          "link": 21
-        }
-      ],
-      "outputs": [
-        {
-          "name": "output",
-          "type": "IMAGE",
-          "links": [
-            18
-          ]
-        }
-      ],
-      "properties": {
-        "cnr_id": "Mojie-API-Party",
-        "ver": "9118360ad066d1f9e6ea7db6c2bac0507d22098b",
-        "Node name for S&R": "GeminiEditNode"
-      },
-      "widgets_values": [
-        "这个女孩带着这个耳机",
-        false,
-        181,
-        "randomize"
       ]
     },
     {
@@ -333,7 +247,7 @@
         {
           "name": "images",
           "type": "IMAGE",
-          "link": 18
+          "link": 35
         }
       ],
       "outputs": [],
@@ -424,6 +338,7 @@
         "这个女孩带着这个耳机，穿着这件衣服",
         false,
         1769,
+        "randomize",
         "randomize"
       ]
     },
@@ -684,33 +599,97 @@
       ],
       "color": "#432",
       "bgcolor": "#653"
+    },
+    {
+      "id": 44,
+      "type": "GeminiEditNode",
+      "pos": [
+        -592.409423828125,
+        -403.9662170410156
+      ],
+      "size": [
+        400,
+        200
+      ],
+      "flags": {},
+      "order": 7,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "image_input",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": 32
+        }
+      ],
+      "outputs": [
+        {
+          "name": "output",
+          "type": "IMAGE",
+          "links": [
+            33
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "Mojie-API-Party",
+        "ver": "c70bad3ddedc3e766eff04b7e666661e51a70c01",
+        "Node name for S&R": "GeminiEditNode"
+      },
+      "widgets_values": [
+        "制作一个图中角色的商业化1/7比例手办，风格写实，环境逼真。手办放置在电脑桌上，配有一个圆形透明亚克力底座，底座上没有文字。电脑屏幕上显示着手办的Zbrush建模过程。电脑屏幕旁边是一个万代风格的玩具盒，上面印有原始画作。",
+        false,
+        "3:4",
+        2048,
+        "randomize"
+      ]
+    },
+    {
+      "id": 45,
+      "type": "GeminiEditNode",
+      "pos": [
+        -314.78411865234375,
+        447.8040466308594
+      ],
+      "size": [
+        400,
+        200
+      ],
+      "flags": {},
+      "order": 12,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "image_input",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": 34
+        }
+      ],
+      "outputs": [
+        {
+          "name": "output",
+          "type": "IMAGE",
+          "links": [
+            35
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "Mojie-API-Party",
+        "ver": "c70bad3ddedc3e766eff04b7e666661e51a70c01",
+        "Node name for S&R": "GeminiEditNode"
+      },
+      "widgets_values": [
+        "这个女孩带着这个耳机",
+        false,
+        "3:4",
+        2048,
+        "randomize"
+      ]
     }
   ],
   "links": [
-    [
-      15,
-      25,
-      0,
-      24,
-      0,
-      "IMAGE"
-    ],
-    [
-      16,
-      24,
-      0,
-      26,
-      0,
-      "IMAGE"
-    ],
-    [
-      18,
-      27,
-      0,
-      29,
-      0,
-      "IMAGE"
-    ],
     [
       19,
       28,
@@ -725,14 +704,6 @@
       0,
       30,
       1,
-      "IMAGE"
-    ],
-    [
-      21,
-      30,
-      0,
-      27,
-      0,
       "IMAGE"
     ],
     [
@@ -798,6 +769,38 @@
       42,
       0,
       "IMAGE"
+    ],
+    [
+      32,
+      25,
+      0,
+      44,
+      0,
+      "IMAGE"
+    ],
+    [
+      33,
+      44,
+      0,
+      26,
+      0,
+      "IMAGE"
+    ],
+    [
+      34,
+      30,
+      0,
+      45,
+      0,
+      "IMAGE"
+    ],
+    [
+      35,
+      45,
+      0,
+      29,
+      0,
+      "IMAGE"
     ]
   ],
   "groups": [
@@ -844,10 +847,10 @@
   "config": {},
   "extra": {
     "ds": {
-      "scale": 1,
+      "scale": 0.7513148009015777,
       "offset": [
-        1935.9731579547279,
-        565.6941252911233
+        1802.1746020001362,
+        594.4376267157138
       ]
     },
     "frontendVersion": "1.25.9",
