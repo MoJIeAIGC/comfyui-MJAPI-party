@@ -526,6 +526,144 @@ class KouTuNode:
             print(f"❌ KouTuNode 错误: {str(e)}")
         return (torch.cat(output_tensors, dim=0),)  # 返回(batch_size, H, W, 3)
 
+# vidu文生视频
+class ViduT2VNode:
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "prompt": ("STRING", {"default": "", "multiline": True}),
+                "model": (["viduq1", "vidu1.5"], {"default": "viduq1"}),
+                "style": (["general", "anime"], {"default": "general"}),
+                "duration": ("INT", {"default": 5, "min": 4, "max": 5, "readonly": True}),
+                "resolution": (["360P", "720P", "1080p"], {"default": "1080p"}),
+                "movement_amplitude": (["auto", "small", "medium", "large"], {"default": "auto"}),
+                "Size": (["1:1", "9:16", "16:9"], {"default": "16:9"}),
+                "bgm": ("BOOLEAN", {"default": False}),  # 是否是翻译模式
+                "seed": ("INT", {"default": -1}),
+            }
+        }
+
+    RETURN_TYPES = ("VIDEO",)  # 返回VIDEO类型
+    RETURN_NAMES = ("video",)
+    FUNCTION = "generate"
+    CATEGORY = "🎨MJapiparty/VideoCreat"
+
+    def generate(self, prompt, model, seed, style="general", duration=5, resolution="1080p", Size="16:9", movement_amplitude="auto", bgm=False):
+        # 获取配置
+        oneapi_url, oneapi_token = config_manager.get_api_config()
+
+        def call_api(seed_override):
+            payload = {
+                "model": "vidut2vNode",
+                "modelr": model,
+                "prompt": prompt,
+                "seed": int(seed_override),
+                "resolution": resolution,
+                "aspect_ratio": Size,
+                "duration": duration,
+                "movement_amplitude": movement_amplitude,
+                "bgm": bgm,
+                "style": style,
+            }
+
+            headers = {
+                "Content-Type": "application/json",
+                "Authorization": f"Bearer {oneapi_token}"
+            }
+            response = requests.post(oneapi_url, headers=headers, json=payload, timeout=400)
+
+            response.raise_for_status()
+
+            result = response.json()
+            print(result)
+
+            video_url = result.get('creations', [])[0].get('url', '')
+            if not video_url:
+                raise ValueError("Empty video data from API.")
+            return video_url
+
+        video_url = call_api(seed)
+        print(video_url)
+        # 下载视频并提取帧
+        video_path = ImageConverter.download_video(video_url)
+        # 使用 VideoFromFile 封装视频
+
+        return (VideoFromFile(video_path),)
+
+# vidu首尾帧视频
+class ViduI2VNode:
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "first_image": ("IMAGE",),  # 接收多个图片
+                "last_image": ("IMAGE",),  # 接收多个图片
+                "prompt": ("STRING", {"default": "", "multiline": True}),
+                "model": (["viduq1", "vidu1.5", "viduq1-classic", "vidu2.0"], {"default": "viduq1-classic"}),
+                "duration": ("INT", {"default": 5, "min": 4, "max": 5, "readonly": True}),
+                "resolution": (["360P", "720P", "1080p"], {"default": "1080p"}),
+                "movement_amplitude": (["auto", "small", "medium", "large"], {"default": "auto"}),
+                "Size": (["1:1", "9:16", "16:9"], {"default": "16:9"}),
+                "bgm": ("BOOLEAN", {"default": False}),  # 是否是翻译模式
+                "seed": ("INT", {"default": -1}),
+            }
+        }
+
+    RETURN_TYPES = ("VIDEO",)  # 返回VIDEO类型
+    RETURN_NAMES = ("video",)
+    FUNCTION = "generate"
+    CATEGORY = "🎨MJapiparty/VideoCreat"
+
+    def generate(self, prompt, model, seed,duration=5, resolution="1080p", Size="16:9", movement_amplitude="auto", bgm=False, first_image=None, last_image=None):
+        # 获取配置
+        oneapi_url, oneapi_token = config_manager.get_api_config()
+        images = []
+        first_image_base64 = ImageConverter.tensor_to_base64(first_image)
+        images.append(first_image_base64)
+        if last_image is not None:
+            last_image_base64 = ImageConverter.tensor_to_base64(last_image)
+            images.append(last_image_base64)
+        
+        def call_api(seed_override):
+            payload = {
+                "model": "vidui2vNode",
+                "modelr": model,
+                "prompt": prompt,
+                "seed": int(seed_override),
+                "resolution": resolution,
+                "aspect_ratio": Size,
+                "duration": duration,
+                "movement_amplitude": movement_amplitude,
+                "bgm": bgm,
+                "images": images,
+            }
+
+            headers = {
+                "Content-Type": "application/json",
+                "Authorization": f"Bearer {oneapi_token}"
+            }
+            response = requests.post(oneapi_url, headers=headers, json=payload, timeout=400)
+
+            response.raise_for_status()
+
+            result = response.json()
+            print(result)
+
+            video_url =  result.get('creations', [])[0].get('url', '')
+            if not video_url:
+                raise ValueError("Empty video data from API.")
+            return video_url
+
+        video_url = call_api(seed)
+        print(video_url)
+        # 下载视频并提取帧
+        video_path = ImageConverter.download_video(video_url)
+        # 使用 VideoFromFile 封装视频
+
+        return (VideoFromFile(video_path),)
+
+
 # seedance文生视频
 class DreaminaT2VNode:
     @classmethod
@@ -584,6 +722,8 @@ class DreaminaT2VNode:
         # 使用 VideoFromFile 封装视频
 
         return (VideoFromFile(video_path),)
+
+
 
 # seedance图生视频 + seedance首尾帧视频
 class DreaminaI2VNode:
@@ -972,6 +1112,28 @@ class ReplaceClothesNode:
         # 调用配置管理器获取配置
         oneapi_url, oneapi_token = config_manager.get_api_config()
 
+        # 获取model_image的尺寸并计算宽高比
+        height, width = model_image.shape[1], model_image.shape[2]  # 获取图像的高度和宽度
+        image_ratio = width / height  # 计算图像的宽高比
+        print(f"模特图片宽高比例: {image_ratio}")
+        # 预定义的宽高比列表及其对应的比值
+        aspect_ratios = {
+            "21:9": 21/9,
+            "16:9": 16/9,
+            "4:3": 4/3,
+            "3:2": 3/2,
+            "1:1": 1/1,
+            "5:4": 5/4,
+            "4:5": 4/5,
+            "3:4": 3/4,
+            "2:3": 2/3,
+            "9:16": 9/16
+        }
+        
+        # 找出最接近的宽高比
+        closest_ratio = min(aspect_ratios, key=lambda x: abs(aspect_ratios[x] - image_ratio))
+        print(f"最接近的宽高比: {closest_ratio}")
+
         merged_base64 = ImageConverter.prepare_and_stitch_images(model_image, cloths_image)
 
         headers = {
@@ -985,6 +1147,7 @@ class ReplaceClothesNode:
             "model": "dressV2ing_diffusion",
             "Custom_prompt": False,
             "seed": seed, 
+            "aspect_ratio": closest_ratio,
             "input_image": merged_base64,
         }
 
@@ -1010,7 +1173,7 @@ class ReplaceClothesNode:
             img_bytes = responseurl.content
             img = Image.open(BytesIO(img_bytes)).convert("RGB")
 
-            img = ImageConverter.get_right_part_of_image(img)
+            # img = ImageConverter.get_right_part_of_image(img)
             # 直接调用导入的 pil2tensor 函数
             tensor_img = ImageConverter.pil2tensor(img)
             output_tensors.append(tensor_img)
@@ -1031,6 +1194,7 @@ class GeminiEditNode:
             "required": {
                 "prompt": ("STRING", {"default": "A beautiful sunset", "multiline": True}),
                 "is_translation": ("BOOLEAN", {"default": False}),  # 是否是翻译模式
+                "Size": (["1:1", "3:4", "4:3", "9:16", "16:9"], {"default": "3:4"}),
                 "seed": ("INT", {"default": -1}),
             },
             "optional": {
@@ -1043,7 +1207,7 @@ class GeminiEditNode:
     FUNCTION = "generate"
     CATEGORY = "🎨MJapiparty/ImageCreat"
 
-    def generate(self, prompt, seed, image_input=None, is_translation=False,):
+    def generate(self, prompt, seed, image_input=None, is_translation=False, Size="3:4"):
         # 调用配置管理器获取配置
         oneapi_url, oneapi_token = config_manager.get_api_config()
 
@@ -1052,6 +1216,7 @@ class GeminiEditNode:
                 "model": "gemini-2.5-flash-image",
                 "prompt": prompt,
                 "is_translation": is_translation,  # 传递翻译模式参数
+                "aspect_ratio": Size,  # 传递尺寸参数
                 "seed": int(seed_override),
             }
             # 如果有图像输入，加入到payload中
@@ -1387,6 +1552,9 @@ NODE_CLASS_MAPPINGS = {
     "DoubaoSeedreamNode": DoubaoSeedreamNode,
     "ModelGenNode": ModelGenNode,
     "MoterPoseNode": MoterPoseNode,
+    "ViduT2VNode": ViduT2VNode,
+    "ViduI2VNode": ViduI2VNode,
+
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
@@ -1407,4 +1575,6 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "DoubaoSeedreamNode": "seedream-4.0",
     "ModelGenNode": "服装模特生成",
     "MoterPoseNode": "模特姿势更改",
+    "ViduT2VNode": "Vidu文生视频",
+    "ViduI2VNode": "Vidu首尾帧视频",
 }
