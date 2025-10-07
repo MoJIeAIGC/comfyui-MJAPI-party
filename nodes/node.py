@@ -1112,6 +1112,28 @@ class ReplaceClothesNode:
         # 调用配置管理器获取配置
         oneapi_url, oneapi_token = config_manager.get_api_config()
 
+        # 获取model_image的尺寸并计算宽高比
+        height, width = model_image.shape[1], model_image.shape[2]  # 获取图像的高度和宽度
+        image_ratio = width / height  # 计算图像的宽高比
+        print(f"模特图片宽高比例: {image_ratio}")
+        # 预定义的宽高比列表及其对应的比值
+        aspect_ratios = {
+            "21:9": 21/9,
+            "16:9": 16/9,
+            "4:3": 4/3,
+            "3:2": 3/2,
+            "1:1": 1/1,
+            "5:4": 5/4,
+            "4:5": 4/5,
+            "3:4": 3/4,
+            "2:3": 2/3,
+            "9:16": 9/16
+        }
+        
+        # 找出最接近的宽高比
+        closest_ratio = min(aspect_ratios, key=lambda x: abs(aspect_ratios[x] - image_ratio))
+        print(f"最接近的宽高比: {closest_ratio}")
+
         merged_base64 = ImageConverter.prepare_and_stitch_images(model_image, cloths_image)
 
         headers = {
@@ -1125,6 +1147,7 @@ class ReplaceClothesNode:
             "model": "dressV2ing_diffusion",
             "Custom_prompt": False,
             "seed": seed, 
+            "aspect_ratio": closest_ratio,
             "input_image": merged_base64,
         }
 
@@ -1150,7 +1173,7 @@ class ReplaceClothesNode:
             img_bytes = responseurl.content
             img = Image.open(BytesIO(img_bytes)).convert("RGB")
 
-            img = ImageConverter.get_right_part_of_image(img)
+            # img = ImageConverter.get_right_part_of_image(img)
             # 直接调用导入的 pil2tensor 函数
             tensor_img = ImageConverter.pil2tensor(img)
             output_tensors.append(tensor_img)
