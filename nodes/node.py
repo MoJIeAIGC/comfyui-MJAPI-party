@@ -954,7 +954,7 @@ class GetDressing:
         return {
             "required": {
                 "image": ("IMAGE",),  # 输入图像
-                "extend_prompt": ([ "全身", "上身", "下身","外套"], {"default": "全身"}),
+                "extend_prompt": ([ "默认","全身", "上身", "下身","外套"], {"default": "默认"}),
                 "size": ([ "1:1", "3:4", "4:3"], {"default": "1:1"}),
                 "seed": ("INT", {"default": -1}),  # -1表示随机
             }
