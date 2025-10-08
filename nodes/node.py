@@ -1365,12 +1365,19 @@ class DoubaoSeedreamNode:
 class ModelGenNode:
     @classmethod
     def INPUT_TYPES(cls):
+        # 发送请求
+        url = "https://qihuaimage.com/api/mjapi/styles/"
+        response = requests.get(url)
+        response.raise_for_status()
+        result = response.json()
+        styles = result.get("data", [])
+        style_prompt = [item["name"] for item in styles]
         return {
             "required": {
                 "cloths_image": ("IMAGE",),  # 输入图像
                 "race_class": (["亚裔", "黑人", "白人"], {"default": "亚裔"}),
                 "gender_class": (["man", "woman", "little boy","little girl"], {"default": "woman"}),
-                "style_prompt": (["INS自拍风", "女装涉谷街拍风", "简约风", "清新室内风", "靠墙特写","露营风"], {"default": "INS自拍风"}),
+                "style_prompt": (style_prompt, {"default": "INS自拍风"}),
                 "seed": ("INT", {"default": -1}),
             },
             "optional": {
