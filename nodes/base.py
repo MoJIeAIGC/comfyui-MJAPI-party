@@ -400,3 +400,43 @@ class ImageConverter:
         # 执行裁剪
         return img.crop((0, top, width, bottom))
 
+
+
+
+    @staticmethod
+    def get_lang(lang):
+        combined_lang_dict = {
+            "阿拉伯语": "ar",
+            "法语": "fr",
+            "英语": "en",
+            "加泰罗尼亚语": "ca",
+            "葡萄牙语": "pt",
+            "西班牙语": "es",
+            "荷兰语": "nl",
+            "德语": "de",
+            "斯洛文尼亚语": "sl",
+            "阿塞拜疆语": "az",
+            "孟加拉语": "bn",
+            "俄语": "ru",
+            "挪威语": "no",
+            "马来语": "ms",
+            "中文": "zh",
+            "中文 (繁体)": "zh_hant",
+            "捷克语": "cs",
+            "斯洛伐克语": "sk",
+            "波兰语": "pl",
+            "匈牙利语": "hu",
+            "越南语": "vi",
+            "丹麦语": "da",
+            "芬兰语": "fi",
+            "瑞典语": "sv",
+            "印尼语": "id",
+            "希伯来语": "he",
+            "意大利语": "it",
+            "日语": "ja",
+            "韩语": "ko",
+            "泰米尔语": "ta",
+            "泰语": "th",
+            "土耳其语": "tr"
+        }
+        return combined_lang_dict.get(lang, "auto")

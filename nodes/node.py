@@ -1540,6 +1540,196 @@ class MoterPoseNode:
             return (torch.cat(error_tensors, dim=0),)
 
 
+class ImageTranslateNode:
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "image_input": ("IMAGE", {"default": []}),  # 可选的图像输入
+                "modelid": (["default", "erase" ], {"default": "default"}),
+                "SourceLang": (["auto","阿拉伯语", "法语", "英语",  "加泰罗尼亚语", "葡萄牙语", "西班牙语", "荷兰语", "德语", "斯洛文尼亚语", "阿塞拜疆语", "孟加拉语", "俄语", "挪威语", "马来语", "中文", "中文 (繁体)", "捷克语", "斯洛伐克语", "波兰语", "匈牙利语", "越南语", "丹麦语", "芬兰语", "瑞典语", "印尼语", "希伯来语", "意大利语", "日语", "韩语", "泰米尔语", "泰语", "土耳其语"], {"default": "auto"}),
+                "TargetLang": (["auto","中文", "中文 (繁体)", "英语",  "日语", "韩语", "阿拉伯语", "葡萄牙语", "法语", "德语", "西班牙语", "印尼语", "意大利语", "马来语", "俄语", "泰语", "越南语"], {"default": "auto"}),
+                "seed": ("INT", {"default": -1}),
+            }
+        }
+
+    RETURN_TYPES = ("IMAGE",)  # 返回一个或多个IMAGE
+    RETURN_NAMES = ("output",)  # 保持为一个返回名
+    FUNCTION = "generate"
+    CATEGORY = "🎨MJapiparty/ImageCreat"
+
+    def generate(self, seed, image_input=[], modelid="default", SourceLang="auto", TargetLang="auto"):
+        # 调用配置管理器获取配置
+        oneapi_url, oneapi_token = config_manager.get_api_config()
+        
+        def call(img):
+            binary_data_base64 = ImageConverter.tensor_to_base64(img)
+
+            payload = {
+                "model": "image_translate",
+                "seed": int(seed+6),
+                "input_image": binary_data_base64,
+                "modelid": modelid,
+                "SourceLang": ImageConverter.get_lang(SourceLang),
+                "TargetLang": ImageConverter.get_lang(TargetLang),
+            }
+
+            headers = {
+                "Content-Type": "application/json",
+                "Authorization": f"Bearer {oneapi_token}"
+            }
+            response = requests.post(oneapi_url, headers=headers, json=payload, timeout=1200)
+            # 判断状态码是否为 200
+            if response.status_code != 200:
+                error_msg = ImageConverter.get_status_error_msg(response)
+                print("错误信息",error_msg)
+                output_tensors = []
+                error_tensor = ImageConverter.create_error_image(error_msg)
+                output_tensors.append(error_tensor)
+                return (torch.cat(output_tensors, dim=0),)
+            response.raise_for_status()
+            result = response.json()
+
+            # 从返回的结果中提取图片 URL
+            res_url = result.get("res_url", "")
+            if not res_url:
+                raise ValueError("未找到图片 URL")
+            return res_url
+
+        api_tensors = []
+        for img in image_input:
+            try:
+                # 宽高
+                width, height = img.shape[2], img.shape[1]
+                print(f"图片宽高: {width}x{height}")
+
+                res_url = call(img)
+                response = requests.get(res_url)
+                response.raise_for_status()
+                # 将图片数据转换为 PIL 图像对象
+                img = Image.open(BytesIO(response.content)).convert("RGB")
+                api_tensors.append(ImageConverter.pil2tensor(img))
+            except Exception as e:
+                print(f"下载图片 {res_url} 失败: {str(e)}")
+                error_tensor = ImageConverter.create_error_image("下载图片失败")
+                api_tensors.append(error_tensor)
+
+        if not api_tensors:
+            error_tensor = ImageConverter.create_error_image("未获取到有效图片 URL")
+            api_tensors.append(error_tensor)
+
+        return (torch.cat(api_tensors, dim=0),)
+
+class ImageUpscaleNode:
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "image_input": ("IMAGE", {"default": []}),  # 可选的图像输入
+                "seed": ("INT", {"default": -1}),
+                "multiple": (["x2", "x4", "x6", "x8"], {"default": "x2"}),
+            }
+        }
+
+    RETURN_TYPES = ("IMAGE",)  # 返回一个或多个IMAGE
+    RETURN_NAMES = ("output",)  # 保持为一个返回名
+    FUNCTION = "generate"
+    CATEGORY = "🎨MJapiparty/ImageCreat"
+
+    def generate(self, seed, image_input=[], multiple="x2"):
+
+            
+        # 调用配置管理器获取配置
+        oneapi_url, oneapi_token = config_manager.get_api_config()
+
+        multiple_map = {
+            "x2": 2,
+            "x4": 4,
+            "x6": 6,
+            "x8": 8,
+        }
+        multiple = multiple_map[multiple]
+
+        def call(img):
+            binary_data_base64 = ImageConverter.tensor_to_base64(img)
+
+            payload = {
+                "model": "image_upscale",
+                "seed": int(seed+6),
+                "input_image": binary_data_base64,
+                "multiple": multiple,
+            }
+
+            headers = {
+                "Content-Type": "application/json",
+                "Authorization": f"Bearer {oneapi_token}"
+            }
+            response = requests.post(oneapi_url, headers=headers, json=payload, timeout=1200)
+            # 判断状态码是否为 200
+            if response.status_code != 200:
+                error_msg = ImageConverter.get_status_error_msg(response)
+                print("错误信息",error_msg)
+                output_tensors = []
+                error_tensor = ImageConverter.create_error_image(error_msg)
+                output_tensors.append(error_tensor)
+                return (torch.cat(output_tensors, dim=0),)
+            response.raise_for_status()
+            result = response.json()
+
+            # 从返回的结果中提取图片 URL
+            res_url = result.get("res_url", "")
+            if not res_url:
+                raise ValueError("未找到图片 URL")
+            return res_url
+
+        api_tensors = []
+        for img in image_input:
+            try:
+                # 宽高
+                width, height = img.shape[2], img.shape[1]
+                print(f"图片宽高: {width}x{height}")
+
+                # 计算放大后的宽高
+                new_width = width * multiple
+                new_height = height * multiple
+                
+                # 检查是否超过10240px的限制
+                max_size = 10240
+                if new_width > max_size or new_height > max_size:
+                    # 计算需要的缩放比例，让原始图片放大multiple倍后不超过限制
+                    required_scale_factor = min(max_size / (width * multiple), max_size / (height * multiple))
+                    # 调整原始图片尺寸
+                    adjusted_width = int(width * required_scale_factor)
+                    adjusted_height = int(height * required_scale_factor)
+                    print(f"放大后尺寸将超出限制，先将原始图片缩放到: {adjusted_width}x{adjusted_height}")
+                    
+                    # 将张量转换为PIL图像进行尺寸调整
+                    pil_img = ImageConverter.tensor2pil(img)
+                    # 使用LANCZOS过滤器调整尺寸，获得更好的质量
+                    pil_img = pil_img.resize((adjusted_width, adjusted_height), Image.Resampling.LANCZOS)
+                    # 转换回张量
+                    img = ImageConverter.pil2tensor(pil_img)
+                    
+                    # 更新宽高信息
+                    width, height = adjusted_width, adjusted_height
+
+                res_url = call(img)
+                response = requests.get(res_url)
+                response.raise_for_status()
+                # 将图片数据转换为 PIL 图像对象
+                img = Image.open(BytesIO(response.content)).convert("RGB")
+                api_tensors.append(ImageConverter.pil2tensor(img))
+            except Exception as e:
+                print(f"下载图片 {res_url} 失败: {str(e)}")
+                error_tensor = ImageConverter.create_error_image("下载图片失败")
+                api_tensors.append(error_tensor)
+
+        if not api_tensors:
+            error_tensor = ImageConverter.create_error_image("未获取到有效图片 URL")
+            api_tensors.append(error_tensor)
+
+        return (torch.cat(api_tensors, dim=0),)
+
 
 NODE_CLASS_MAPPINGS = {
     "DreaminaI2INode": DreaminaI2INode,
@@ -1561,6 +1751,8 @@ NODE_CLASS_MAPPINGS = {
     "MoterPoseNode": MoterPoseNode,
     "ViduT2VNode": ViduT2VNode,
     "ViduI2VNode": ViduI2VNode,
+    "ImageUpscaleNode": ImageUpscaleNode,
+    "ImageTranslateNode": ImageTranslateNode,
 
 }
 
@@ -1584,4 +1776,6 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "MoterPoseNode": "模特姿势更改",
     "ViduT2VNode": "Vidu文生视频",
     "ViduI2VNode": "Vidu首尾帧视频",
+    "ImageUpscaleNode": "高清放大",
+    "ImageTranslateNode": "图片翻译",
 }
