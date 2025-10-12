@@ -89,6 +89,94 @@ app.registerExtension({
             // category: ["Custom Nodes"]
         });
 
+        // 账户充值入口
+        app.ui.settings.addSetting({
+            id: "Mjapi.recharge",
+            name: "账户充值请前往：",
+            type: () => {
+                const container = document.createElement("div");
+
+                const link = document.createElement("a");
+                link.href = "https://mojieaigc.com";
+                link.innerText = "https://mojieaigc.com";
+                link.target = "_blank"; // ✅ 新窗口打开
+                link.className = "comfy-text";
+                link.style.color = "#00aaff";
+                link.style.fontWeight = "bold";
+                link.style.textDecoration = "underline";
+                link.style.cursor = "pointer";
+
+                container.appendChild(link);
+                return container;
+            },
+        });
+
+        // 用户信息
+        app.ui.settings.addSetting({
+            id: "Mjapi.userinfo",
+            name: "账户信息",
+            type: () => {
+                const container = document.createElement("div");
+                container.style.display = "flex";
+                container.style.flexDirection = "column";
+                container.style.gap = "6px"; // 每行间距
+                container.style.fontSize = "14px";
+                container.style.padding = "4px 0";
+
+                // 第1行：用户名
+                const userRow = document.createElement("div");
+                userRow.style.display = "flex";
+                userRow.style.justifyContent = "space-between";
+                userRow.style.alignItems = "center";
+
+                const userLabel = document.createElement("span");
+                userLabel.textContent = "当前账户：";
+                userLabel.style.color = "#888";
+
+                const userValue = document.createElement("span");
+                userValue.className = "comfy-text";
+                userValue.style.fontWeight = "bold";
+                userValue.style.color = "#00aaff";
+
+                userRow.appendChild(userLabel);
+                userRow.appendChild(userValue);
+
+                // 第2行：余额
+                const quotaRow = document.createElement("div");
+                quotaRow.style.display = "flex";
+                quotaRow.style.justifyContent = "space-between";
+                quotaRow.style.alignItems = "center";
+
+                const quotaLabel = document.createElement("span");
+                quotaLabel.textContent = "当前余额：";
+                quotaLabel.style.color = "#888";
+
+                const quotaValue = document.createElement("span");
+                quotaValue.className = "comfy-text";
+                quotaValue.style.fontWeight = "bold";
+                quotaValue.style.color = "#00cc66";
+
+                quotaRow.appendChild(quotaLabel);
+                quotaRow.appendChild(quotaValue);
+
+                // 加入容器
+                container.appendChild(userRow);
+                container.appendChild(quotaRow);
+
+                // 获取用户信息
+                api.fetchApi("/my_node/get_user").then(async (resp) => {
+                    const data = await resp.json();
+                    console.log(data);
+                    userValue.textContent = data.username || "未知";
+                    quotaValue.textContent = data.quota !== undefined ? data.quota : "—";
+                }).catch((err) => {
+                    userValue.textContent = "加载失败";
+                    quotaValue.textContent = "—";
+                });
+
+                return container;
+            },
+        });
 
 
     }

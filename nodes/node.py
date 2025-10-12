@@ -1547,8 +1547,8 @@ class ImageTranslateNode:
             "required": {
                 "image_input": ("IMAGE", {"default": []}),  # 可选的图像输入
                 "modelid": (["default", "erase" ], {"default": "default"}),
-                "SourceLang": (["auto","阿拉伯语", "法语", "英语",  "加泰罗尼亚语", "葡萄牙语", "西班牙语", "荷兰语", "德语", "斯洛文尼亚语", "阿塞拜疆语", "孟加拉语", "俄语", "挪威语", "马来语", "中文", "中文 (繁体)", "捷克语", "斯洛伐克语", "波兰语", "匈牙利语", "越南语", "丹麦语", "芬兰语", "瑞典语", "印尼语", "希伯来语", "意大利语", "日语", "韩语", "泰米尔语", "泰语", "土耳其语"], {"default": "auto"}),
-                "TargetLang": (["auto","中文", "中文 (繁体)", "英语",  "日语", "韩语", "阿拉伯语", "葡萄牙语", "法语", "德语", "西班牙语", "印尼语", "意大利语", "马来语", "俄语", "泰语", "越南语"], {"default": "auto"}),
+                "SourceLang": (["阿拉伯语", "法语", "英语",  "加泰罗尼亚语", "葡萄牙语", "西班牙语", "荷兰语", "德语", "斯洛文尼亚语", "阿塞拜疆语", "孟加拉语", "俄语", "挪威语", "马来语", "中文", "中文 (繁体)", "捷克语", "斯洛伐克语", "波兰语", "匈牙利语", "越南语", "丹麦语", "芬兰语", "瑞典语", "印尼语", "希伯来语", "意大利语", "日语", "韩语", "泰米尔语", "泰语", "土耳其语"], {"default": "英语"}),
+                "TargetLang": (["中文", "中文 (繁体)", "英语",  "日语", "韩语", "阿拉伯语", "葡萄牙语", "法语", "德语", "西班牙语", "印尼语", "意大利语", "马来语", "俄语", "泰语", "越南语"], {"default": "英语"}),
                 "seed": ("INT", {"default": -1}),
             }
         }
@@ -1627,7 +1627,7 @@ class ImageUpscaleNode:
             "required": {
                 "image_input": ("IMAGE", {"default": []}),  # 可选的图像输入
                 "seed": ("INT", {"default": -1}),
-                "multiple": (["x2", "x4", "x6", "x8"], {"default": "x2"}),
+                "multiple": (["x2", "x4", "x6"], {"default": "x2"}),
             }
         }
 
@@ -1685,33 +1685,66 @@ class ImageUpscaleNode:
         api_tensors = []
         for img in image_input:
             try:
-                # 宽高
-                width, height = img.shape[2], img.shape[1]
+
+                # 获取图片尺寸
+                # print("处理图片...",len(img.shape))
+                height, width = img.shape[0], img.shape[1]
                 print(f"图片宽高: {width}x{height}")
 
-                # 计算放大后的宽高
-                new_width = width * multiple
-                new_height = height * multiple
+                # print("====== 图像输入调试 ======")
+                # print("类型:", type(img))
+
+                # if isinstance(img, torch.Tensor):
+                #     print("形状:", img.shape)
+                #     print("数据类型:", img.dtype)
+                #     print("值范围:", (float(img.min()), float(img.max())))
+                #     print("前10个像素值:", img.flatten()[:10])
+                # elif isinstance(img, list) or isinstance(img, tuple):
+                #     print("列表长度:", len(img))
+                #     if len(img) > 0 and isinstance(img[0], torch.Tensor):
+                #         print("第一个元素形状:", img[0].shape)
+                # else:
+                #     print("未知结构:", img)
+                # print("=========================")
                 
-                # 检查是否超过10240px的限制
-                max_size = 10240
-                if new_width > max_size or new_height > max_size:
-                    # 计算需要的缩放比例，让原始图片放大multiple倍后不超过限制
-                    required_scale_factor = min(max_size / (width * multiple), max_size / (height * multiple))
-                    # 调整原始图片尺寸
-                    adjusted_width = int(width * required_scale_factor)
-                    adjusted_height = int(height * required_scale_factor)
-                    print(f"放大后尺寸将超出限制，先将原始图片缩放到: {adjusted_width}x{adjusted_height}")
+                # 检查图片尺寸是否满足要求
+                min_size = 256
+                max_size = 2048
+                
+                # 调整图片尺寸以满足要求
+                if width < min_size or height < min_size or width > max_size or height > max_size:
+                    # 计算缩放因子
+                    scale_factor = 1.0
                     
-                    # 将张量转换为PIL图像进行尺寸调整
+                    # 处理过小的情况
+                    if width < min_size or height < min_size:
+                        scale_factor = max(min_size / width, min_size / height)
+                    
+                    # 处理过大的情况
+                    new_width = int(width * scale_factor)
+                    new_height = int(height * scale_factor)
+                    if new_width > max_size or new_height > max_size:
+                        scale_factor = min(max_size / width, max_size / height)
+                    
+                    # 计算新的尺寸
+                    new_width = int(width * scale_factor)
+                    new_height = int(height * scale_factor)
+                    print(f"调整图片尺寸至: {new_width}x{new_height}")
+                    
+                    # 转换并调整尺寸
                     pil_img = ImageConverter.tensor2pil(img)
-                    # 使用LANCZOS过滤器调整尺寸，获得更好的质量
-                    pil_img = pil_img.resize((adjusted_width, adjusted_height), Image.Resampling.LANCZOS)
-                    # 转换回张量
+                    pil_img = pil_img.resize((new_width, new_height), Image.Resampling.LANCZOS)
                     img = ImageConverter.pil2tensor(pil_img)
-                    
-                    # 更新宽高信息
-                    width, height = adjusted_width, adjusted_height
+                else:
+                    new_width = width
+                    new_height = height
+
+                # 如果宽高*multiple大于10240，就直接原图输出
+                if new_width * multiple > 10240 or new_height * multiple > 10240:
+                    print(f"图片尺寸 {new_width}x{new_height} 超过最大限制 10240x10240，直接输出原图")
+                    api_tensors.append(img)
+                    continue
+
 
                 res_url = call(img)
                 response = requests.get(res_url)
@@ -1720,7 +1753,6 @@ class ImageUpscaleNode:
                 img = Image.open(BytesIO(response.content)).convert("RGB")
                 api_tensors.append(ImageConverter.pil2tensor(img))
             except Exception as e:
-                print(f"下载图片 {res_url} 失败: {str(e)}")
                 error_tensor = ImageConverter.create_error_image("下载图片失败")
                 api_tensors.append(error_tensor)
 
