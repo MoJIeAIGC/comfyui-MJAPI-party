@@ -14,7 +14,6 @@
     </a>
 </div>
   
-
 ***  
 
   MojieAI开发的Comfyui自定义节点工具。为了让comfyui更加普及，让本地低配置电脑也同样能顺利的运行comfyui，同时避免在comfyui中调用外部API时密钥和地址难以统一管理，以及许多更优秀模型本地算力难以支撑，本地部署耗时耗力，因此mjapi-party将许多优秀常用的API节点做整合，只需要一个API-key即可以调用全网的API接口能力，也能够通过comfyui节点式操作，保留极大的灵活性，极大的拓展了comfyui的易用性。更多API节点正逐步添加中,后续也会逐步增加对扣子和n8n的支持。
@@ -32,6 +31,8 @@
 [传送门](https://space.bilibili.com/483532108)
 
 ### 目前已支持的节点
+- [图片翻译节点](/doc/node_list.md#图片翻译节点)
+- [图片高清放大节点](/doc/node_list.md#图片高清放大节点)
 - [seedance视频生成](/doc/node_list.md#seedance视频生成)
 - [服装系列节点](/doc/node_list.md#服装系列节点)
 - [seedream-4](/doc/node_list.md#seedream-4使用说明)
@@ -53,6 +54,15 @@
 
 在comfyui节点列表中找到mjapiparty
 ![alt text](doc/assets/node.png)
+
+- 251012-新增图片翻译节点和图片高清放大节点
+#### 图片翻译节点
+该节点支持20多种语言，包括中文、英文、日文、韩文、法文、德文、西班牙文、葡萄牙文、意大利文、俄语等，可以将图片中的文字翻译成其他语言。
+![alt text](doc/assets/图片翻译.png)
+
+#### 图片高清放大节点
+该节点可以将图片放大最高6倍，在保留细节的同时提高图片的清晰度。
+![alt text](doc/assets/图片高清放大.png)
 
 - 250929-新增seedance视频生成节点，原有即梦视频生成已下线.
 #### seedance 视频生成节点使用说明
