@@ -969,12 +969,6 @@ class GetDressing:
         # 调用配置管理器获取配置
         oneapi_url, oneapi_token = config_manager.get_api_config()
 
-        sizes = {
-            "1:1": "2048x2048",
-            "3:4": "1728x2304",
-            "4:3": "2304x1728"
-        }
-
         mig_base64 = ImageConverter.tensor_to_base64(image)
 
         headers = {
@@ -989,8 +983,8 @@ class GetDressing:
         payload = {
             "model": "mojie_get_dressing",
             "seed": seed, 
-            "size": sizes[size],
-            "input_image": [mig_base64],
+            "aspect_ratio": size,
+            "input_image": mig_base64,
             "watermark": False,
             "extend_prompt": extend_prompt
         }
