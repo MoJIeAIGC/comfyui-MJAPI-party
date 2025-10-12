@@ -1,58 +1,9 @@
 {
   "id": "0a3b477c-f646-4993-b4fe-3370d260bbe9",
   "revision": 0,
-  "last_node_id": 24,
+  "last_node_id": 25,
   "last_link_id": 13,
   "nodes": [
-    {
-      "id": 2,
-      "type": "ModelGenNode",
-      "pos": [
-        536.0947265625,
-        231.709228515625
-      ],
-      "size": [
-        270,
-        174
-      ],
-      "flags": {},
-      "order": 10,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "cloths_image",
-          "type": "IMAGE",
-          "link": 1
-        },
-        {
-          "name": "face_image",
-          "shape": 7,
-          "type": "IMAGE",
-          "link": 2
-        }
-      ],
-      "outputs": [
-        {
-          "name": "output",
-          "type": "IMAGE",
-          "links": [
-            4
-          ]
-        }
-      ],
-      "properties": {
-        "cnr_id": "Mojie-API-Party",
-        "ver": "5f88d79db064fced6dce5b6dafb42aa836b81c60",
-        "Node name for S&R": "ModelGenNode"
-      },
-      "widgets_values": [
-        "亚裔",
-        "woman",
-        "INS自拍风",
-        396,
-        "randomize"
-      ]
-    },
     {
       "id": 6,
       "type": "SaveImage",
@@ -429,51 +380,6 @@
       "widgets_values": []
     },
     {
-      "id": 18,
-      "type": "ReplaceClothesNode",
-      "pos": [
-        2152.884521484375,
-        260.51910400390625
-      ],
-      "size": [
-        270,
-        102
-      ],
-      "flags": {},
-      "order": 13,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "cloths_image",
-          "type": "IMAGE",
-          "link": 9
-        },
-        {
-          "name": "model_image",
-          "type": "IMAGE",
-          "link": 10
-        }
-      ],
-      "outputs": [
-        {
-          "name": "output",
-          "type": "IMAGE",
-          "links": [
-            13
-          ]
-        }
-      ],
-      "properties": {
-        "cnr_id": "Mojie-API-Party",
-        "ver": "5f88d79db064fced6dce5b6dafb42aa836b81c60",
-        "Node name for S&R": "ReplaceClothesNode"
-      },
-      "widgets_values": [
-        379,
-        "randomize"
-      ]
-    },
-    {
       "id": 24,
       "type": "SaveImage",
       "pos": [
@@ -626,6 +532,100 @@
       ],
       "color": "#432",
       "bgcolor": "#653"
+    },
+    {
+      "id": 2,
+      "type": "ModelGenNode",
+      "pos": [
+        536.0947265625,
+        231.709228515625
+      ],
+      "size": [
+        270,
+        174
+      ],
+      "flags": {},
+      "order": 10,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "cloths_image",
+          "type": "IMAGE",
+          "link": 1
+        },
+        {
+          "name": "face_image",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": 2
+        }
+      ],
+      "outputs": [
+        {
+          "name": "output",
+          "type": "IMAGE",
+          "links": [
+            4
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "Mojie-API-Party",
+        "ver": "5f88d79db064fced6dce5b6dafb42aa836b81c60",
+        "Node name for S&R": "ModelGenNode"
+      },
+      "widgets_values": [
+        "亚裔",
+        "woman",
+        "通用-INS自拍",
+        396,
+        "randomize"
+      ]
+    },
+    {
+      "id": 18,
+      "type": "ReplaceClothesNode",
+      "pos": [
+        2152.884521484375,
+        260.51910400390625
+      ],
+      "size": [
+        270,
+        102
+      ],
+      "flags": {},
+      "order": 13,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "cloths_image",
+          "type": "IMAGE",
+          "link": 9
+        },
+        {
+          "name": "model_image",
+          "type": "IMAGE",
+          "link": 10
+        }
+      ],
+      "outputs": [
+        {
+          "name": "output",
+          "type": "IMAGE",
+          "links": [
+            13
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "Mojie-API-Party",
+        "ver": "5f88d79db064fced6dce5b6dafb42aa836b81c60",
+        "Node name for S&R": "ReplaceClothesNode"
+      },
+      "widgets_values": [
+        379,
+        "randomize"
+      ]
     }
   ],
   "links": [
@@ -799,10 +799,10 @@
   "config": {},
   "extra": {
     "ds": {
-      "scale": 0.683013455365071,
+      "scale": 1.1,
       "offset": [
-        531.416463976209,
-        112.20363959852996
+        194.49309691832187,
+        -132.32053702967104
       ]
     },
     "frontendVersion": "1.25.9"

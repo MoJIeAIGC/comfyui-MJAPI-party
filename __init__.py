@@ -7,7 +7,7 @@ config_manager = ConfigManager()
 import os
 import subprocess
 import logging
-
+import requests
 
 routes = PromptServer.instance.routes
 @routes.post('/my_node/set_key')
@@ -36,6 +36,27 @@ async def get_key(request):
         "msg": oneapi_token,
         "version": version
     })
+
+
+
+@routes.get('/my_node/get_user')
+async def get_user(request):
+    oneapi_url, oneapi_token = config_manager.get_api_config()
+    oneapi_token = oneapi_token[3:]
+    response = requests.get(f"https://mojieaigc.com/api/userinfoo?oneapi_token={oneapi_token}")
+    data = response.json()
+    print(f"用户信息响应: {data}")
+    username = data.get("username", "未知用户")
+    quota = data.get("quota", 0)
+    quota = round(quota/100, 2)
+    print(f"获取用户信息: {username}, 配额: {quota}")
+    
+    return web.json_response({
+        "msg": oneapi_token,
+        "username": username,
+        "quota": quota
+    })
+
 
 @routes.post('/my_node/update')
 async def update(request):
