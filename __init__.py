@@ -49,6 +49,8 @@ async def get_user(request):
         print(f"用户信息响应: {data}")
         username = data.get("username", "")
         quota = data.get("quota", 0)
+        # 报量两位小数
+        quota = round(quota / 100, 2)
         print(f"获取用户信息: {username}, 配额: {quota}")
         return web.json_response({
             "msg": "ok",
