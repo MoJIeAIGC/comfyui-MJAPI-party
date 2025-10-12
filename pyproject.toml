@@ -1,7 +1,7 @@
 [project]
 name = "Mojie-API-Party"
 description = "A node that aggregates many powerful API features,Easier integration into workflows"
-version = "1.9.2"
+version = "1.9.5"
 license = {file = "LICENSE"}
 dependencies = []
 classifiers = ["Operating System :: OS Independent"]
