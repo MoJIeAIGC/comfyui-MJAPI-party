@@ -1556,7 +1556,7 @@ class ImageTranslateNode:
     RETURN_TYPES = ("IMAGE",)  # 返回一个或多个IMAGE
     RETURN_NAMES = ("output",)  # 保持为一个返回名
     FUNCTION = "generate"
-    CATEGORY = "🎨MJapiparty/ImageCreat"
+    CATEGORY = "🎨MJapiparty/Tools_api"
 
     def generate(self, seed, image_input=[], modelid="default", SourceLang="auto", TargetLang="auto"):
         # 调用配置管理器获取配置
@@ -1634,7 +1634,7 @@ class ImageUpscaleNode:
     RETURN_TYPES = ("IMAGE",)  # 返回一个或多个IMAGE
     RETURN_NAMES = ("output",)  # 保持为一个返回名
     FUNCTION = "generate"
-    CATEGORY = "🎨MJapiparty/ImageCreat"
+    CATEGORY = "🎨MJapiparty/Tools_api"
 
     def generate(self, seed, image_input=[], multiple="x2"):
 
