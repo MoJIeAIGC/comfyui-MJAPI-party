@@ -1446,12 +1446,12 @@ class ModelGenNode:
                 # 直接调用导入的 pil2tensor 函数
                 # tensor_img = ImageConverter.pil2tensor(img)
                 output_tensors.append(img)
-                print(f"Gemini 第 {i+1} 张图片生成成功")
+                print(f"MojieClothesAPI 第 {i+1} 张图片生成成功")
 
             return (torch.cat(output_tensors, dim=0),)  # 拼接为 (数量, H, W, 3)
 
         except Exception as e:
-            print(f"Gemini: {str(e)}")
+            print(f"MojieClothesAPI: {str(e)}")
             error_tensor = ImageConverter.create_error_image("运行异常，请稍后重试")
             # 返回指定数量错误图
             error_tensors = [error_tensor for _ in range(1)]
