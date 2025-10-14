@@ -1371,7 +1371,7 @@ class ModelGenNode:
                 "cloths_image": ("IMAGE",),  # 输入图像
                 "race_class": (["亚裔", "黑人", "白人"], {"default": "亚裔"}),
                 "gender_class": (["man", "woman", "little boy","little girl"], {"default": "woman"}),
-                "style_prompt": (style_prompt, {"default": "INS自拍风"}),
+                "style_prompt": (style_prompt, {"default": "通用-INS自拍"}),
                 "seed": ("INT", {"default": -1}),
                 "Size": (["1:1", "3:4", "9:16"], {"default": "3:4"}),
             },
