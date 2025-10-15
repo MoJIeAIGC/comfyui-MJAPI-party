@@ -1436,7 +1436,7 @@ class ModelGenNode:
             # 将图片数据转换为 PIL 图像对象
             img = Image.open(BytesIO(response.content)).convert("RGB")
             # 调用封装的函数裁剪白色边框
-            img = ImageConverter.crop_white_borders(img)
+            # img = ImageConverter.crop_white_borders(img)
             return ImageConverter.pil2tensor(img)
 
         output_tensors = []
