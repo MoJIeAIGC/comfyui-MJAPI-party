@@ -533,10 +533,8 @@ class ViduT2VNode:
         return {
             "required": {
                 "prompt": ("STRING", {"default": "", "multiline": True}),
-                "model": (["viduq1", "vidu1.5"], {"default": "viduq1"}),
-                "style": (["general", "anime"], {"default": "general"}),
-                "duration": ("INT", {"default": 5, "min": 4, "max": 5, "readonly": True}),
-                "resolution": (["360P", "720P", "1080p"], {"default": "1080p"}),
+                "duration": ("INT", {"default": 5, "min": 1, "max": 8}),
+                "resolution": (["540p", "720p", "1080p"], {"default": "1080p"}),
                 "movement_amplitude": (["auto", "small", "medium", "large"], {"default": "auto"}),
                 "Size": (["1:1", "9:16", "16:9"], {"default": "16:9"}),
                 "bgm": ("BOOLEAN", {"default": False}),  # 是否是翻译模式
@@ -549,14 +547,14 @@ class ViduT2VNode:
     FUNCTION = "generate"
     CATEGORY = "🎨MJapiparty/VideoCreat"
 
-    def generate(self, prompt, model, seed, style="general", duration=5, resolution="1080p", Size="16:9", movement_amplitude="auto", bgm=False):
+    def generate(self, prompt, seed, duration=5, resolution="1080p", Size="16:9", movement_amplitude="auto", bgm=False):
         # 获取配置
         oneapi_url, oneapi_token = config_manager.get_api_config()
 
         def call_api(seed_override):
             payload = {
                 "model": "vidut2vNode",
-                "modelr": model,
+                "modelr": "viduq2",
                 "prompt": prompt,
                 "seed": int(seed_override),
                 "resolution": resolution,
@@ -564,7 +562,6 @@ class ViduT2VNode:
                 "duration": duration,
                 "movement_amplitude": movement_amplitude,
                 "bgm": bgm,
-                "style": style,
             }
 
             headers = {
@@ -600,11 +597,9 @@ class ViduI2VNode:
                 "first_image": ("IMAGE",),  # 接收多个图片
                 "last_image": ("IMAGE",),  # 接收多个图片
                 "prompt": ("STRING", {"default": "", "multiline": True}),
-                "model": (["viduq1", "vidu1.5", "viduq1-classic", "vidu2.0"], {"default": "viduq1-classic"}),
-                "duration": ("INT", {"default": 5, "min": 4, "max": 5, "readonly": True}),
-                "resolution": (["360P", "720P", "1080p"], {"default": "1080p"}),
+                "duration": ("INT", {"default": 5, "min": 2, "max": 8}),
+                "resolution": (["720p", "1080p"], {"default": "1080p"}),
                 "movement_amplitude": (["auto", "small", "medium", "large"], {"default": "auto"}),
-                "Size": (["1:1", "9:16", "16:9"], {"default": "16:9"}),
                 "bgm": ("BOOLEAN", {"default": False}),  # 是否是翻译模式
                 "seed": ("INT", {"default": -1}),
             }
@@ -615,7 +610,7 @@ class ViduI2VNode:
     FUNCTION = "generate"
     CATEGORY = "🎨MJapiparty/VideoCreat"
 
-    def generate(self, prompt, model, seed,duration=5, resolution="1080p", Size="16:9", movement_amplitude="auto", bgm=False, first_image=None, last_image=None):
+    def generate(self, prompt,  seed,duration=5, resolution="1080p", Size="16:9", movement_amplitude="auto", bgm=False, first_image=None, last_image=None):
         # 获取配置
         oneapi_url, oneapi_token = config_manager.get_api_config()
         images = []
@@ -628,11 +623,10 @@ class ViduI2VNode:
         def call_api(seed_override):
             payload = {
                 "model": "vidui2vNode",
-                "modelr": model,
+                "modelr": "viduq2-turbo",
                 "prompt": prompt,
                 "seed": int(seed_override),
                 "resolution": resolution,
-                "aspect_ratio": Size,
                 "duration": duration,
                 "movement_amplitude": movement_amplitude,
                 "bgm": bgm,
@@ -1026,8 +1020,10 @@ class ViduNode:
         return {
             "required": {
                 "prompt": ("STRING", {"default": "A beautiful sunset", "multiline": True}),
-                "model": (["default", "viduq1", "vidu1.5", "vidu2.0"], {"default": "viduq1"}),
                 "aspect_ratio": ([ "16:9", "9:16", "1:1"], {"default": "16:9"}),
+                "duration": ("INT", {"default": 5, "min": 1, "max": 8}),
+                "resolution": (["540p", "720p", "1080p"], {"default": "1080p"}),
+                "movement_amplitude": (["auto", "small", "medium", "large"], {"default": "auto"}),
                 "seed": ("INT", {"default": -1}),
                 "images": ("IMAGE", {"default": []})  # 接收多个图片
             }
@@ -1038,24 +1034,21 @@ class ViduNode:
     FUNCTION = "generate"
     CATEGORY = "🎨MJapiparty/VideoCreat"
 
-    def generate(self, prompt, seed,model, aspect_ratio="16:9", images=[]):
+    def generate(self, prompt, seed, aspect_ratio="16:9", duration=5, resolution="1080p", movement_amplitude="auto", images=[]):
         # 获取配置
         oneapi_url, oneapi_token = config_manager.get_api_config()
-
-        if model == "viduq1":
-            duration = 5
-        else:
-            duration = 5
 
         def call_api(seed_override, binary_data_base64):
             payload = {
                 "model": "vidu_video",
-                "modelr": model,
+                "modelr": "viduq2",
                 "aspect_ratio": aspect_ratio,
                 "prompt": prompt,
                 "duration": duration,
                 "seed": 0,
-                "images": binary_data_base64  # 添加Base64编码的图片数据
+                "images": binary_data_base64,  # 添加Base64编码的图片数据
+                "resolution": resolution,
+                "movement_amplitude": movement_amplitude,
             }
             headers = {
                 "Content-Type": "application/json",
