@@ -1382,7 +1382,7 @@ class ModelGenNode:
         # 调用配置管理器获取配置
         oneapi_url, oneapi_token = config_manager.get_api_config()
 
-        image_base64 = ImageConverter.process_images(face_image, cloths_image)
+        cloths_image_base64 = ImageConverter.tensor_to_base64(cloths_image)
 
         races = {
             "亚裔": "Asia",
@@ -1402,8 +1402,12 @@ class ModelGenNode:
                 "is_face": is_face,
                 "style_prompt": style_prompt,
                 "aspect_ratio": Size,  # 传递尺寸参数
-                "input_image": image_base64
+                "cloths_image": cloths_image_base64
             }
+            if face_image is not None:
+                face_image_base64 = ImageConverter.tensor_to_base64(face_image)
+                payload["face_image"] = face_image_base64
+
 
             headers = {
                 "Content-Type": "application/json",
