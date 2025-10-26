@@ -90,14 +90,14 @@ async def login(request):
         
         # 发送GET请求到imagetranslate API
         try:
-            translate_response = requests.get(f"http://127.0.0.1:8080/api/mjapi/getcomfyuitoken", params={"userid": id})
+            translate_response = requests.get(f"https://qihuaimage.com/api/mjapi/getcomfyuitoken", params={"userid": id})
             translate_data = translate_response.json()
             if translate_data.get("code") != 200:
                 return web.json_response({"msg": "获取comfyui_token失败"}, status=400)
             key = "sk-"+translate_data.get("data").get("key")
             config_manager.set_api_key(key)
-            print(f"收到保存请求，KEY长度: {len(key)}")
-            print(f"返回数据: {translate_data}")
+            # print(f"收到保存请求，KEY长度: {len(key)}")
+            # print(f"返回数据: {translate_data}")
         except Exception as e:
             return web.json_response({"msg": f"获取comfyui_token失败: {e}"}, status=500)
 
