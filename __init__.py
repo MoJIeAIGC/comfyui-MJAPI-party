@@ -58,6 +58,57 @@ async def get_user(request):
     })
 
 
+@routes.post('/my_node/login')
+async def login(request):
+    try:
+        oneapi_url, oneapi_token = config_manager.get_api_config()
+
+        data = await request.json()
+        username = data.get("username", "")
+        password = data.get("password", "")
+        
+        # 非空检查
+        if not username or not password:
+            return web.json_response({"msg": "用户名和密码不能为空"}, status=400)
+        
+        # 发送登录请求
+        login_data = {
+            "username": username,
+            "password": password
+        }
+        
+        response = requests.post("https://mojieaigc.com/api/user/login", json=login_data)
+        response_data = response.json()
+        if not response_data.get("success"):
+            return web.json_response({"msg": "登录失败"}, status=400)
+
+        if oneapi_token:
+            return web.json_response({
+                "msg": "login success",
+            })
+        id = response_data.get("data").get("id")
+        
+        # 发送GET请求到imagetranslate API
+        try:
+            translate_response = requests.get(f"http://127.0.0.1:8080/api/mjapi/getcomfyuitoken", params={"userid": id})
+            translate_data = translate_response.json()
+            if translate_data.get("code") != 200:
+                return web.json_response({"msg": "获取comfyui_token失败"}, status=400)
+            key = "sk-"+translate_data.get("data").get("key")
+            config_manager.set_api_key(key)
+            print(f"收到保存请求，KEY长度: {len(key)}")
+            print(f"返回数据: {translate_data}")
+        except Exception as e:
+            return web.json_response({"msg": f"获取comfyui_token失败: {e}"}, status=500)
+
+        return web.json_response({
+            "msg": "登录请求已发送",
+            "data": response_data
+        })
+    except Exception as e:
+        print(f"登录失败: {str(e)}")
+        return web.json_response({"msg": f"登录失败: {e}"}, status=500)
+
 @routes.post('/my_node/update')
 async def update(request):
     try:
