@@ -58,6 +58,89 @@ async def get_user(request):
     })
 
 
+@routes.post('/my_node/send_message')
+async def send_message(request):
+    try:
+        data = await request.json()
+        email = data.get("email", "")
+        # 构建请求URL
+        url = f"https://mojieaigc.com/api/verification?email={email}&turnstile="
+        
+        try:
+            # 发送GET请求
+            resp = requests.get(url)
+            
+            # 解析JSON响应
+            data = resp.json()
+            
+            # 打印响应数据
+            print(f"验证码发送接口返回数据: {data}")
+            if data.get("success"):
+                return web.json_response({"msg": "验证码发送成功","success": True})
+            else:
+                return web.json_response({"msg": "验证码发送失败","success": False}, status=400)
+        except Exception as e:
+            print(f"验证码发送接口请求失败: {str(e)}")
+            return web.json_response({"msg": f"验证码发送失败: {e}","success": False}, status=500)
+
+    except Exception as e:
+        print(f"保存KEY失败: {str(e)}")
+        return web.json_response({"msg": f"保存失败: {e}"}, status=500)
+
+
+@routes.post('/my_node/register')
+async def register(request):
+    try:
+        oneapi_url, oneapi_token = config_manager.get_api_config()
+
+        data = await request.json()
+        account = data.get("email", "")
+        verifyCode = data.get("verification_code", "")
+        password = data.get("password", "")
+        confirmPwd = data.get("confirmPassword", "")
+
+        if not account or not verifyCode or not password or not confirmPwd:
+            return web.json_response({"msg": "所有字段不能为空","success": False}, status=400)
+
+        if password != confirmPwd:
+            return web.json_response({"msg": "两次密码输入不一致","success": False}, status=400)
+        
+        try:
+            # 调用注册接口
+            resp = requests.post("https://mojieaigc.com/api/user/register?turnstile=", json={
+                "username": account,
+                "email": account,
+                "password": password,
+                "confirmPassword": confirmPwd,
+                "verification_code": verifyCode
+            })
+            data = resp.json()
+            print(f"注册接口返回数据: {data}")
+            if data.get("success"):
+                # if oneapi_token:
+                return web.json_response({"msg": "注册成功","success": True})
+                # try:
+                #     translate_response = requests.get(f"https://qihuaimage.com/api/mjapi/getcomfyuitoken", params={"userid": 2})
+                #     translate_data = translate_response.json()
+                #     if translate_data.get("code") != 200:
+                #         return web.json_response({"msg": "获取comfyui_token失败"}, status=400)
+                #     key = "sk-"+translate_data.get("data").get("key")
+                #     config_manager.set_api_key(key)
+                #     return web.json_response({"msg": "注册成功","success": True})
+                # except Exception as e:
+                #     return web.json_response({"msg": f"获取comfyui_token失败: {e}","success": False}, status=500)
+            else:
+                return web.json_response({"msg": "注册失败","success": False}, status=400)
+        except Exception as e:
+            return web.json_response({"msg": f"注册失败: {e}","success": False}, status=500)
+
+    except Exception as e:
+        print(f"注册失败: {str(e)}")
+        return web.json_response({"msg": f"注册失败: {e}","success": False}, status=500)
+
+
+
+
 @routes.post('/my_node/login')
 async def login(request):
     try:
