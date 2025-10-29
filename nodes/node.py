@@ -1464,7 +1464,7 @@ class MoterPoseNode:
             "required": {
                 "image_input": ("IMAGE", {"default": None}),  # 可选的图像输入
                 "extent_prompt": ("BOOLEAN", {"default": True}),  # 是否是翻译模式
-                "out_batch": ("INT", {"default": 1, "min": 1, "max": 2}),  # 生成张数
+                "out_batch": ("INT", {"default": 1, "min": 1, "max": 4}),  # 生成张数
                 "seed": ("INT", {"default": -1}),
             }
         }
@@ -1484,6 +1484,7 @@ class MoterPoseNode:
                 "extent_prompt": extent_prompt,  # 传递翻译模式参数
                 "seed": int(seed_override),
                 "watermark": False,
+                "mount": out_batch,
                 "input_image": ImageConverter.tensor_to_base64(image_input)
             }
 
@@ -1505,26 +1506,33 @@ class MoterPoseNode:
 
             if not image_url:
                 raise ValueError("未找到图片 URL")
-            # 下载图片
-            response = requests.get(image_url)
-            response.raise_for_status()
-            # 将图片数据转换为 PIL 图像对象
-            img = Image.open(BytesIO(response.content)).convert("RGB")
-            return ImageConverter.pil2tensor(img)
+            image_urls = image_url.split("|") if image_url else []
 
-        output_tensors = []
+            api_tensors = []
+            print(image_urls)
+            for image_url in image_urls:
+                if not image_url:
+                    continue
+                try:
+                    # 下载图片
+                    response = requests.get(image_url)
+                    response.raise_for_status()
+                    # 将图片数据转换为 PIL 图像对象
+                    img = Image.open(BytesIO(response.content)).convert("RGB")
+                    api_tensors.append(ImageConverter.pil2tensor(img))
+                except Exception as e:
+                    print(f"下载图片 {image_url} 失败: {str(e)}")
+                    error_tensor = ImageConverter.create_error_image("下载图片失败")
+                    api_tensors.append(error_tensor)
+
+            if not api_tensors:
+                error_tensor = ImageConverter.create_error_image("未获取到有效图片 URL")
+                api_tensors.append(error_tensor)
+
+            return (torch.cat(api_tensors, dim=0),)
 
         try:
-            for i in range(out_batch):
-                # 如果两次请求用同一个seed也行，可改为 seed+i 实现不同seed
-                img = call_api(seed + i)
-                # 直接调用导入的 pil2tensor 函数
-                # tensor_img = ImageConverter.pil2tensor(img)
-                output_tensors.append(img)
-                print(f" 第 {i+1} 张图片生成成功")
-
-            return (torch.cat(output_tensors, dim=0),)  # 拼接为 (数量, H, W, 3)
-
+            return call_api(seed + 666)
         except Exception as e:
             print(f": {str(e)}")
             error_tensor = ImageConverter.create_error_image("运行异常，请稍后重试")
