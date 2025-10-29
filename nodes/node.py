@@ -1182,6 +1182,7 @@ class GeminiEditNode:
                 "prompt": ("STRING", {"default": "A beautiful sunset", "multiline": True}),
                 "is_translation": ("BOOLEAN", {"default": False}),  # 是否是翻译模式
                 "Size": (["1:1", "3:4", "4:3", "9:16", "16:9"], {"default": "3:4"}),
+                "mount": ("INT", {"default": 1, "min": 1, "max": 4}),  # 生成张数
                 "seed": ("INT", {"default": -1}),
             },
             "optional": {
@@ -1194,7 +1195,7 @@ class GeminiEditNode:
     FUNCTION = "generate"
     CATEGORY = "🎨MJapiparty/ImageCreat"
 
-    def generate(self, prompt, seed, image_input=None, is_translation=False, Size="3:4"):
+    def generate(self, prompt, seed, image_input=None, is_translation=False, Size="3:4", mount=1):
         # 调用配置管理器获取配置
         oneapi_url, oneapi_token = config_manager.get_api_config()
 
@@ -1204,6 +1205,7 @@ class GeminiEditNode:
                 "prompt": prompt,
                 "is_translation": is_translation,  # 传递翻译模式参数
                 "aspect_ratio": Size,  # 传递尺寸参数
+                "mount": mount,  # 生成张数
                 "seed": int(seed_override),
             }
             # 如果有图像输入，加入到payload中
@@ -1228,25 +1230,33 @@ class GeminiEditNode:
 
             if not image_url:
                 raise ValueError("未找到图片 URL")
-            # 下载图片
-            response = requests.get(image_url)
-            response.raise_for_status()
-            # 将图片数据转换为 PIL 图像对象
-            img = Image.open(BytesIO(response.content)).convert("RGB")
-            return ImageConverter.pil2tensor(img)
+            image_urls = image_url.split("|") if image_url else []
 
-        output_tensors = []
+            api_tensors = []
+            print(image_urls)
+            for image_url in image_urls:
+                if not image_url:
+                    continue
+                try:
+                    # 下载图片
+                    response = requests.get(image_url)
+                    response.raise_for_status()
+                    # 将图片数据转换为 PIL 图像对象
+                    img = Image.open(BytesIO(response.content)).convert("RGB")
+                    api_tensors.append(ImageConverter.pil2tensor(img))
+                except Exception as e:
+                    print(f"下载图片 {image_url} 失败: {str(e)}")
+                    error_tensor = ImageConverter.create_error_image("下载图片失败")
+                    api_tensors.append(error_tensor)
+
+            if not api_tensors:
+                error_tensor = ImageConverter.create_error_image("未获取到有效图片 URL")
+                api_tensors.append(error_tensor)
+
+            return (torch.cat(api_tensors, dim=0),)
 
         try:
-            for i in range(1):
-                # 如果两次请求用同一个seed也行，可改为 seed+i 实现不同seed
-                img = call_api(seed + i)
-                # 直接调用导入的 pil2tensor 函数
-                # tensor_img = ImageConverter.pil2tensor(img)
-                output_tensors.append(img)
-                print(f"Gemini 第 {i+1} 张图片生成成功: {prompt}")
-
-            return (torch.cat(output_tensors, dim=0),)  # 拼接为 (数量, H, W, 3)
+            return call_api(seed + 666)
 
         except Exception as e:
             print(f"Gemini: {str(e)}")
