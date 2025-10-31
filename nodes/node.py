@@ -534,7 +534,7 @@ class ViduT2VNode:
             "required": {
                 "prompt": ("STRING", {"default": "", "multiline": True}),
                 "duration": ("INT", {"default": 5, "min": 1, "max": 8}),
-                "resolution": (["540p", "720p", "1080p"], {"default": "1080p"}),
+                "resolution": ([ "720p", "1080p"], {"default": "1080p"}),
                 "movement_amplitude": (["auto", "small", "medium", "large"], {"default": "auto"}),
                 "Size": (["1:1", "9:16", "16:9"], {"default": "16:9"}),
                 "bgm": ("BOOLEAN", {"default": False}),  # 是否是翻译模式
@@ -1022,7 +1022,7 @@ class ViduNode:
                 "prompt": ("STRING", {"default": "A beautiful sunset", "multiline": True}),
                 "aspect_ratio": ([ "16:9", "9:16", "1:1"], {"default": "16:9"}),
                 "duration": ("INT", {"default": 5, "min": 1, "max": 8}),
-                "resolution": (["540p", "720p", "1080p"], {"default": "1080p"}),
+                "resolution": (["720p", "1080p"], {"default": "1080p"}),
                 "movement_amplitude": (["auto", "small", "medium", "large"], {"default": "auto"}),
                 "seed": ("INT", {"default": -1}),
                 "images": ("IMAGE", {"default": []})  # 接收多个图片
@@ -1186,7 +1186,7 @@ class GeminiEditNode:
                 "seed": ("INT", {"default": -1}),
             },
             "optional": {
-                "image_input": ("IMAGE", {"default": None}),  # 可选的图像输入
+                "image_input": ("IMAGE", {"default": []}),  # 可选的图像输入
             }
         }
 
@@ -1195,7 +1195,7 @@ class GeminiEditNode:
     FUNCTION = "generate"
     CATEGORY = "🎨MJapiparty/ImageCreat"
 
-    def generate(self, prompt, seed, image_input=None, is_translation=False, Size="3:4", mount=1):
+    def generate(self, prompt, seed, image_input=[], is_translation=False, Size="3:4", mount=1):
         # 调用配置管理器获取配置
         oneapi_url, oneapi_token = config_manager.get_api_config()
 
@@ -1209,8 +1209,9 @@ class GeminiEditNode:
                 "seed": int(seed_override),
             }
             # 如果有图像输入，加入到payload中
-            if image_input is not None:
-                payload["input_image"] = ImageConverter.tensor_to_base64(image_input)
+            if len(image_input) > 0:
+                binary_data_base64 = ImageConverter.convert_images_to_base64(image_input)
+                payload["input_image"] = binary_data_base64
 
             headers = {
                 "Content-Type": "application/json",
