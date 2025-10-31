@@ -1,8 +1,8 @@
 {
   "id": "9595610a-a68a-4922-a51e-a8ce7e616335",
   "revision": 0,
-  "last_node_id": 45,
-  "last_link_id": 35,
+  "last_node_id": 51,
+  "last_link_id": 53,
   "nodes": [
     {
       "id": 25,
@@ -24,7 +24,7 @@
           "name": "IMAGE",
           "type": "IMAGE",
           "links": [
-            32
+            36
           ]
         },
         {
@@ -61,7 +61,7 @@
         {
           "name": "images",
           "type": "IMAGE",
-          "link": 33
+          "link": 37
         }
       ],
       "outputs": [],
@@ -93,7 +93,7 @@
           "name": "IMAGE",
           "type": "IMAGE",
           "links": [
-            20
+            41
           ]
         },
         {
@@ -132,7 +132,7 @@
           "name": "IMAGE",
           "type": "IMAGE",
           "links": [
-            19
+            40
           ]
         },
         {
@@ -149,84 +149,6 @@
       "widgets_values": [
         "p (1).jpeg",
         "image"
-      ]
-    },
-    {
-      "id": 32,
-      "type": "PreviewImage",
-      "pos": [
-        -641.9852905273438,
-        701.002197265625
-      ],
-      "size": [
-        336.8999938964844,
-        258
-      ],
-      "flags": {},
-      "order": 11,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "images",
-          "type": "IMAGE",
-          "link": 22
-        }
-      ],
-      "outputs": [],
-      "properties": {
-        "cnr_id": "comfy-core",
-        "ver": "0.3.51",
-        "Node name for S&R": "PreviewImage"
-      },
-      "widgets_values": []
-    },
-    {
-      "id": 30,
-      "type": "ImageStitch",
-      "pos": [
-        -629.2853393554688,
-        450.20208740234375
-      ],
-      "size": [
-        270,
-        150
-      ],
-      "flags": {},
-      "order": 8,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "image1",
-          "type": "IMAGE",
-          "link": 19
-        },
-        {
-          "name": "image2",
-          "shape": 7,
-          "type": "IMAGE",
-          "link": 20
-        }
-      ],
-      "outputs": [
-        {
-          "name": "IMAGE",
-          "type": "IMAGE",
-          "links": [
-            22,
-            34
-          ]
-        }
-      ],
-      "properties": {
-        "cnr_id": "comfy-core",
-        "ver": "0.3.51",
-        "Node name for S&R": "ImageStitch"
-      },
-      "widgets_values": [
-        "right",
-        true,
-        0,
-        "white"
       ]
     },
     {
@@ -247,7 +169,7 @@
         {
           "name": "images",
           "type": "IMAGE",
-          "link": 35
+          "link": 39
         }
       ],
       "outputs": [],
@@ -279,7 +201,7 @@
           "name": "IMAGE",
           "type": "IMAGE",
           "links": [
-            24
+            46
           ]
         },
         {
@@ -299,15 +221,158 @@
       ]
     },
     {
-      "id": 38,
+      "id": 43,
+      "type": "MarkdownNote",
+      "pos": [
+        -1561.463623046875,
+        -468.43707275390625
+      ],
+      "size": [
+        457.3439025878906,
+        860.368408203125
+      ],
+      "flags": {},
+      "order": 4,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [],
+      "title": "使用说明",
+      "properties": {},
+      "widgets_values": [
+        "### NanoBanana 使用说明\n\nNanoBanana又名Gemini 2.5 Flash Image Preview,是google旗下的图片编辑工具。提示词遵循强度很高。基本不需要特别的提示词格式，支持中英文输入，但是不支持中文输出，可输出英文字体。\nis_translation是翻译开关，如果中文输入效果不理想，可以把翻译开关打开，翻译过后再试。\n\n- size是输出图像的尺寸比例\n- mount是输出图像的数量\n- 单图编辑没什么好讲的。\n- 多图编辑据说最高可组合12种元素。可直接使用图像批次节点把图像按顺序串联起来.\n\n以下列了三种使用方式，单图，双图组合，三图组合。更多图组合请自行搭建。\n所有工作流放一起会同时运行，因此你需要将3种工作流自行拆开复制到其他空白工作流上。或者框选后使用ctrl+B,使其暂时忽略。\n\n工作流如果加载不成功请升级comfyui\n\n有问题加微信:mojieaigc"
+      ],
+      "color": "#432",
+      "bgcolor": "#653"
+    },
+    {
+      "id": 46,
       "type": "GeminiEditNode",
       "pos": [
-        -272.70831298828125,
-        1498.960205078125
+        -583.6445922851562,
+        -403.41534423828125
       ],
       "size": [
         400,
-        200
+        208
+      ],
+      "flags": {},
+      "order": 7,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "image_input",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": 36
+        }
+      ],
+      "outputs": [
+        {
+          "name": "output",
+          "type": "IMAGE",
+          "links": [
+            37
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "Mojie-API-Party",
+        "ver": "a55ddbda35ae925eda3304ac64b8b22568de9bb2",
+        "Node name for S&R": "GeminiEditNode"
+      },
+      "widgets_values": [
+        "制作一个图中角色的商业化1/7比例手办，风格写实，环境逼真。手办放置在电脑桌上，配有一个圆形透明亚克力底座，底座上没有文字。电脑屏幕上显示着手办的Zbrush建模过程。电脑屏幕旁边是一个万代风格的玩具盒，上面印有原始画作。",
+        false,
+        "3:4",
+        1,
+        1234,
+        "randomize"
+      ]
+    },
+    {
+      "id": 32,
+      "type": "PreviewImage",
+      "pos": [
+        -650.2493896484375,
+        577.8623657226562
+      ],
+      "size": [
+        336.8999938964844,
+        258
+      ],
+      "flags": {},
+      "order": 12,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 43
+        }
+      ],
+      "outputs": [],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.51",
+        "Node name for S&R": "PreviewImage"
+      },
+      "widgets_values": []
+    },
+    {
+      "id": 47,
+      "type": "GeminiEditNode",
+      "pos": [
+        -308.8729553222656,
+        442.6861267089844
+      ],
+      "size": [
+        400,
+        208
+      ],
+      "flags": {},
+      "order": 11,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "image_input",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": 42
+        }
+      ],
+      "outputs": [
+        {
+          "name": "output",
+          "type": "IMAGE",
+          "links": [
+            39
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "Mojie-API-Party",
+        "ver": "a55ddbda35ae925eda3304ac64b8b22568de9bb2",
+        "Node name for S&R": "GeminiEditNode"
+      },
+      "widgets_values": [
+        "这个女孩带着这个耳机",
+        false,
+        "3:4",
+        1,
+        1234,
+        "randomize"
+      ]
+    },
+    {
+      "id": 49,
+      "type": "GeminiEditNode",
+      "pos": [
+        -284.3367919921875,
+        1504.2637939453125
+      ],
+      "size": [
+        400,
+        208
       ],
       "flags": {},
       "order": 15,
@@ -317,7 +382,7 @@
           "name": "image_input",
           "shape": 7,
           "type": "IMAGE",
-          "link": 30
+          "link": 52
         }
       ],
       "outputs": [
@@ -325,22 +390,106 @@
           "name": "output",
           "type": "IMAGE",
           "links": [
-            27
+            45
           ]
         }
       ],
       "properties": {
         "cnr_id": "Mojie-API-Party",
-        "ver": "9118360ad066d1f9e6ea7db6c2bac0507d22098b",
+        "ver": "a55ddbda35ae925eda3304ac64b8b22568de9bb2",
         "Node name for S&R": "GeminiEditNode"
       },
       "widgets_values": [
         "这个女孩带着这个耳机，穿着这件衣服",
         false,
-        1769,
-        "randomize",
+        "3:4",
+        1,
+        1234,
         "randomize"
       ]
+    },
+    {
+      "id": 48,
+      "type": "ImageBatch",
+      "pos": [
+        -562.5491333007812,
+        443.5678405761719
+      ],
+      "size": [
+        140,
+        46
+      ],
+      "flags": {},
+      "order": 8,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "image1",
+          "type": "IMAGE",
+          "link": 40
+        },
+        {
+          "name": "image2",
+          "type": "IMAGE",
+          "link": 41
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            42,
+            43
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.65",
+        "Node name for S&R": "ImageBatch"
+      }
+    },
+    {
+      "id": 50,
+      "type": "ImageBatch",
+      "pos": [
+        -573.9511108398438,
+        1551.6435546875
+      ],
+      "size": [
+        140,
+        46
+      ],
+      "flags": {},
+      "order": 9,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "image1",
+          "type": "IMAGE",
+          "link": 46
+        },
+        {
+          "name": "image2",
+          "type": "IMAGE",
+          "link": 47
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            48
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.65",
+        "Node name for S&R": "ImageBatch"
+      }
     },
     {
       "id": 41,
@@ -354,7 +503,7 @@
         455.08599853515625
       ],
       "flags": {},
-      "order": 4,
+      "order": 5,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -362,7 +511,7 @@
           "name": "IMAGE",
           "type": "IMAGE",
           "links": [
-            29
+            49
           ]
         },
         {
@@ -382,102 +531,15 @@
       ]
     },
     {
-      "id": 34,
-      "type": "LoadImage",
+      "id": 51,
+      "type": "ImageBatch",
       "pos": [
-        -1030.9698486328125,
-        2055.444580078125
+        -541.0841674804688,
+        1691.075927734375
       ],
       "size": [
-        350.5255126953125,
-        450.8933410644531
-      ],
-      "flags": {},
-      "order": 5,
-      "mode": 0,
-      "inputs": [],
-      "outputs": [
-        {
-          "name": "IMAGE",
-          "type": "IMAGE",
-          "links": [
-            25
-          ]
-        },
-        {
-          "name": "MASK",
-          "type": "MASK",
-          "links": null
-        }
-      ],
-      "properties": {
-        "cnr_id": "comfy-core",
-        "ver": "0.3.51",
-        "Node name for S&R": "LoadImage"
-      },
-      "widgets_values": [
-        "152838377312388750868885_x.jpg",
-        "image"
-      ]
-    },
-    {
-      "id": 37,
-      "type": "ImageStitch",
-      "pos": [
-        -652.7366943359375,
-        1507.744873046875
-      ],
-      "size": [
-        270,
-        150
-      ],
-      "flags": {},
-      "order": 9,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "image1",
-          "type": "IMAGE",
-          "link": 24
-        },
-        {
-          "name": "image2",
-          "shape": 7,
-          "type": "IMAGE",
-          "link": 25
-        }
-      ],
-      "outputs": [
-        {
-          "name": "IMAGE",
-          "type": "IMAGE",
-          "links": [
-            28
-          ]
-        }
-      ],
-      "properties": {
-        "cnr_id": "comfy-core",
-        "ver": "0.3.51",
-        "Node name for S&R": "ImageStitch"
-      },
-      "widgets_values": [
-        "down",
-        true,
-        0,
-        "white"
-      ]
-    },
-    {
-      "id": 40,
-      "type": "ImageStitch",
-      "pos": [
-        -611.266845703125,
-        1731.5614013671875
-      ],
-      "size": [
-        270,
-        150
+        140,
+        46
       ],
       "flags": {},
       "order": 13,
@@ -486,13 +548,12 @@
         {
           "name": "image1",
           "type": "IMAGE",
-          "link": 28
+          "link": 48
         },
         {
           "name": "image2",
-          "shape": 7,
           "type": "IMAGE",
-          "link": 29
+          "link": 49
         }
       ],
       "outputs": [
@@ -500,22 +561,45 @@
           "name": "IMAGE",
           "type": "IMAGE",
           "links": [
-            30,
-            31
+            52,
+            53
           ]
         }
       ],
       "properties": {
         "cnr_id": "comfy-core",
+        "ver": "0.3.65",
+        "Node name for S&R": "ImageBatch"
+      }
+    },
+    {
+      "id": 42,
+      "type": "PreviewImage",
+      "pos": [
+        -274.0269470214844,
+        1793.7359619140625
+      ],
+      "size": [
+        385.9687805175781,
+        359.8147888183594
+      ],
+      "flags": {},
+      "order": 16,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 53
+        }
+      ],
+      "outputs": [],
+      "properties": {
+        "cnr_id": "comfy-core",
         "ver": "0.3.51",
-        "Node name for S&R": "ImageStitch"
+        "Node name for S&R": "PreviewImage"
       },
-      "widgets_values": [
-        "right",
-        true,
-        0,
-        "white"
-      ]
+      "widgets_values": []
     },
     {
       "id": 39,
@@ -535,7 +619,7 @@
         {
           "name": "images",
           "type": "IMAGE",
-          "link": 27
+          "link": 45
         }
       ],
       "outputs": [],
@@ -548,257 +632,155 @@
       ]
     },
     {
-      "id": 42,
-      "type": "PreviewImage",
+      "id": 34,
+      "type": "LoadImage",
       "pos": [
-        -271.36492919921875,
-        1772.440185546875
+        -1037.625,
+        2052.782470703125
       ],
       "size": [
-        385.9687805175781,
-        359.8147888183594
-      ],
-      "flags": {},
-      "order": 16,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "images",
-          "type": "IMAGE",
-          "link": 31
-        }
-      ],
-      "outputs": [],
-      "properties": {
-        "cnr_id": "comfy-core",
-        "ver": "0.3.51",
-        "Node name for S&R": "PreviewImage"
-      },
-      "widgets_values": []
-    },
-    {
-      "id": 43,
-      "type": "MarkdownNote",
-      "pos": [
-        -1561.463623046875,
-        -468.43707275390625
-      ],
-      "size": [
-        457.3439025878906,
-        860.368408203125
+        350.5255126953125,
+        450.8933410644531
       ],
       "flags": {},
       "order": 6,
       "mode": 0,
       "inputs": [],
-      "outputs": [],
-      "title": "使用说明",
-      "properties": {},
-      "widgets_values": [
-        "### NanoBanana 使用说明\n\nNanoBanana又名Gemini 2.5 Flash Image Preview,是google旗下的图片编辑工具。提示词遵循强度很高。基本不需要特别的提示词格式，支持中英文输入，但是不支持中文输出，可输出英文字体。\nis_translation是翻译开关，如果中文输入效果不理想，可以把翻译开关打开，翻译过后再试。\n\n\n- 单图编辑没什么好讲的。\n- 多图编辑据说最高可组合12种元素（还没亲测过）。需要使用image Stitch节点把元素组合起来形成单图。请勿直接发送多图。\n\n以下列了三种使用方式，单图，双图组合，三图组合。更多图组合请自行搭建。\n所有工作流放一起会同时运行，因此你需要将3种工作流自行拆开复制到其他空白工作流上。或者框选后使用ctrl+B,使其暂时忽略。\n\n工作流如果加载不成功请升级comfyui\n\n有问题加微信:mojieaigc"
-      ],
-      "color": "#432",
-      "bgcolor": "#653"
-    },
-    {
-      "id": 44,
-      "type": "GeminiEditNode",
-      "pos": [
-        -592.409423828125,
-        -403.9662170410156
-      ],
-      "size": [
-        400,
-        200
-      ],
-      "flags": {},
-      "order": 7,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "image_input",
-          "shape": 7,
-          "type": "IMAGE",
-          "link": 32
-        }
-      ],
       "outputs": [
         {
-          "name": "output",
+          "name": "IMAGE",
           "type": "IMAGE",
           "links": [
-            33
+            47
           ]
+        },
+        {
+          "name": "MASK",
+          "type": "MASK",
+          "links": null
         }
       ],
       "properties": {
-        "cnr_id": "Mojie-API-Party",
-        "ver": "c70bad3ddedc3e766eff04b7e666661e51a70c01",
-        "Node name for S&R": "GeminiEditNode"
+        "cnr_id": "comfy-core",
+        "ver": "0.3.51",
+        "Node name for S&R": "LoadImage"
       },
       "widgets_values": [
-        "制作一个图中角色的商业化1/7比例手办，风格写实，环境逼真。手办放置在电脑桌上，配有一个圆形透明亚克力底座，底座上没有文字。电脑屏幕上显示着手办的Zbrush建模过程。电脑屏幕旁边是一个万代风格的玩具盒，上面印有原始画作。",
-        false,
-        "3:4",
-        2048,
-        "randomize"
-      ]
-    },
-    {
-      "id": 45,
-      "type": "GeminiEditNode",
-      "pos": [
-        -314.78411865234375,
-        447.8040466308594
-      ],
-      "size": [
-        400,
-        200
-      ],
-      "flags": {},
-      "order": 12,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "image_input",
-          "shape": 7,
-          "type": "IMAGE",
-          "link": 34
-        }
-      ],
-      "outputs": [
-        {
-          "name": "output",
-          "type": "IMAGE",
-          "links": [
-            35
-          ]
-        }
-      ],
-      "properties": {
-        "cnr_id": "Mojie-API-Party",
-        "ver": "c70bad3ddedc3e766eff04b7e666661e51a70c01",
-        "Node name for S&R": "GeminiEditNode"
-      },
-      "widgets_values": [
-        "这个女孩带着这个耳机",
-        false,
-        "3:4",
-        2048,
-        "randomize"
+        "152838377312388750868885_x.jpg",
+        "image"
       ]
     }
   ],
   "links": [
     [
-      19,
-      28,
-      0,
-      30,
-      0,
-      "IMAGE"
-    ],
-    [
-      20,
-      31,
-      0,
-      30,
-      1,
-      "IMAGE"
-    ],
-    [
-      22,
-      30,
-      0,
-      32,
-      0,
-      "IMAGE"
-    ],
-    [
-      24,
-      35,
-      0,
-      37,
-      0,
-      "IMAGE"
-    ],
-    [
-      25,
-      34,
-      0,
-      37,
-      1,
-      "IMAGE"
-    ],
-    [
-      27,
-      38,
-      0,
-      39,
-      0,
-      "IMAGE"
-    ],
-    [
-      28,
-      37,
-      0,
-      40,
-      0,
-      "IMAGE"
-    ],
-    [
-      29,
-      41,
-      0,
-      40,
-      1,
-      "IMAGE"
-    ],
-    [
-      30,
-      40,
-      0,
-      38,
-      0,
-      "IMAGE"
-    ],
-    [
-      31,
-      40,
-      0,
-      42,
-      0,
-      "IMAGE"
-    ],
-    [
-      32,
+      36,
       25,
       0,
-      44,
+      46,
       0,
       "IMAGE"
     ],
     [
-      33,
-      44,
+      37,
+      46,
       0,
       26,
       0,
       "IMAGE"
     ],
     [
-      34,
-      30,
+      39,
+      47,
       0,
-      45,
+      29,
       0,
       "IMAGE"
     ],
     [
-      35,
-      45,
+      40,
+      28,
       0,
-      29,
+      48,
+      0,
+      "IMAGE"
+    ],
+    [
+      41,
+      31,
+      0,
+      48,
+      1,
+      "IMAGE"
+    ],
+    [
+      42,
+      48,
+      0,
+      47,
+      0,
+      "IMAGE"
+    ],
+    [
+      43,
+      48,
+      0,
+      32,
+      0,
+      "IMAGE"
+    ],
+    [
+      45,
+      49,
+      0,
+      39,
+      0,
+      "IMAGE"
+    ],
+    [
+      46,
+      35,
+      0,
+      50,
+      0,
+      "IMAGE"
+    ],
+    [
+      47,
+      34,
+      0,
+      50,
+      1,
+      "IMAGE"
+    ],
+    [
+      48,
+      50,
+      0,
+      51,
+      0,
+      "IMAGE"
+    ],
+    [
+      49,
+      41,
+      0,
+      51,
+      1,
+      "IMAGE"
+    ],
+    [
+      52,
+      51,
+      0,
+      49,
+      0,
+      "IMAGE"
+    ],
+    [
+      53,
+      51,
+      0,
+      42,
       0,
       "IMAGE"
     ]
@@ -847,13 +829,13 @@
   "config": {},
   "extra": {
     "ds": {
-      "scale": 0.7513148009015777,
+      "scale": 0.7513148009015783,
       "offset": [
-        1802.1746020001362,
-        594.4376267157138
+        1456.1440834212922,
+        598.1161997247352
       ]
     },
-    "frontendVersion": "1.25.9",
+    "frontendVersion": "1.27.10",
     "groupNodes": {}
   },
   "version": 0.4

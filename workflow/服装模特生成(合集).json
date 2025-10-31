@@ -1,8 +1,8 @@
 {
   "id": "0a3b477c-f646-4993-b4fe-3370d260bbe9",
   "revision": 0,
-  "last_node_id": 25,
-  "last_link_id": 13,
+  "last_node_id": 26,
+  "last_link_id": 15,
   "nodes": [
     {
       "id": 6,
@@ -182,48 +182,6 @@
       ]
     },
     {
-      "id": 8,
-      "type": "GetDressing",
-      "pos": [
-        559.4490356445312,
-        1253.061767578125
-      ],
-      "size": [
-        270,
-        130
-      ],
-      "flags": {},
-      "order": 11,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "image",
-          "type": "IMAGE",
-          "link": 5
-        }
-      ],
-      "outputs": [
-        {
-          "name": "output",
-          "type": "IMAGE",
-          "links": [
-            6
-          ]
-        }
-      ],
-      "properties": {
-        "cnr_id": "Mojie-API-Party",
-        "ver": "5f88d79db064fced6dce5b6dafb42aa836b81c60",
-        "Node name for S&R": "GetDressing"
-      },
-      "widgets_values": [
-        "全身",
-        "3:4",
-        516,
-        "randomize"
-      ]
-    },
-    {
       "id": 13,
       "type": "MarkdownNote",
       "pos": [
@@ -289,7 +247,7 @@
           "name": "IMAGE",
           "type": "IMAGE",
           "links": [
-            7
+            14
           ]
         },
         {
@@ -306,48 +264,6 @@
       "widgets_values": [
         "mojie-API_00001_.png",
         "image"
-      ]
-    },
-    {
-      "id": 15,
-      "type": "MoterPoseNode",
-      "pos": [
-        2185.5830078125,
-        1264.284912109375
-      ],
-      "size": [
-        270,
-        130
-      ],
-      "flags": {},
-      "order": 12,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "image_input",
-          "type": "IMAGE",
-          "link": 7
-        }
-      ],
-      "outputs": [
-        {
-          "name": "output",
-          "type": "IMAGE",
-          "links": [
-            8
-          ]
-        }
-      ],
-      "properties": {
-        "cnr_id": "Mojie-API-Party",
-        "ver": "5f88d79db064fced6dce5b6dafb42aa836b81c60",
-        "Node name for S&R": "MoterPoseNode"
-      },
-      "widgets_values": [
-        true,
-        1,
-        487,
-        "randomize"
       ]
     },
     {
@@ -368,7 +284,7 @@
         {
           "name": "images",
           "type": "IMAGE",
-          "link": 8
+          "link": 15
         }
       ],
       "outputs": [],
@@ -542,7 +458,7 @@
       ],
       "size": [
         270,
-        174
+        198
       ],
       "flags": {},
       "order": 10,
@@ -579,7 +495,8 @@
         "woman",
         "通用-INS自拍",
         396,
-        "randomize"
+        "randomize",
+        "3:4"
       ]
     },
     {
@@ -626,6 +543,90 @@
         379,
         "randomize"
       ]
+    },
+    {
+      "id": 26,
+      "type": "MoterPoseNode",
+      "pos": [
+        2182.496826171875,
+        1277.345703125
+      ],
+      "size": [
+        270,
+        130
+      ],
+      "flags": {},
+      "order": 12,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "image_input",
+          "type": "IMAGE",
+          "link": 14
+        }
+      ],
+      "outputs": [
+        {
+          "name": "output",
+          "type": "IMAGE",
+          "links": [
+            15
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "Mojie-API-Party",
+        "ver": "a55ddbda35ae925eda3304ac64b8b22568de9bb2",
+        "Node name for S&R": "MoterPoseNode"
+      },
+      "widgets_values": [
+        true,
+        4,
+        487,
+        "randomize"
+      ]
+    },
+    {
+      "id": 8,
+      "type": "GetDressing",
+      "pos": [
+        558.4490356445312,
+        1260.061767578125
+      ],
+      "size": [
+        270,
+        130
+      ],
+      "flags": {},
+      "order": 11,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "link": 5
+        }
+      ],
+      "outputs": [
+        {
+          "name": "output",
+          "type": "IMAGE",
+          "links": [
+            6
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "Mojie-API-Party",
+        "ver": "5f88d79db064fced6dce5b6dafb42aa836b81c60",
+        "Node name for S&R": "GetDressing"
+      },
+      "widgets_values": [
+        "全身",
+        "3:4",
+        516,
+        "randomize"
+      ]
     }
   ],
   "links": [
@@ -670,22 +671,6 @@
       "IMAGE"
     ],
     [
-      7,
-      16,
-      0,
-      15,
-      0,
-      "IMAGE"
-    ],
-    [
-      8,
-      15,
-      0,
-      17,
-      0,
-      "IMAGE"
-    ],
-    [
       9,
       19,
       0,
@@ -706,6 +691,22 @@
       18,
       0,
       24,
+      0,
+      "IMAGE"
+    ],
+    [
+      14,
+      16,
+      0,
+      26,
+      0,
+      "IMAGE"
+    ],
+    [
+      15,
+      26,
+      0,
+      17,
       0,
       "IMAGE"
     ]
@@ -799,13 +800,13 @@
   "config": {},
   "extra": {
     "ds": {
-      "scale": 1.1,
+      "scale": 0.6209213230591554,
       "offset": [
-        194.49309691832187,
-        -132.32053702967104
+        538.02447511217,
+        13.912360840334543
       ]
     },
-    "frontendVersion": "1.25.9"
+    "frontendVersion": "1.27.10"
   },
   "version": 0.4
 }
