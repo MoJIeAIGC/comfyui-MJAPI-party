@@ -533,10 +533,8 @@ class ViduT2VNode:
         return {
             "required": {
                 "prompt": ("STRING", {"default": "", "multiline": True}),
-                "model": (["viduq1", "vidu1.5"], {"default": "viduq1"}),
-                "style": (["general", "anime"], {"default": "general"}),
-                "duration": ("INT", {"default": 5, "min": 4, "max": 5, "readonly": True}),
-                "resolution": (["360P", "720P", "1080p"], {"default": "1080p"}),
+                "duration": ("INT", {"default": 5, "min": 1, "max": 8}),
+                "resolution": ([ "720p", "1080p"], {"default": "1080p"}),
                 "movement_amplitude": (["auto", "small", "medium", "large"], {"default": "auto"}),
                 "Size": (["1:1", "9:16", "16:9"], {"default": "16:9"}),
                 "bgm": ("BOOLEAN", {"default": False}),  # 是否是翻译模式
@@ -549,14 +547,14 @@ class ViduT2VNode:
     FUNCTION = "generate"
     CATEGORY = "🎨MJapiparty/VideoCreat"
 
-    def generate(self, prompt, model, seed, style="general", duration=5, resolution="1080p", Size="16:9", movement_amplitude="auto", bgm=False):
+    def generate(self, prompt, seed, duration=5, resolution="1080p", Size="16:9", movement_amplitude="auto", bgm=False):
         # 获取配置
         oneapi_url, oneapi_token = config_manager.get_api_config()
 
         def call_api(seed_override):
             payload = {
                 "model": "vidut2vNode",
-                "modelr": model,
+                "modelr": "viduq2",
                 "prompt": prompt,
                 "seed": int(seed_override),
                 "resolution": resolution,
@@ -564,7 +562,6 @@ class ViduT2VNode:
                 "duration": duration,
                 "movement_amplitude": movement_amplitude,
                 "bgm": bgm,
-                "style": style,
             }
 
             headers = {
@@ -600,11 +597,9 @@ class ViduI2VNode:
                 "first_image": ("IMAGE",),  # 接收多个图片
                 "last_image": ("IMAGE",),  # 接收多个图片
                 "prompt": ("STRING", {"default": "", "multiline": True}),
-                "model": (["viduq1", "vidu1.5", "viduq1-classic", "vidu2.0"], {"default": "viduq1-classic"}),
-                "duration": ("INT", {"default": 5, "min": 4, "max": 5, "readonly": True}),
-                "resolution": (["360P", "720P", "1080p"], {"default": "1080p"}),
+                "duration": ("INT", {"default": 5, "min": 2, "max": 8}),
+                "resolution": (["720p", "1080p"], {"default": "1080p"}),
                 "movement_amplitude": (["auto", "small", "medium", "large"], {"default": "auto"}),
-                "Size": (["1:1", "9:16", "16:9"], {"default": "16:9"}),
                 "bgm": ("BOOLEAN", {"default": False}),  # 是否是翻译模式
                 "seed": ("INT", {"default": -1}),
             }
@@ -615,7 +610,7 @@ class ViduI2VNode:
     FUNCTION = "generate"
     CATEGORY = "🎨MJapiparty/VideoCreat"
 
-    def generate(self, prompt, model, seed,duration=5, resolution="1080p", Size="16:9", movement_amplitude="auto", bgm=False, first_image=None, last_image=None):
+    def generate(self, prompt,  seed,duration=5, resolution="1080p", Size="16:9", movement_amplitude="auto", bgm=False, first_image=None, last_image=None):
         # 获取配置
         oneapi_url, oneapi_token = config_manager.get_api_config()
         images = []
@@ -628,11 +623,10 @@ class ViduI2VNode:
         def call_api(seed_override):
             payload = {
                 "model": "vidui2vNode",
-                "modelr": model,
+                "modelr": "viduq2-turbo",
                 "prompt": prompt,
                 "seed": int(seed_override),
                 "resolution": resolution,
-                "aspect_ratio": Size,
                 "duration": duration,
                 "movement_amplitude": movement_amplitude,
                 "bgm": bgm,
@@ -1026,8 +1020,10 @@ class ViduNode:
         return {
             "required": {
                 "prompt": ("STRING", {"default": "A beautiful sunset", "multiline": True}),
-                "model": (["default", "viduq1", "vidu1.5", "vidu2.0"], {"default": "viduq1"}),
                 "aspect_ratio": ([ "16:9", "9:16", "1:1"], {"default": "16:9"}),
+                "duration": ("INT", {"default": 5, "min": 1, "max": 8}),
+                "resolution": (["720p", "1080p"], {"default": "1080p"}),
+                "movement_amplitude": (["auto", "small", "medium", "large"], {"default": "auto"}),
                 "seed": ("INT", {"default": -1}),
                 "images": ("IMAGE", {"default": []})  # 接收多个图片
             }
@@ -1038,24 +1034,21 @@ class ViduNode:
     FUNCTION = "generate"
     CATEGORY = "🎨MJapiparty/VideoCreat"
 
-    def generate(self, prompt, seed,model, aspect_ratio="16:9", images=[]):
+    def generate(self, prompt, seed, aspect_ratio="16:9", duration=5, resolution="1080p", movement_amplitude="auto", images=[]):
         # 获取配置
         oneapi_url, oneapi_token = config_manager.get_api_config()
-
-        if model == "viduq1":
-            duration = 5
-        else:
-            duration = 5
 
         def call_api(seed_override, binary_data_base64):
             payload = {
                 "model": "vidu_video",
-                "modelr": model,
+                "modelr": "viduq2",
                 "aspect_ratio": aspect_ratio,
                 "prompt": prompt,
                 "duration": duration,
                 "seed": 0,
-                "images": binary_data_base64  # 添加Base64编码的图片数据
+                "images": binary_data_base64,  # 添加Base64编码的图片数据
+                "resolution": resolution,
+                "movement_amplitude": movement_amplitude,
             }
             headers = {
                 "Content-Type": "application/json",
@@ -1189,10 +1182,11 @@ class GeminiEditNode:
                 "prompt": ("STRING", {"default": "A beautiful sunset", "multiline": True}),
                 "is_translation": ("BOOLEAN", {"default": False}),  # 是否是翻译模式
                 "Size": (["1:1", "3:4", "4:3", "9:16", "16:9"], {"default": "3:4"}),
+                "mount": ("INT", {"default": 1, "min": 1, "max": 4}),  # 生成张数
                 "seed": ("INT", {"default": -1}),
             },
             "optional": {
-                "image_input": ("IMAGE", {"default": None}),  # 可选的图像输入
+                "image_input": ("IMAGE", {"default": []}),  # 可选的图像输入
             }
         }
 
@@ -1201,7 +1195,7 @@ class GeminiEditNode:
     FUNCTION = "generate"
     CATEGORY = "🎨MJapiparty/ImageCreat"
 
-    def generate(self, prompt, seed, image_input=None, is_translation=False, Size="3:4"):
+    def generate(self, prompt, seed, image_input=[], is_translation=False, Size="3:4", mount=1):
         # 调用配置管理器获取配置
         oneapi_url, oneapi_token = config_manager.get_api_config()
 
@@ -1211,11 +1205,13 @@ class GeminiEditNode:
                 "prompt": prompt,
                 "is_translation": is_translation,  # 传递翻译模式参数
                 "aspect_ratio": Size,  # 传递尺寸参数
+                "mount": mount,  # 生成张数
                 "seed": int(seed_override),
             }
             # 如果有图像输入，加入到payload中
-            if image_input is not None:
-                payload["input_image"] = ImageConverter.tensor_to_base64(image_input)
+            if len(image_input) > 0:
+                binary_data_base64 = ImageConverter.convert_images_to_base64(image_input)
+                payload["input_image"] = binary_data_base64
 
             headers = {
                 "Content-Type": "application/json",
@@ -1223,10 +1219,12 @@ class GeminiEditNode:
             }
             response = requests.post(oneapi_url, headers=headers, json=payload, timeout=1200)
             # 判断状态码是否为 200
+            print(f"Gemini API 响应状态码: {response.status_code}")
             if response.status_code != 200:
-                error_msg = ImageConverter.get_status_error_msg(response)
-                error_tensor = ImageConverter.create_error_image(error_msg, width=512, height=512)
-                return error_tensor
+                raise requests.exceptions.HTTPError(f"Request failed with status code {response.status_code}: {response.text}")
+                # error_msg = ImageConverter.get_status_error_msg(response)
+                # error_tensor = ImageConverter.create_error_image(error_msg, width=512, height=512)
+                # return (torch.cat(error_tensor, dim=0),)
             response.raise_for_status()
             result = response.json()
 
@@ -1235,25 +1233,33 @@ class GeminiEditNode:
 
             if not image_url:
                 raise ValueError("未找到图片 URL")
-            # 下载图片
-            response = requests.get(image_url)
-            response.raise_for_status()
-            # 将图片数据转换为 PIL 图像对象
-            img = Image.open(BytesIO(response.content)).convert("RGB")
-            return ImageConverter.pil2tensor(img)
+            image_urls = image_url.split("|") if image_url else []
 
-        output_tensors = []
+            api_tensors = []
+            print(image_urls)
+            for image_url in image_urls:
+                if not image_url:
+                    continue
+                try:
+                    # 下载图片
+                    response = requests.get(image_url)
+                    response.raise_for_status()
+                    # 将图片数据转换为 PIL 图像对象
+                    img = Image.open(BytesIO(response.content)).convert("RGB")
+                    api_tensors.append(ImageConverter.pil2tensor(img))
+                except Exception as e:
+                    print(f"下载图片 {image_url} 失败: {str(e)}")
+                    error_tensor = ImageConverter.create_error_image("下载图片失败")
+                    api_tensors.append(error_tensor)
+
+            if not api_tensors:
+                error_tensor = ImageConverter.create_error_image("未获取到有效图片 URL")
+                api_tensors.append(error_tensor)
+
+            return (torch.cat(api_tensors, dim=0),)
 
         try:
-            for i in range(1):
-                # 如果两次请求用同一个seed也行，可改为 seed+i 实现不同seed
-                img = call_api(seed + i)
-                # 直接调用导入的 pil2tensor 函数
-                # tensor_img = ImageConverter.pil2tensor(img)
-                output_tensors.append(img)
-                print(f"Gemini 第 {i+1} 张图片生成成功: {prompt}")
-
-            return (torch.cat(output_tensors, dim=0),)  # 拼接为 (数量, H, W, 3)
+            return call_api(seed + 666)
 
         except Exception as e:
             print(f"Gemini: {str(e)}")
@@ -1389,7 +1395,7 @@ class ModelGenNode:
         # 调用配置管理器获取配置
         oneapi_url, oneapi_token = config_manager.get_api_config()
 
-        image_base64 = ImageConverter.process_images(face_image, cloths_image)
+        cloths_image_base64 = ImageConverter.tensor_to_base64(cloths_image)
 
         races = {
             "亚裔": "Asia",
@@ -1409,8 +1415,12 @@ class ModelGenNode:
                 "is_face": is_face,
                 "style_prompt": style_prompt,
                 "aspect_ratio": Size,  # 传递尺寸参数
-                "input_image": image_base64
+                "cloths_image": cloths_image_base64
             }
+            if face_image is not None:
+                face_image_base64 = ImageConverter.tensor_to_base64(face_image)
+                payload["face_image"] = face_image_base64
+
 
             headers = {
                 "Content-Type": "application/json",
@@ -1467,7 +1477,7 @@ class MoterPoseNode:
             "required": {
                 "image_input": ("IMAGE", {"default": None}),  # 可选的图像输入
                 "extent_prompt": ("BOOLEAN", {"default": True}),  # 是否是翻译模式
-                "out_batch": ("INT", {"default": 1, "min": 1, "max": 2}),  # 生成张数
+                "out_batch": ("INT", {"default": 1, "min": 1, "max": 4}),  # 生成张数
                 "seed": ("INT", {"default": -1}),
             }
         }
@@ -1487,6 +1497,7 @@ class MoterPoseNode:
                 "extent_prompt": extent_prompt,  # 传递翻译模式参数
                 "seed": int(seed_override),
                 "watermark": False,
+                "mount": out_batch,
                 "input_image": ImageConverter.tensor_to_base64(image_input)
             }
 
@@ -1497,9 +1508,10 @@ class MoterPoseNode:
             response = requests.post(oneapi_url, headers=headers, json=payload, timeout=1200)
             # 判断状态码是否为 200
             if response.status_code != 200:
-                error_msg = ImageConverter.get_status_error_msg(response)
-                error_tensor = ImageConverter.create_error_image(error_msg, width=512, height=512)
-                return error_tensor
+                raise requests.exceptions.HTTPError(f"Request failed with status code {response.status_code}: {response.text}")
+                # error_msg = ImageConverter.get_status_error_msg(response)
+                # error_tensor = ImageConverter.create_error_image(error_msg, width=512, height=512)
+                # return error_tensor
             response.raise_for_status()
             result = response.json()
 
@@ -1508,26 +1520,33 @@ class MoterPoseNode:
 
             if not image_url:
                 raise ValueError("未找到图片 URL")
-            # 下载图片
-            response = requests.get(image_url)
-            response.raise_for_status()
-            # 将图片数据转换为 PIL 图像对象
-            img = Image.open(BytesIO(response.content)).convert("RGB")
-            return ImageConverter.pil2tensor(img)
+            image_urls = image_url.split("|") if image_url else []
 
-        output_tensors = []
+            api_tensors = []
+            print(image_urls)
+            for image_url in image_urls:
+                if not image_url:
+                    continue
+                try:
+                    # 下载图片
+                    response = requests.get(image_url)
+                    response.raise_for_status()
+                    # 将图片数据转换为 PIL 图像对象
+                    img = Image.open(BytesIO(response.content)).convert("RGB")
+                    api_tensors.append(ImageConverter.pil2tensor(img))
+                except Exception as e:
+                    print(f"下载图片 {image_url} 失败: {str(e)}")
+                    error_tensor = ImageConverter.create_error_image("下载图片失败")
+                    api_tensors.append(error_tensor)
+
+            if not api_tensors:
+                error_tensor = ImageConverter.create_error_image("未获取到有效图片 URL")
+                api_tensors.append(error_tensor)
+
+            return (torch.cat(api_tensors, dim=0),)
 
         try:
-            for i in range(out_batch):
-                # 如果两次请求用同一个seed也行，可改为 seed+i 实现不同seed
-                img = call_api(seed + i)
-                # 直接调用导入的 pil2tensor 函数
-                # tensor_img = ImageConverter.pil2tensor(img)
-                output_tensors.append(img)
-                print(f" 第 {i+1} 张图片生成成功")
-
-            return (torch.cat(output_tensors, dim=0),)  # 拼接为 (数量, H, W, 3)
-
+            return call_api(seed + 666)
         except Exception as e:
             print(f": {str(e)}")
             error_tensor = ImageConverter.create_error_image("运行异常，请稍后重试")
