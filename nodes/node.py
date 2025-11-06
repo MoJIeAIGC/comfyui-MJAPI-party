@@ -1121,7 +1121,10 @@ class ReplaceClothesNode:
         closest_ratio = min(aspect_ratios, key=lambda x: abs(aspect_ratios[x] - image_ratio))
         print(f"最接近的宽高比: {closest_ratio}")
 
-        merged_base64 = ImageConverter.prepare_and_stitch_images(model_image, cloths_image)
+
+        imput_image = []
+        imput_image.append(ImageConverter.tensor_to_base64(model_image))
+        imput_image.append(ImageConverter.tensor_to_base64(cloths_image))
 
         headers = {
             "Content-Type": "application/json",
@@ -1135,7 +1138,7 @@ class ReplaceClothesNode:
             "Custom_prompt": False,
             "seed": seed, 
             "aspect_ratio": closest_ratio,
-            "input_image": merged_base64,
+            "input_image": imput_image,
         }
 
         try:
