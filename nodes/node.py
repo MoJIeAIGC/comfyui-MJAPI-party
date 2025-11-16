@@ -595,13 +595,15 @@ class ViduI2VNode:
         return {
             "required": {
                 "first_image": ("IMAGE",),  # 接收多个图片
-                "last_image": ("IMAGE",),  # 接收多个图片
                 "prompt": ("STRING", {"default": "", "multiline": True}),
                 "duration": ("INT", {"default": 5, "min": 2, "max": 8}),
                 "resolution": (["720p", "1080p"], {"default": "1080p"}),
                 "movement_amplitude": (["auto", "small", "medium", "large"], {"default": "auto"}),
                 "bgm": ("BOOLEAN", {"default": False}),  # 是否是翻译模式
                 "seed": ("INT", {"default": -1}),
+            },
+            "optional": {
+                "last_image": ("IMAGE",),  # 接收多个图片
             }
         }
 
