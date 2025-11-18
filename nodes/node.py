@@ -595,13 +595,15 @@ class ViduI2VNode:
         return {
             "required": {
                 "first_image": ("IMAGE",),  # 接收多个图片
-                "last_image": ("IMAGE",),  # 接收多个图片
                 "prompt": ("STRING", {"default": "", "multiline": True}),
                 "duration": ("INT", {"default": 5, "min": 2, "max": 8}),
                 "resolution": (["720p", "1080p"], {"default": "1080p"}),
                 "movement_amplitude": (["auto", "small", "medium", "large"], {"default": "auto"}),
                 "bgm": ("BOOLEAN", {"default": False}),  # 是否是翻译模式
                 "seed": ("INT", {"default": -1}),
+            },
+            "optional": {
+                "last_image": ("IMAGE",),  # 接收多个图片
             }
         }
 
@@ -1121,7 +1123,10 @@ class ReplaceClothesNode:
         closest_ratio = min(aspect_ratios, key=lambda x: abs(aspect_ratios[x] - image_ratio))
         print(f"最接近的宽高比: {closest_ratio}")
 
-        merged_base64 = ImageConverter.prepare_and_stitch_images(model_image, cloths_image)
+
+        imput_image = []
+        imput_image.append(ImageConverter.tensor_to_base64(model_image))
+        imput_image.append(ImageConverter.tensor_to_base64(cloths_image))
 
         headers = {
             "Content-Type": "application/json",
@@ -1135,7 +1140,7 @@ class ReplaceClothesNode:
             "Custom_prompt": False,
             "seed": seed, 
             "aspect_ratio": closest_ratio,
-            "input_image": merged_base64,
+            "input_image": imput_image,
         }
 
         try:
