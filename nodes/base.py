@@ -298,6 +298,59 @@ class ImageConverter:
 
         return base64.b64encode(buffered.getvalue()).decode("utf-8")
 
+    @staticmethod
+    def highlight_mask_with_rectangle(image, mask):
+        """
+        在原图上用红色矩形框出遮罩区域
+        
+        :param image: 输入图像张量
+        :param mask: 输入遮罩张量
+        :return: 带有红色矩形框的图像的base64编码
+        """
+        if mask is None:
+            return ImageConverter.tensor_to_base64(image)
+            
+        # 转换为PIL图像
+        image_pil = ImageConverter.tensor2pil(image).convert("RGB")
+        mask_pil = ImageConverter.tensor2pil(mask).convert("L")
+        
+        # 确保图像和mask尺寸一致
+        if image_pil.size != mask_pil.size:
+            mask_pil = mask_pil.resize(image_pil.size, Image.BILINEAR)
+        
+        # 创建绘图对象
+        draw = ImageDraw.Draw(image_pil)
+        
+        # 找到遮罩区域的边界框
+        # 首先找到遮罩中非零像素的坐标
+        mask_array = np.array(mask_pil)
+        non_zero_indices = np.where(mask_array > 0)
+        
+        if len(non_zero_indices[0]) == 0:  # 如果没有非零像素，返回原图
+            return ImageConverter.tensor_to_base64(image)
+            
+        # 计算边界框
+        min_y, min_x = np.min(non_zero_indices[0], axis=0), np.min(non_zero_indices[1], axis=0)
+        max_y, max_x = np.max(non_zero_indices[0], axis=0), np.max(non_zero_indices[1], axis=0)
+        
+        # 在边界框周围绘制红色矩形
+        # 可以添加一些边距使矩形更明显
+        margin = 5
+        left = max(0, min_x - margin)
+        top = max(0, min_y - margin)
+        right = min(image_pil.width, max_x + margin + 1)
+        bottom = min(image_pil.height, max_y + margin + 1)
+        
+        # 绘制红色矩形框
+        draw.rectangle([(left, top), (right, bottom)], outline=(255, 0, 0), width=3)
+        
+        # 转换回base64
+        buffered = BytesIO()
+        image_pil.save(buffered, format="PNG")
+        img_base64 = base64.b64encode(buffered.getvalue()).decode("utf-8")
+        
+        return img_base64
+
 
     @staticmethod
     def download_video(video_url: str, save_path: str = "temp_video.mp4") -> str:
