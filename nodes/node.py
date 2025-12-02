@@ -1984,7 +1984,48 @@ class DetailJinNode:
     def generate(self, seed, input_image=None,Polished_type="金属&木纹",num_images=1):
         # 调用配置管理器获取配置
         oneapi_url, oneapi_token = config_manager.get_api_config()
-        # 合并图像和遮罩
+        
+        # 获取图片的长宽
+        if input_image is not None:
+            # 将张量转换为PIL图像以获取尺寸
+            pil_image = ImageConverter.tensor2pil(input_image)
+            width, height = pil_image.size
+            print(f"原始图片尺寸: 宽度={width}, 高度={height}")
+            
+            # 检查并调整图片尺寸，确保宽高在1280到4096之间
+            min_size, max_size = 1280, 4096
+            needs_resize = False
+            scale_factor = 1.0
+            
+            # 如果宽度或高度小于最小值，需要放大
+            if width < min_size or height < min_size:
+                # 计算放大比例，取两个方向中较大的比例
+                scale_factor = max(min_size / width, min_size / height)
+                needs_resize = True
+            
+            # 如果宽度或高度大于最大值，需要缩小
+            elif width > max_size or height > max_size:
+                # 计算缩小比例，取两个方向中较小的比例
+                scale_factor = min(max_size / width, max_size / height)
+                needs_resize = True
+            
+            # 如果需要调整尺寸
+            if needs_resize:
+                new_width = int(width * scale_factor)
+                new_height = int(height * scale_factor)
+                print(f"调整图片尺寸: 宽度={new_width}, 高度={new_height}, 缩放比例={scale_factor:.2f}")
+                
+                # 使用LANCZOS重采样方法进行高质量缩放
+                pil_image = pil_image.resize((new_width, new_height), Image.LANCZOS)
+                
+                # 将调整后的PIL图像转换回张量
+                input_image = ImageConverter.pil2tensor(pil_image)
+            
+            # 获取最终尺寸用于API请求
+            final_width, final_height = pil_image.size
+            size = f"{final_width}x{final_height}"
+            print(f"最终图片尺寸: {size}")
+        
         merged_image = ImageConverter.tensor_to_base64(input_image)
 
         payload = {
@@ -1993,6 +2034,7 @@ class DetailJinNode:
             "max_SetImage": num_images,
             "input_image": [merged_image],
             "Polished-type": Polished_type,
+            "size": size,
         }
 
 
@@ -2043,6 +2085,94 @@ class DetailJinNode:
 
 
 
+
+class FurnitureAngleNode:
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "input_image": ("IMAGE",),  # 接收多个图片
+                "angle_type": (["2k-俯视45度","2k-顶视图","2K-对角线拍摄","1k-左侧垂直视图","1k-右侧垂直视图"], {"default": "2k-俯视45度"}),
+                "num_images": ("INT", {"default": 1, "min": 1, "max": 2}),  # 新增参数，只能是1或2
+                "seed": ("INT", {"default": -1}),
+            }
+        }
+
+    RETURN_TYPES = ("IMAGE",)  # 返回一个或多个IMAGE
+    RETURN_NAMES = ("output",)  # 保持为一个返回名
+    FUNCTION = "generate"
+    CATEGORY = "🎨MJapiparty/ImageCreat"
+
+    def generate(self, seed, input_image=None,angle_type="2k-俯视45度",num_images=1):
+        # 调用配置管理器获取配置
+        oneapi_url, oneapi_token = config_manager.get_api_config()
+        # 合并图像和遮罩
+        merged_image = ImageConverter.tensor_to_base64(input_image)
+
+        def cell(num):
+            payload = {
+                "model": "flux2",
+                "input_image": merged_image,
+                "angle_type": angle_type,
+                "seed": int(seed+num),
+            }
+            if "1k" in angle_type:
+                payload["model"] = "multiple-angles"
+                payload["input_image"] = [merged_image]
+                payload["rotate_right_left"] = float(90) if "右侧" in angle_type else float(-90)
+                payload["num_images"] = num_images
+
+            headers = {
+                "Content-Type": "application/json",
+                "Authorization": f"Bearer {oneapi_token}"
+            }
+            response = requests.post(oneapi_url, headers=headers, json=payload, timeout=1200)
+            # 判断状态码是否为 200
+            if response.status_code != 200:
+                error_msg = ImageConverter.get_status_error_msg(response)
+                print("错误信息",error_msg)
+                output_tensors = []
+                error_tensor = ImageConverter.create_error_image(error_msg)
+                output_tensors.append(error_tensor)
+                return (torch.cat(output_tensors, dim=0),)
+            response.raise_for_status()
+            result = response.json()
+
+            # 从返回的结果中提取图片 URL
+            res_url = result.get("res_url", "")
+            if not res_url:
+                raise ValueError("未找到图片 URL")
+            image_urls = res_url.split("|") if res_url else []
+
+            print(image_urls)
+            for image_url in image_urls:
+                if not image_url:
+                    continue
+                try:
+                    # 下载图片
+                    response = requests.get(image_url)
+                    response.raise_for_status()
+                    # 将图片数据转换为 PIL 图像对象
+                    img = Image.open(BytesIO(response.content)).convert("RGB")
+                    api_tensors.append(ImageConverter.pil2tensor(img))
+                except Exception as e:
+                    print(f"下载图片 {image_url} 失败: {str(e)}")
+                    error_tensor = ImageConverter.create_error_image("下载图片失败")
+                    api_tensors.append(error_tensor)
+        api_tensors = []
+        cell(1)
+        if "2k" in angle_type and num_images == 2:
+            cell(2)
+        if not api_tensors:
+            error_tensor = ImageConverter.create_error_image("未获取到有效图片 URL")
+            api_tensors.append(error_tensor)
+
+        return (torch.cat(api_tensors, dim=0),)
+
+
+
+
+
 NODE_CLASS_MAPPINGS = {
     "DreaminaI2INode": DreaminaI2INode,
     "FluxProNode": FluxProNode,
@@ -2068,6 +2198,7 @@ NODE_CLASS_MAPPINGS = {
     "FurniturePhotoNode": FurniturePhotoNode,
     "DetailPhotoNode": DetailPhotoNode,
     "DetailJinNode": DetailJinNode,
+    "FurnitureAngleNode": FurnitureAngleNode,
 
 }
 
@@ -2096,4 +2227,5 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "FurniturePhotoNode": "家具摄影图",
     "DetailPhotoNode": "细节摄影图",
     "DetailJinNode": "细节精修",
+    "FurnitureAngleNode": "家具角度图",
 }

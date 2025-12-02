@@ -328,6 +328,20 @@ class ImageConverter:
         image_pil = ImageConverter.tensor2pil(image).convert("RGB")
         mask_pil = ImageConverter.tensor2pil(mask).convert("L")
         
+        # 检查图片长边，如果超过4096则等比压缩
+        width, height = image_pil.size
+        max_size = max(width, height)
+        
+        if max_size > 4096:
+            # 计算缩放比例
+            scale = 4096 / max_size
+            new_width = int(width * scale)
+            new_height = int(height * scale)
+            # 使用高质量的重采样方法进行缩放
+            image_pil = image_pil.resize((new_width, new_height), Image.LANCZOS)
+            # 同时缩放遮罩以保持一致
+            mask_pil = mask_pil.resize((new_width, new_height), Image.LANCZOS)
+        
         # 确保图像和mask尺寸一致
         if image_pil.size != mask_pil.size:
             mask_pil = mask_pil.resize(image_pil.size, Image.BILINEAR)
