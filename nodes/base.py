@@ -135,11 +135,25 @@ class ImageConverter:
     def tensor_to_base64(image_tensor):
         """
         将图像张量转换为 base64 编码的字符串
+        如果图片长边超过4096，则等比压缩
 
         :param image_tensor: 输入的图像张量
         :return: base64 编码的字符串
         """
         pil_image = ImageConverter.tensor2pil(image_tensor)
+        
+        # 检查图片长边，如果超过4096则等比压缩
+        width, height = pil_image.size
+        max_size = max(width, height)
+        
+        if max_size > 4096:
+            # 计算缩放比例
+            scale = 4096 / max_size
+            new_width = int(width * scale)
+            new_height = int(height * scale)
+            # 使用高质量的重采样方法进行缩放
+            pil_image = pil_image.resize((new_width, new_height), Image.LANCZOS)
+        
         buffered = BytesIO()
         pil_image.save(buffered, format="JPEG")
         return base64.b64encode(buffered.getvalue()).decode("utf-8")

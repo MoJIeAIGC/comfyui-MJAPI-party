@@ -1855,19 +1855,31 @@ class FurniturePhotoNode:
 
             if not image_url:
                 raise ValueError("未找到图片 URL")
-            # 下载图片
-            response = requests.get(image_url)
-            response.raise_for_status()
-            # 将图片数据转换为 PIL 图像对象
-            img = Image.open(BytesIO(response.content)).convert("RGB")
-            # 调用封装的函数裁剪白色边框
-            # img = ImageConverter.crop_white_borders(img)
-            return ImageConverter.pil2tensor(img)
+
+            image_urls = image_url.split("|") if image_url else []
+
+            print(image_urls)
+            for image_url in image_urls:
+                if not image_url:
+                    continue
+                try:
+                    # 下载图片
+                    response = requests.get(image_url)
+                    response.raise_for_status()
+                    # 将图片数据转换为 PIL 图像对象
+                    img = Image.open(BytesIO(response.content)).convert("RGB")
+                    output_tensors.append(ImageConverter.pil2tensor(img))
+                except Exception as e:
+                    print(f"下载图片 {image_url} 失败: {str(e)}")
+                    error_tensor = ImageConverter.create_error_image("下载图片失败")
+                    output_tensors.append(error_tensor)
+            if not output_tensors:
+                error_tensor = ImageConverter.create_error_image("未获取到有效图片 URL")
+                output_tensors.append(error_tensor)
         output_tensors = []
 
         # 调用API
-        video_url = call_api(seed)
-        output_tensors.append(video_url)
+        call_api(seed)
 
         return (torch.cat(output_tensors, dim=0),)  # 拼接为 (数量, H, W, 3)
 
@@ -1951,6 +1963,86 @@ class DetailPhotoNode:
         return (torch.cat(api_tensors, dim=0),)
 
 
+
+class DetailJinNode:
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "input_image": ("IMAGE",),  # 接收多个图片
+                "Polished_type": (["金属&木纹","木纹","金属"], {"default": "金属&木纹"}),
+                "num_images": ("INT", {"default": 1, "min": 1, "max": 2}),  # 新增参数，只能是1或2
+                "seed": ("INT", {"default": -1}),
+            }
+        }
+
+    RETURN_TYPES = ("IMAGE",)  # 返回一个或多个IMAGE
+    RETURN_NAMES = ("output",)  # 保持为一个返回名
+    FUNCTION = "generate"
+    CATEGORY = "🎨MJapiparty/ImageCreat"
+
+    def generate(self, seed, input_image=None,Polished_type="金属&木纹",num_images=1):
+        # 调用配置管理器获取配置
+        oneapi_url, oneapi_token = config_manager.get_api_config()
+        # 合并图像和遮罩
+        merged_image = ImageConverter.tensor_to_base64(input_image)
+
+        payload = {
+            "model": "doubao-seedream-4.0",
+            "seed": int(seed+6),
+            "max_SetImage": num_images,
+            "input_image": [merged_image],
+            "Polished-type": Polished_type,
+        }
+
+
+        headers = {
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {oneapi_token}"
+        }
+        response = requests.post(oneapi_url, headers=headers, json=payload, timeout=1200)
+        # 判断状态码是否为 200
+        if response.status_code != 200:
+            error_msg = ImageConverter.get_status_error_msg(response)
+            print("错误信息",error_msg)
+            output_tensors = []
+            error_tensor = ImageConverter.create_error_image(error_msg)
+            output_tensors.append(error_tensor)
+            return (torch.cat(output_tensors, dim=0),)
+        response.raise_for_status()
+        result = response.json()
+
+        # 从返回的结果中提取图片 URL
+        res_url = result.get("res_url", "")
+        if not res_url:
+            raise ValueError("未找到图片 URL")
+        image_urls = res_url.split("|") if res_url else []
+
+        api_tensors = []
+        print(image_urls)
+        for image_url in image_urls:
+            if not image_url:
+                continue
+            try:
+                # 下载图片
+                response = requests.get(image_url)
+                response.raise_for_status()
+                # 将图片数据转换为 PIL 图像对象
+                img = Image.open(BytesIO(response.content)).convert("RGB")
+                api_tensors.append(ImageConverter.pil2tensor(img))
+            except Exception as e:
+                print(f"下载图片 {image_url} 失败: {str(e)}")
+                error_tensor = ImageConverter.create_error_image("下载图片失败")
+                api_tensors.append(error_tensor)
+
+        if not api_tensors:
+            error_tensor = ImageConverter.create_error_image("未获取到有效图片 URL")
+            api_tensors.append(error_tensor)
+
+        return (torch.cat(api_tensors, dim=0),)
+
+
+
 NODE_CLASS_MAPPINGS = {
     "DreaminaI2INode": DreaminaI2INode,
     "FluxProNode": FluxProNode,
@@ -1975,6 +2067,7 @@ NODE_CLASS_MAPPINGS = {
     "ImageTranslateNode": ImageTranslateNode,
     "FurniturePhotoNode": FurniturePhotoNode,
     "DetailPhotoNode": DetailPhotoNode,
+    "DetailJinNode": DetailJinNode,
 
 }
 
@@ -2002,4 +2095,5 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "ImageTranslateNode": "图片翻译",
     "FurniturePhotoNode": "家具摄影图",
     "DetailPhotoNode": "细节摄影图",
+    "DetailJinNode": "细节精修",
 }
