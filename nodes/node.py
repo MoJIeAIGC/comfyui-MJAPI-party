@@ -1833,7 +1833,7 @@ class FurniturePhotoNode:
         input_image_base64 = ImageConverter.tensor_to_base64(input_image)
         def call_api(seed_override):
             payload = {
-                "model": "nano-banana-pro",
+                "model": "furniture-photo",
                 "resolution": resolution,
                 "aspect_ratio": aspect_ratio,
                 "num_images": num_images,
@@ -1947,7 +1947,7 @@ class DetailPhotoNode:
         merged_image = ImageConverter.highlight_mask_with_rectangle(input_image, mask)
 
         payload = {
-            "model": "doubao-seedream-4.0",
+            "model": "detail-photo",
             "seed": int(seed+6),
             "watermark": False,
             "max_SetImage": num_images,
@@ -2069,7 +2069,7 @@ class DetailJinNode:
         merged_image = ImageConverter.tensor_to_base64(input_image)
 
         payload = {
-            "model": "doubao-seedream-4.0",
+            "model": "detail-jin",
             "seed": int(seed+6),
             "max_SetImage": num_images,
             "input_image": [merged_image],
@@ -2151,7 +2151,7 @@ class FurnitureAngleNode:
 
         def cell(num):
             payload = {
-                "model": "flux2",
+                "model": "furniture-angle",
                 "input_image": merged_image,
                 "angle_type": angle_type,
                 "seed": int(seed+num),
