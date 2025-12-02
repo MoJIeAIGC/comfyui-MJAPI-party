@@ -1904,6 +1904,45 @@ class DetailPhotoNode:
     def generate(self, seed, input_image=None, mask=None, num_images=1):
         # 调用配置管理器获取配置
         oneapi_url, oneapi_token = config_manager.get_api_config()
+        if input_image is not None:
+            # 将张量转换为PIL图像以获取尺寸
+            pil_image = ImageConverter.tensor2pil(input_image)
+            width, height = pil_image.size
+            print(f"原始图片尺寸: 宽度={width}, 高度={height}")
+            
+            # 检查并调整图片尺寸，确保宽高在1280到4096之间
+            min_size, max_size = 1280, 4096
+            needs_resize = False
+            scale_factor = 1.0
+            
+            # 如果宽度或高度小于最小值，需要放大
+            if width < min_size or height < min_size:
+                # 计算放大比例，取两个方向中较大的比例
+                scale_factor = max(min_size / width, min_size / height)
+                needs_resize = True
+            
+            # 如果宽度或高度大于最大值，需要缩小
+            elif width > max_size or height > max_size:
+                # 计算缩小比例，取两个方向中较小的比例
+                scale_factor = min(max_size / width, max_size / height)
+                needs_resize = True
+            
+            # 如果需要调整尺寸
+            if needs_resize:
+                new_width = int(width * scale_factor)
+                new_height = int(height * scale_factor)
+                print(f"调整图片尺寸: 宽度={new_width}, 高度={new_height}, 缩放比例={scale_factor:.2f}")
+                
+                # 使用LANCZOS重采样方法进行高质量缩放
+                pil_image = pil_image.resize((new_width, new_height), Image.LANCZOS)
+                
+                # 将调整后的PIL图像转换回张量
+                input_image = ImageConverter.pil2tensor(pil_image)
+            
+            # 获取最终尺寸用于API请求
+            final_width, final_height = pil_image.size
+            size = f"{final_width}x{final_height}"
+            print(f"最终图片尺寸: {size}")
         # 合并图像和遮罩
         merged_image = ImageConverter.highlight_mask_with_rectangle(input_image, mask)
 
@@ -1914,6 +1953,7 @@ class DetailPhotoNode:
             "max_SetImage": num_images,
             "input_image": [merged_image],
             "DetailPhoto": True,
+            "size": size,
         }
 
 
