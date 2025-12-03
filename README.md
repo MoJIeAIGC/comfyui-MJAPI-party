@@ -54,6 +54,7 @@
 
 在comfyui节点列表中找到mjapiparty
 ![alt text](doc/assets/node.png)
+- 251203-最近实在是太忙了，为客户定制了一套家具生成节点，感兴趣的朋友也可以试试。2.0版本会更新Nanp-pro和flux-2
 
 - 251030-主要更新更新了Google-Nano节点
 Nano节点现在可以设置生成数量和生成尺寸了。
