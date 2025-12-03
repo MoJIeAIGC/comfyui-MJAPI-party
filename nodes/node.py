@@ -1891,7 +1891,6 @@ class DetailPhotoNode:
             "required": {
                 "input_image": ("IMAGE",),  # 接收多个图片
                 "mask": ("MASK",),  # 输入遮罩
-                "num_images": ("INT", {"default": 1, "min": 1, "max": 4}),  # 新增参数，只能是1或2
                 "seed": ("INT", {"default": -1}),
             }
         }
@@ -2159,7 +2158,7 @@ class FurnitureAngleNode:
             if "1k" in angle_type:
                 payload["model"] = "multiple-angles"
                 payload["input_image"] = [merged_image]
-                payload["rotate_right_left"] = float(90) if "右侧" in angle_type else float(-90)
+                payload["rotate_right_left"] = float(-90) if "右侧" in angle_type else float(90)
                 payload["num_images"] = num_images
 
             headers = {
