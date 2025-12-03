@@ -959,7 +959,7 @@ class GetDressing:
     RETURN_TYPES = ("IMAGE",)
     RETURN_NAMES = ("output",)
     FUNCTION = "generate"
-    CATEGORY = "🎨MJapiparty/clothCreat"
+    CATEGORY = "🎨MJapiparty/Product&tool"
 
     def generate(self,  image, seed,  extend_prompt,size="1:1"):
         # 调用配置管理器获取配置
@@ -1095,7 +1095,7 @@ class ReplaceClothesNode:
     RETURN_TYPES = ("IMAGE",)
     RETURN_NAMES = ("output",)
     FUNCTION = "generate"
-    CATEGORY = "🎨MJapiparty/clothCreat"
+    CATEGORY = "🎨MJapiparty/Product&tool"
 
     def generate(self, cloths_image, model_image, seed):
         # 调用配置管理器获取配置
@@ -1394,7 +1394,7 @@ class ModelGenNode:
     RETURN_TYPES = ("IMAGE",)  # 返回一个或多个IMAGE
     RETURN_NAMES = ("output",)  # 保持为一个返回名
     FUNCTION = "generate"
-    CATEGORY = "🎨MJapiparty/clothCreat"
+    CATEGORY = "🎨MJapiparty/Product&tool"
 
     def generate(self , seed, face_image=None, cloths_image=None,race_class="Asia",gender_class="woman",style_prompt="INS自拍风",Size="3:4"):
         # 调用配置管理器获取配置
@@ -1490,7 +1490,7 @@ class MoterPoseNode:
     RETURN_TYPES = ("IMAGE",)  # 返回一个或多个IMAGE
     RETURN_NAMES = ("output",)  # 保持为一个返回名
     FUNCTION = "generate"
-    CATEGORY = "🎨MJapiparty/clothCreat"
+    CATEGORY = "🎨MJapiparty/Product&tool"
 
     def generate(self,  seed, image_input=None, extent_prompt=False,out_batch=1):
         # 调用配置管理器获取配置
@@ -1783,6 +1783,435 @@ class ImageUpscaleNode:
         return (torch.cat(api_tensors, dim=0),)
 
 
+class FurniturePhotoNode:
+    @classmethod
+    def INPUT_TYPES(cls):
+        url = "http://admin.qihuaimage.com/items/furniture_style"
+        response = requests.get(url)
+        response.raise_for_status()
+        result = response.json()
+        
+        # 处理数据：创建去重的parentname列表和以parentname为键的字典
+        data = result.get('data', [])
+        
+        # 创建去重的parentname列表
+        parentname_list = list(set(item['parentname'] for item in data))
+        parentname_list.sort()  # 排序
+        
+        # 创建以parentname为键，typename列表为值的字典
+        parentname_dict = {}
+        for item in data:
+            parentname = item['parentname']
+            typename = item['typename']
+            if parentname not in parentname_dict:
+                parentname_dict[parentname] = []
+            parentname_dict[parentname].append(typename)
+        
+        # print("去重的parentname列表:", parentname_list)
+        # print("parentname字典:", parentname_dict)
+        
+        return {
+            "required": {
+                "input_image": ("IMAGE",),  # 接收多个图片
+                "furniture_types": (parentname_list, {"default": parentname_list[0]}),
+                "style_type": (parentname_dict.get(parentname_list[0], []), {"default": parentname_dict[parentname_list[0]][0]}),
+                "resolution": (["1K", "2K", "4K"], {"default": "2K"}),
+                "aspect_ratio": (["16:9","4:3","1:1", "3:4",  "9:16"], {"default": "4:3"}),
+                "num_images": ("INT", {"default": 1, "min": 1, "max": 2}),  # 新增参数，只能是1或2
+                "seed": ("INT", {"default": -1}),
+            }
+        }
+
+    RETURN_TYPES = ("IMAGE",)  # 返回一个或多个IMAGE
+    RETURN_NAMES = ("output",)  # 保持为一个返回名
+    FUNCTION = "generate"
+    CATEGORY = "🎨MJapiparty/Product&tool"
+
+    def generate(self, seed, input_image, resolution="1K", aspect_ratio="4:3", num_images=1, furniture_types="", style_type=""):
+        # 获取配置
+        oneapi_url, oneapi_token = config_manager.get_api_config()
+        input_image_base64 = ImageConverter.tensor_to_base64(input_image)
+        def call_api(seed_override):
+            payload = {
+                "model": "furniture-photo",
+                "resolution": resolution,
+                "aspect_ratio": aspect_ratio,
+                "num_images": num_images,
+                "furniture_types": furniture_types,
+                "style_type": style_type,
+                "seed": int(seed_override),
+                "input_image": [input_image_base64],
+            }
+            headers = {
+                "Content-Type": "application/json",
+                "Authorization": f"Bearer {oneapi_token}"
+            }
+            response = requests.post(oneapi_url, headers=headers, json=payload, timeout=240)
+
+            response.raise_for_status()
+
+            result = response.json()
+            image_url = result.get("res_url")
+
+            if not image_url:
+                raise ValueError("未找到图片 URL")
+
+            image_urls = image_url.split("|") if image_url else []
+
+            print(image_urls)
+            for image_url in image_urls:
+                if not image_url:
+                    continue
+                try:
+                    # 下载图片
+                    response = requests.get(image_url)
+                    response.raise_for_status()
+                    # 将图片数据转换为 PIL 图像对象
+                    img = Image.open(BytesIO(response.content)).convert("RGB")
+                    output_tensors.append(ImageConverter.pil2tensor(img))
+                except Exception as e:
+                    print(f"下载图片 {image_url} 失败: {str(e)}")
+                    error_tensor = ImageConverter.create_error_image("下载图片失败")
+                    output_tensors.append(error_tensor)
+            if not output_tensors:
+                error_tensor = ImageConverter.create_error_image("未获取到有效图片 URL")
+                output_tensors.append(error_tensor)
+        output_tensors = []
+
+        # 调用API
+        call_api(seed)
+
+        return (torch.cat(output_tensors, dim=0),)  # 拼接为 (数量, H, W, 3)
+
+
+class DetailPhotoNode:
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "input_image": ("IMAGE",),  # 接收多个图片
+                "mask": ("MASK",),  # 输入遮罩
+                "seed": ("INT", {"default": -1}),
+            }
+        }
+
+    RETURN_TYPES = ("IMAGE",)  # 返回一个或多个IMAGE
+    RETURN_NAMES = ("output",)  # 保持为一个返回名
+    FUNCTION = "generate"
+    CATEGORY = "🎨MJapiparty/Product&tool"
+
+    def generate(self, seed, input_image=None, mask=None, num_images=1):
+        # 调用配置管理器获取配置
+        oneapi_url, oneapi_token = config_manager.get_api_config()
+        if input_image is not None:
+            # 将张量转换为PIL图像以获取尺寸
+            pil_image = ImageConverter.tensor2pil(input_image)
+            width, height = pil_image.size
+            # print(f"原始图片尺寸: 宽度={width}, 高度={height}")
+            
+            # 检查并调整图片尺寸，确保宽高在1280到4096之间
+            min_size, max_size = 1280, 4096
+            needs_resize = False
+            scale_factor = 1.0
+            
+            # 如果宽度或高度小于最小值，需要放大
+            if width < min_size or height < min_size:
+                # 计算放大比例，取两个方向中较大的比例
+                scale_factor = max(min_size / width, min_size / height)
+                needs_resize = True
+            
+            # 如果宽度或高度大于最大值，需要缩小
+            elif width > max_size or height > max_size:
+                # 计算缩小比例，取两个方向中较小的比例
+                scale_factor = min(max_size / width, max_size / height)
+                needs_resize = True
+            
+            # 如果需要调整尺寸
+            if needs_resize:
+                new_width = int(width * scale_factor)
+                new_height = int(height * scale_factor)
+                #print(f"调整图片尺寸: 宽度={new_width}, 高度={new_height}, 缩放比例={scale_factor:.2f}")
+                
+                # 使用LANCZOS重采样方法进行高质量缩放
+                pil_image = pil_image.resize((new_width, new_height), Image.LANCZOS)
+                
+                # 将调整后的PIL图像转换回张量
+                input_image = ImageConverter.pil2tensor(pil_image)
+            
+            # 获取最终尺寸用于API请求
+            final_width, final_height = pil_image.size
+            size = f"{final_width}x{final_height}"
+            # print(f"最终图片尺寸: {size}")
+        # 合并图像和遮罩
+        merged_image = ImageConverter.highlight_mask_with_rectangle(input_image, mask)
+
+        payload = {
+            "model": "detail-photo",
+            "seed": int(seed+6),
+            "watermark": False,
+            "max_SetImage": num_images,
+            "input_image": [merged_image],
+            "DetailPhoto": True,
+            "size": size,
+        }
+
+
+        headers = {
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {oneapi_token}"
+        }
+        response = requests.post(oneapi_url, headers=headers, json=payload, timeout=1200)
+        # 判断状态码是否为 200
+        if response.status_code != 200:
+            error_msg = ImageConverter.get_status_error_msg(response)
+            print("错误信息",error_msg)
+            output_tensors = []
+            error_tensor = ImageConverter.create_error_image(error_msg)
+            output_tensors.append(error_tensor)
+            return (torch.cat(output_tensors, dim=0),)
+        response.raise_for_status()
+        result = response.json()
+
+        # 从返回的结果中提取图片 URL
+        res_url = result.get("res_url", "")
+        if not res_url:
+            raise ValueError("未找到图片 URL")
+        image_urls = res_url.split("|") if res_url else []
+
+        api_tensors = []
+        print(image_urls)
+        for image_url in image_urls:
+            if not image_url:
+                continue
+            try:
+                # 下载图片
+                response = requests.get(image_url)
+                response.raise_for_status()
+                # 将图片数据转换为 PIL 图像对象
+                img = Image.open(BytesIO(response.content)).convert("RGB")
+                api_tensors.append(ImageConverter.pil2tensor(img))
+            except Exception as e:
+                print(f"下载图片 {image_url} 失败: {str(e)}")
+                error_tensor = ImageConverter.create_error_image("下载图片失败")
+                api_tensors.append(error_tensor)
+
+        if not api_tensors:
+            error_tensor = ImageConverter.create_error_image("未获取到有效图片 URL")
+            api_tensors.append(error_tensor)
+
+        return (torch.cat(api_tensors, dim=0),)
+
+
+
+class DetailJinNode:
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "input_image": ("IMAGE",),  # 接收多个图片
+                "Polished_type": (["金属&木纹","木纹","金属"], {"default": "金属&木纹"}),
+                "num_images": ("INT", {"default": 1, "min": 1, "max": 2}),  # 新增参数，只能是1或2
+                "seed": ("INT", {"default": -1}),
+            }
+        }
+
+    RETURN_TYPES = ("IMAGE",)  # 返回一个或多个IMAGE
+    RETURN_NAMES = ("output",)  # 保持为一个返回名
+    FUNCTION = "generate"
+    CATEGORY = "🎨MJapiparty/Product&tool"
+
+    def generate(self, seed, input_image=None,Polished_type="金属&木纹",num_images=1):
+        # 调用配置管理器获取配置
+        oneapi_url, oneapi_token = config_manager.get_api_config()
+        
+        # 获取图片的长宽
+        if input_image is not None:
+            # 将张量转换为PIL图像以获取尺寸
+            pil_image = ImageConverter.tensor2pil(input_image)
+            width, height = pil_image.size
+            # print(f"原始图片尺寸: 宽度={width}, 高度={height}")
+            
+            # 检查并调整图片尺寸，确保宽高在1280到4096之间
+            min_size, max_size = 1280, 4096
+            needs_resize = False
+            scale_factor = 1.0
+            
+            # 如果宽度或高度小于最小值，需要放大
+            if width < min_size or height < min_size:
+                # 计算放大比例，取两个方向中较大的比例
+                scale_factor = max(min_size / width, min_size / height)
+                needs_resize = True
+            
+            # 如果宽度或高度大于最大值，需要缩小
+            elif width > max_size or height > max_size:
+                # 计算缩小比例，取两个方向中较小的比例
+                scale_factor = min(max_size / width, max_size / height)
+                needs_resize = True
+            
+            # 如果需要调整尺寸
+            if needs_resize:
+                new_width = int(width * scale_factor)
+                new_height = int(height * scale_factor)
+                # print(f"调整图片尺寸: 宽度={new_width}, 高度={new_height}, 缩放比例={scale_factor:.2f}")
+                
+                # 使用LANCZOS重采样方法进行高质量缩放
+                pil_image = pil_image.resize((new_width, new_height), Image.LANCZOS)
+                
+                # 将调整后的PIL图像转换回张量
+                input_image = ImageConverter.pil2tensor(pil_image)
+            
+            # 获取最终尺寸用于API请求
+            final_width, final_height = pil_image.size
+            size = f"{final_width}x{final_height}"
+            # print(f"最终图片尺寸: {size}")
+        
+        merged_image = ImageConverter.tensor_to_base64(input_image)
+
+        payload = {
+            "model": "detail-jin",
+            "seed": int(seed+6),
+            "max_SetImage": num_images,
+            "input_image": [merged_image],
+            "Polished-type": Polished_type,
+            "size": size,
+        }
+
+
+        headers = {
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {oneapi_token}"
+        }
+        response = requests.post(oneapi_url, headers=headers, json=payload, timeout=1200)
+        # 判断状态码是否为 200
+        if response.status_code != 200:
+            error_msg = ImageConverter.get_status_error_msg(response)
+            print("错误信息",error_msg)
+            output_tensors = []
+            error_tensor = ImageConverter.create_error_image(error_msg)
+            output_tensors.append(error_tensor)
+            return (torch.cat(output_tensors, dim=0),)
+        response.raise_for_status()
+        result = response.json()
+
+        # 从返回的结果中提取图片 URL
+        res_url = result.get("res_url", "")
+        if not res_url:
+            raise ValueError("未找到图片 URL")
+        image_urls = res_url.split("|") if res_url else []
+
+        api_tensors = []
+        print(image_urls)
+        for image_url in image_urls:
+            if not image_url:
+                continue
+            try:
+                # 下载图片
+                response = requests.get(image_url)
+                response.raise_for_status()
+                # 将图片数据转换为 PIL 图像对象
+                img = Image.open(BytesIO(response.content)).convert("RGB")
+                api_tensors.append(ImageConverter.pil2tensor(img))
+            except Exception as e:
+                print(f"下载图片 {image_url} 失败: {str(e)}")
+                error_tensor = ImageConverter.create_error_image("下载图片失败")
+                api_tensors.append(error_tensor)
+
+        if not api_tensors:
+            error_tensor = ImageConverter.create_error_image("未获取到有效图片 URL")
+            api_tensors.append(error_tensor)
+
+        return (torch.cat(api_tensors, dim=0),)
+
+
+
+
+class FurnitureAngleNode:
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "input_image": ("IMAGE",),  # 接收多个图片
+                "angle_type": (["2k-俯视45度","2k-顶视图","2K-对角线拍摄","1k-左侧垂直视图","1k-右侧垂直视图"], {"default": "2k-俯视45度"}),
+                "num_images": ("INT", {"default": 1, "min": 1, "max": 2}),  # 新增参数，只能是1或2
+                "seed": ("INT", {"default": -1}),
+            }
+        }
+
+    RETURN_TYPES = ("IMAGE",)  # 返回一个或多个IMAGE
+    RETURN_NAMES = ("output",)  # 保持为一个返回名
+    FUNCTION = "generate"
+    CATEGORY = "🎨MJapiparty/Product&tool"
+
+    def generate(self, seed, input_image=None,angle_type="2k-俯视45度",num_images=1):
+        # 调用配置管理器获取配置
+        oneapi_url, oneapi_token = config_manager.get_api_config()
+        # 合并图像和遮罩
+        merged_image = ImageConverter.tensor_to_base64(input_image)
+
+        def cell(num):
+            payload = {
+                "model": "furniture-angle",
+                "input_image": merged_image,
+                "angle_type": angle_type,
+                "seed": int(seed+num),
+            }
+            if "1k" in angle_type:
+                payload["model"] = "multiple-angles"
+                payload["input_image"] = [merged_image]
+                payload["rotate_right_left"] = float(-90) if "右侧" in angle_type else float(90)
+                payload["num_images"] = num_images
+
+            headers = {
+                "Content-Type": "application/json",
+                "Authorization": f"Bearer {oneapi_token}"
+            }
+            response = requests.post(oneapi_url, headers=headers, json=payload, timeout=1200)
+            # 判断状态码是否为 200
+            if response.status_code != 200:
+                error_msg = ImageConverter.get_status_error_msg(response)
+                print("错误信息",error_msg)
+                output_tensors = []
+                error_tensor = ImageConverter.create_error_image(error_msg)
+                output_tensors.append(error_tensor)
+                return (torch.cat(output_tensors, dim=0),)
+            response.raise_for_status()
+            result = response.json()
+
+            # 从返回的结果中提取图片 URL
+            res_url = result.get("res_url", "")
+            if not res_url:
+                raise ValueError("未找到图片 URL")
+            image_urls = res_url.split("|") if res_url else []
+
+            print(image_urls)
+            for image_url in image_urls:
+                if not image_url:
+                    continue
+                try:
+                    # 下载图片
+                    response = requests.get(image_url)
+                    response.raise_for_status()
+                    # 将图片数据转换为 PIL 图像对象
+                    img = Image.open(BytesIO(response.content)).convert("RGB")
+                    api_tensors.append(ImageConverter.pil2tensor(img))
+                except Exception as e:
+                    print(f"下载图片 {image_url} 失败: {str(e)}")
+                    error_tensor = ImageConverter.create_error_image("下载图片失败")
+                    api_tensors.append(error_tensor)
+        api_tensors = []
+        cell(1)
+        if "2k" in angle_type and num_images == 2:
+            cell(2)
+        if not api_tensors:
+            error_tensor = ImageConverter.create_error_image("未获取到有效图片 URL")
+            api_tensors.append(error_tensor)
+
+        return (torch.cat(api_tensors, dim=0),)
+
+
+
+
+
 NODE_CLASS_MAPPINGS = {
     "DreaminaI2INode": DreaminaI2INode,
     "FluxProNode": FluxProNode,
@@ -1805,6 +2234,10 @@ NODE_CLASS_MAPPINGS = {
     "ViduI2VNode": ViduI2VNode,
     "ImageUpscaleNode": ImageUpscaleNode,
     "ImageTranslateNode": ImageTranslateNode,
+    "FurniturePhotoNode": FurniturePhotoNode,
+    "DetailPhotoNode": DetailPhotoNode,
+    "DetailJinNode": DetailJinNode,
+    "FurnitureAngleNode": FurnitureAngleNode,
 
 }
 
@@ -1830,4 +2263,8 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "ViduI2VNode": "Vidu首尾帧视频",
     "ImageUpscaleNode": "高清放大",
     "ImageTranslateNode": "图片翻译",
+    "FurniturePhotoNode": "AI家具摄影图",
+    "DetailPhotoNode": "局部细节呈现",
+    "DetailJinNode": "细节精修",
+    "FurnitureAngleNode": "家具角度图",
 }

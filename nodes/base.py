@@ -135,11 +135,25 @@ class ImageConverter:
     def tensor_to_base64(image_tensor):
         """
         将图像张量转换为 base64 编码的字符串
+        如果图片长边超过4096，则等比压缩
 
         :param image_tensor: 输入的图像张量
         :return: base64 编码的字符串
         """
         pil_image = ImageConverter.tensor2pil(image_tensor)
+        
+        # 检查图片长边，如果超过4096则等比压缩
+        width, height = pil_image.size
+        max_size = max(width, height)
+        
+        if max_size > 4096:
+            # 计算缩放比例
+            scale = 4096 / max_size
+            new_width = int(width * scale)
+            new_height = int(height * scale)
+            # 使用高质量的重采样方法进行缩放
+            pil_image = pil_image.resize((new_width, new_height), Image.LANCZOS)
+        
         buffered = BytesIO()
         pil_image.save(buffered, format="JPEG")
         return base64.b64encode(buffered.getvalue()).decode("utf-8")
@@ -297,6 +311,73 @@ class ImageConverter:
         rgba_image.save(buffered, format="PNG", pnginfo=meta)
 
         return base64.b64encode(buffered.getvalue()).decode("utf-8")
+
+    @staticmethod
+    def highlight_mask_with_rectangle(image, mask):
+        """
+        在原图上用红色矩形框出遮罩区域
+        
+        :param image: 输入图像张量
+        :param mask: 输入遮罩张量
+        :return: 带有红色矩形框的图像的base64编码
+        """
+        if mask is None:
+            return ImageConverter.tensor_to_base64(image)
+            
+        # 转换为PIL图像
+        image_pil = ImageConverter.tensor2pil(image).convert("RGB")
+        mask_pil = ImageConverter.tensor2pil(mask).convert("L")
+        
+        # 检查图片长边，如果超过4096则等比压缩
+        width, height = image_pil.size
+        max_size = max(width, height)
+        
+        if max_size > 4096:
+            # 计算缩放比例
+            scale = 4096 / max_size
+            new_width = int(width * scale)
+            new_height = int(height * scale)
+            # 使用高质量的重采样方法进行缩放
+            image_pil = image_pil.resize((new_width, new_height), Image.LANCZOS)
+            # 同时缩放遮罩以保持一致
+            mask_pil = mask_pil.resize((new_width, new_height), Image.LANCZOS)
+        
+        # 确保图像和mask尺寸一致
+        if image_pil.size != mask_pil.size:
+            mask_pil = mask_pil.resize(image_pil.size, Image.BILINEAR)
+        
+        # 创建绘图对象
+        draw = ImageDraw.Draw(image_pil)
+        
+        # 找到遮罩区域的边界框
+        # 首先找到遮罩中非零像素的坐标
+        mask_array = np.array(mask_pil)
+        non_zero_indices = np.where(mask_array > 0)
+        
+        if len(non_zero_indices[0]) == 0:  # 如果没有非零像素，返回原图
+            return ImageConverter.tensor_to_base64(image)
+            
+        # 计算边界框
+        min_y, min_x = np.min(non_zero_indices[0], axis=0), np.min(non_zero_indices[1], axis=0)
+        max_y, max_x = np.max(non_zero_indices[0], axis=0), np.max(non_zero_indices[1], axis=0)
+        
+        # 在边界框周围绘制红色矩形
+        # 可以添加一些边距使矩形更明显
+        margin = 5
+        left = max(0, min_x - margin)
+        top = max(0, min_y - margin)
+        right = min(image_pil.width, max_x + margin + 1)
+        bottom = min(image_pil.height, max_y + margin + 1)
+        
+        # 绘制红色矩形框
+        draw.rectangle([(left, top), (right, bottom)], outline=(255, 0, 0), width=3)
+        
+        # 转换回base64
+        buffered = BytesIO()
+        image_pil.save(buffered, format="PNG")
+        img_base64 = base64.b64encode(buffered.getvalue()).decode("utf-8")
+        
+        return img_base64
 
 
     @staticmethod
