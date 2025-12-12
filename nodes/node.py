@@ -1816,7 +1816,7 @@ class FurniturePhotoNode:
                 "input_image": ("IMAGE",),  # 接收多个图片
                 "furniture_types": (parentname_list, {"default": parentname_list[0]}),
                 "style_type": (parentname_dict.get(parentname_list[0], []), {"default": parentname_dict[parentname_list[0]][0]}),
-                "resolution": (["1K", "2K", "4K"], {"default": "1K"}),
+                "resolution": (["1K", "2K", "4K"], {"default": "2K"}),
                 "aspect_ratio": (["16:9","4:3","1:1", "3:4",  "9:16"], {"default": "4:3"}),
                 "num_images": ("INT", {"default": 1, "min": 1, "max": 2}),  # 新增参数，只能是1或2
                 "seed": ("INT", {"default": -1}),
@@ -1908,7 +1908,7 @@ class DetailPhotoNode:
             # 将张量转换为PIL图像以获取尺寸
             pil_image = ImageConverter.tensor2pil(input_image)
             width, height = pil_image.size
-            print(f"原始图片尺寸: 宽度={width}, 高度={height}")
+            # print(f"原始图片尺寸: 宽度={width}, 高度={height}")
             
             # 检查并调整图片尺寸，确保宽高在1280到4096之间
             min_size, max_size = 1280, 4096
@@ -1931,7 +1931,7 @@ class DetailPhotoNode:
             if needs_resize:
                 new_width = int(width * scale_factor)
                 new_height = int(height * scale_factor)
-                print(f"调整图片尺寸: 宽度={new_width}, 高度={new_height}, 缩放比例={scale_factor:.2f}")
+                #print(f"调整图片尺寸: 宽度={new_width}, 高度={new_height}, 缩放比例={scale_factor:.2f}")
                 
                 # 使用LANCZOS重采样方法进行高质量缩放
                 pil_image = pil_image.resize((new_width, new_height), Image.LANCZOS)
@@ -1942,7 +1942,7 @@ class DetailPhotoNode:
             # 获取最终尺寸用于API请求
             final_width, final_height = pil_image.size
             size = f"{final_width}x{final_height}"
-            print(f"最终图片尺寸: {size}")
+            # print(f"最终图片尺寸: {size}")
         # 合并图像和遮罩
         merged_image = ImageConverter.highlight_mask_with_rectangle(input_image, mask)
 
@@ -2030,7 +2030,7 @@ class DetailJinNode:
             # 将张量转换为PIL图像以获取尺寸
             pil_image = ImageConverter.tensor2pil(input_image)
             width, height = pil_image.size
-            print(f"原始图片尺寸: 宽度={width}, 高度={height}")
+            # print(f"原始图片尺寸: 宽度={width}, 高度={height}")
             
             # 检查并调整图片尺寸，确保宽高在1280到4096之间
             min_size, max_size = 1280, 4096
@@ -2053,7 +2053,7 @@ class DetailJinNode:
             if needs_resize:
                 new_width = int(width * scale_factor)
                 new_height = int(height * scale_factor)
-                print(f"调整图片尺寸: 宽度={new_width}, 高度={new_height}, 缩放比例={scale_factor:.2f}")
+                # print(f"调整图片尺寸: 宽度={new_width}, 高度={new_height}, 缩放比例={scale_factor:.2f}")
                 
                 # 使用LANCZOS重采样方法进行高质量缩放
                 pil_image = pil_image.resize((new_width, new_height), Image.LANCZOS)
@@ -2064,7 +2064,7 @@ class DetailJinNode:
             # 获取最终尺寸用于API请求
             final_width, final_height = pil_image.size
             size = f"{final_width}x{final_height}"
-            print(f"最终图片尺寸: {size}")
+            # print(f"最终图片尺寸: {size}")
         
         merged_image = ImageConverter.tensor_to_base64(input_image)
 
@@ -2141,7 +2141,7 @@ class FurnitureAngleNode:
     RETURN_TYPES = ("IMAGE",)  # 返回一个或多个IMAGE
     RETURN_NAMES = ("output",)  # 保持为一个返回名
     FUNCTION = "generate"
-    CATEGORY = "🎨MJapiparty/ImageCreat"
+    CATEGORY = "🎨MJapiparty/Product&tool"
 
     def generate(self, seed, input_image=None,angle_type="2k-俯视45度",num_images=1):
         # 调用配置管理器获取配置
