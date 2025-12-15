@@ -2139,10 +2139,6 @@ class FurnitureAngleNode:
             "required": {
                 "input_image": ("IMAGE",),  # 接收多个图片
                 "angle_type": (["4k-俯视45度","4K-正视角","4k-顶视图","4K-对角线拍摄","1k-左侧垂直视图","1k-右侧垂直视图"], {"default": "2k-俯视45度"}),
-                "custom_size": ("BOOLEAN", {"default": False}),  # 自定义尺寸开关
-                "width": ("INT", {"default": 1024, "min": 1024, "max": 4096}),  # 生成张数
-                "height": ("INT", {"default": 1024, "min": 1024, "max": 4096}),  # 生成张数
-                "num_images": ("INT", {"default": 1, "min": 1, "max": 2}),  # 新增参数，只能是1或2
                 "seed": ("INT", {"default": -1}),
             }
         }
@@ -2168,9 +2164,7 @@ class FurnitureAngleNode:
                 "max_SetImage": num_images,
                 "pro": True,
             }
-            if custom_size:
-                resl_size = f"{width}x{height}"
-                payload["size"] = resl_size
+
             if "1k" in angle_type:
                 payload["model"] = "multiple-angles"
                 payload["input_image"] = [merged_image]
@@ -2234,10 +2228,10 @@ class NanoProNode:
             "required": {
                 "prompt": ("STRING", {"default": "A beautiful sunset", "multiline": True}),
                 "is_translation": ("BOOLEAN", {"default": False}),  # 是否是翻译模式
-                "limit_generations": ("BOOLEAN", {"default": False}),  # 是否是翻译模式
+                # "limit_generations": ("BOOLEAN", {"default": False}),  # 是否是翻译模式
                 "resolution": (["1K", "2K", "4K"], {"default": "1K"}),
                 "aspect_ratio": (["16:9","4:3","2:3","4:5","1:1","3:2","5:4","3:4",  "9:16"], {"default": "4:3"}),
-                # "num_images": ("INT", {"default": 1, "min": 1, "max": 2}),  # 新增参数，只能是1或2
+                "num_images": ("INT", {"default": 1, "min": 1, "max": 2}),  # 新增参数，只能是1或2
                 "seed": ("INT", {"default": -1}),
             },
             "optional": {
@@ -2250,7 +2244,7 @@ class NanoProNode:
     FUNCTION = "generate"
     CATEGORY = "🎨MJapiparty/Product&tool"
 
-    def generate(self, seed, input_images=None, resolution="1K", aspect_ratio="4:3", is_translation=False, limit_generations=False, prompt="", style_type=""):
+    def generate(self, seed, input_images=None, resolution="1K", aspect_ratio="4:3", is_translation=False, limit_generations=False, prompt="", num_images=1):
         # 获取配置
         oneapi_url, oneapi_token = config_manager.get_api_config()
         def call_api(seed_override):
@@ -2262,6 +2256,7 @@ class NanoProNode:
                 "is_translation": is_translation,
                 "limit_generations": limit_generations,
                 "seed": int(seed_override),
+                "num_images": int(num_images),
             }
             if input_images is not None:
                 input_image_base64 = ImageConverter.convert_images_to_base64(input_images)
