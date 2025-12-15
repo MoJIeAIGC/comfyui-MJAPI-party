@@ -1816,7 +1816,7 @@ class FurniturePhotoNode:
                 "input_image": ("IMAGE",),  # 接收多个图片
                 "furniture_types": (parentname_list, {"default": parentname_list[0]}),
                 "style_type": (parentname_dict.get(parentname_list[0], []), {"default": parentname_dict[parentname_list[0]][0]}),
-                "resolution": (["1K", "2K", "4K"], {"default": "2K"}),
+                # "resolution": (["1K", "2K", "4K"], {"default": "2K"}),
                 "aspect_ratio": (["16:9","4:3","1:1", "3:4",  "9:16"], {"default": "4:3"}),
                 "num_images": ("INT", {"default": 1, "min": 1, "max": 2}),  # 新增参数，只能是1或2
                 "seed": ("INT", {"default": -1}),
@@ -1835,7 +1835,7 @@ class FurniturePhotoNode:
         def call_api(seed_override):
             payload = {
                 "model": "furniture-photo",
-                "resolution": resolution,
+                "resolution": "2K",
                 "aspect_ratio": aspect_ratio,
                 "num_images": num_images,
                 "furniture_types": furniture_types,
@@ -2007,10 +2007,16 @@ class DetailPhotoNode:
 class DetailJinNode:
     @classmethod
     def INPUT_TYPES(cls):
+        url = "http://admin.qihuaimage.com/items/furn_cai"
+        response = requests.get(url)
+        response.raise_for_status()
+        result = response.json()
+        data = result.get('data', [])
+        Polished_list = list(set(item['name'] for item in data))
         return {
             "required": {
                 "input_image": ("IMAGE",),  # 接收多个图片
-                "Polished_type": (["金属&木纹","木纹","金属"], {"default": "金属&木纹"}),
+                "Polished_type": (Polished_list, {"default": Polished_list[0]}),
                 "num_images": ("INT", {"default": 1, "min": 1, "max": 2}),  # 新增参数，只能是1或2
                 "seed": ("INT", {"default": -1}),
             }
@@ -2132,7 +2138,10 @@ class FurnitureAngleNode:
         return {
             "required": {
                 "input_image": ("IMAGE",),  # 接收多个图片
-                "angle_type": (["2k-俯视45度","2k-顶视图","2K-对角线拍摄","1k-左侧垂直视图","1k-右侧垂直视图"], {"default": "2k-俯视45度"}),
+                "angle_type": (["4k-俯视45度","4K-正视角","4k-顶视图","4K-对角线拍摄","1k-左侧垂直视图","1k-右侧垂直视图"], {"default": "2k-俯视45度"}),
+                "custom_size": ("BOOLEAN", {"default": False}),  # 自定义尺寸开关
+                "width": ("INT", {"default": 1024, "min": 1024, "max": 4096}),  # 生成张数
+                "height": ("INT", {"default": 1024, "min": 1024, "max": 4096}),  # 生成张数
                 "num_images": ("INT", {"default": 1, "min": 1, "max": 2}),  # 新增参数，只能是1或2
                 "seed": ("INT", {"default": -1}),
             }
@@ -2143,19 +2152,25 @@ class FurnitureAngleNode:
     FUNCTION = "generate"
     CATEGORY = "🎨MJapiparty/Product&tool"
 
-    def generate(self, seed, input_image=None,angle_type="2k-俯视45度",num_images=1):
+    def generate(self, seed, input_image=None,angle_type="2k-俯视45度",num_images=1,custom_size=False,width=1024,height=1024):
         # 调用配置管理器获取配置
         oneapi_url, oneapi_token = config_manager.get_api_config()
         # 合并图像和遮罩
         merged_image = ImageConverter.tensor_to_base64(input_image)
-
+        
         def cell(num):
             payload = {
                 "model": "furniture-angle",
-                "input_image": merged_image,
+                "input_image": [merged_image],
                 "angle_type": angle_type,
                 "seed": int(seed+num),
+                "watermark": False,
+                "max_SetImage": num_images,
+                "pro": True,
             }
+            if custom_size:
+                resl_size = f"{width}x{height}"
+                payload["size"] = resl_size
             if "1k" in angle_type:
                 payload["model"] = "multiple-angles"
                 payload["input_image"] = [merged_image]
