@@ -2248,7 +2248,7 @@ class NanoProNode:
     RETURN_TYPES = ("IMAGE",)  # 返回一个或多个IMAGE
     RETURN_NAMES = ("output",)  # 保持为一个返回名
     FUNCTION = "generate"
-    CATEGORY = "🎨MJapiparty/Product&tool"
+    CATEGORY = "🎨MJapiparty/ImageCreat"
 
     def generate(self, seed, input_images=None, resolution="1K", aspect_ratio="4:3", is_translation=False, limit_generations=False, prompt="", style_type=""):
         # 获取配置
@@ -2330,7 +2330,7 @@ class Flux2Node:
     RETURN_TYPES = ("IMAGE",)  # 返回一个或多个IMAGE
     RETURN_NAMES = ("output",)  # 保持为一个返回名
     FUNCTION = "generate"
-    CATEGORY = "🎨MJapiparty/ImageCreat"
+    CATEGORY = "🎨MJapiparty/Flux"
 
     def generate(self, seed, input_images=None,prompt="",num_images=1,is_translation=False,aspect_ratio="4:3",custom_size=False,width=1024,height=1024):
         # 调用配置管理器获取配置
