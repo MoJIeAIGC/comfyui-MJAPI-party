@@ -2148,7 +2148,43 @@ class FurnitureAngleNode:
     FUNCTION = "generate"
     CATEGORY = "🎨MJapiparty/Product&tool"
 
-    def generate(self, seed, input_image=None,angle_type="2k-俯视45度",num_images=1,custom_size=False,width=1024,height=1024):
+    def generate(self, seed, input_image=None,angle_type="2k-俯视45度",num_images=1):
+        # 初始化默认宽高
+        width = 1024
+        height = 1024
+        
+        # 从input_image中获取宽高
+        if input_image is not None:
+            # 将张量转换为PIL图像
+            pil_image = ImageConverter.tensor2pil(input_image)
+            if pil_image is not None:
+                width = pil_image.width
+                height = pil_image.height
+        
+        min_pixels = 3986400  # 2560x1440
+        max_pixels = 16777216  # 4096x4096
+        
+        # 计算当前总像素数
+        current_pixels = width * height
+        
+        # 1. 首先处理总像素数不满足的情况
+        if current_pixels < min_pixels:
+            scale_ratio = (min_pixels / current_pixels) ** 0.5
+            width = int(width * scale_ratio)
+            height = int(height * scale_ratio)
+            current_pixels = width * height  # 更新当前像素数
+
+        if current_pixels > max_pixels:
+            # 需要缩小，计算缩小比例
+            scale_ratio = (max_pixels / current_pixels) ** 0.5
+            width = int(width * scale_ratio)
+            height = int(height * scale_ratio)
+            current_pixels = width * height  # 更新当前像素数
+        
+        # print("处理后的图片宽高",f"{width}x{height}")
+            
+
+                
         # 调用配置管理器获取配置
         oneapi_url, oneapi_token = config_manager.get_api_config()
         # 合并图像和遮罩
@@ -2163,6 +2199,7 @@ class FurnitureAngleNode:
                 "watermark": False,
                 "max_SetImage": num_images,
                 "pro": True,
+                "size": f"{width}x{height}",
             }
 
             if "1k" in angle_type:
