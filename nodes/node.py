@@ -2267,7 +2267,7 @@ class NanoProNode:
                 "is_translation": ("BOOLEAN", {"default": False}),  # 是否是翻译模式
                 # "limit_generations": ("BOOLEAN", {"default": False}),  # 是否是翻译模式
                 "resolution": (["1K", "2K", "4K"], {"default": "1K"}),
-                "aspect_ratio": (["16:9","4:3","2:3","4:5","1:1","3:2","5:4","3:4",  "9:16"], {"default": "4:3"}),
+                "aspect_ratio": (["auto","16:9","4:3","2:3","4:5","1:1","3:2","5:4","3:4",  "9:16"], {"default": "auto"}),
                 "num_images": ("INT", {"default": 1, "min": 1, "max": 2}),  # 新增参数，只能是1或2
                 "seed": ("INT", {"default": -1}),
             },
@@ -2281,7 +2281,7 @@ class NanoProNode:
     FUNCTION = "generate"
     CATEGORY = "🎨MJapiparty/ImageCreat"
 
-    def generate(self, seed, input_images=None, resolution="1K", aspect_ratio="4:3", is_translation=False, limit_generations=False, prompt="", num_images=1):
+    def generate(self, seed, input_images=None, resolution="1K", aspect_ratio="auto", is_translation=False, limit_generations=False, prompt="", num_images=1):
         # 获取配置
         oneapi_url, oneapi_token = config_manager.get_api_config()
         def call_api(seed_override):
@@ -2295,6 +2295,8 @@ class NanoProNode:
                 "seed": int(seed_override),
                 "num_images": int(num_images),
             }
+            if input_images is None and aspect_ratio == "auto":
+                payload["aspect_ratio"] = "1:1"
             if input_images is not None:
                 input_image_base64 = ImageConverter.convert_images_to_base64(input_images)
                 payload["input_image"] = input_image_base64
@@ -2348,7 +2350,7 @@ class Flux2Node:
             "required": {
                 "prompt": ("STRING", {"default": "A beautiful sunset", "multiline": True}),
                 "is_translation": ("BOOLEAN", {"default": False}),  # 是否是翻译模式
-                "aspect_ratio": (["16:9","4:3","1:1", "3:4",  "9:16"], {"default": "4:3"}),
+                "aspect_ratio": (["auto","16:9","4:3","1:1", "3:4",  "9:16"], {"default": "auto"}),
                 "custom_size": ("BOOLEAN", {"default": False}),  # 自定义尺寸开关
                 "width": ("INT", {"default": 1024, "min": 1024, "max": 2048}),  # 生成张数
                 "height": ("INT", {"default": 1024, "min": 1024, "max": 2048}),  # 生成张数
@@ -2364,7 +2366,7 @@ class Flux2Node:
     FUNCTION = "generate"
     CATEGORY = "🎨MJapiparty/Flux"
 
-    def generate(self, seed, input_images=None,prompt="",num_images=1,is_translation=False,aspect_ratio="4:3",custom_size=False,width=1024,height=1024):
+    def generate(self, seed, input_images=None,prompt="",num_images=1,is_translation=False,aspect_ratio="auto",custom_size=False,width=1024,height=1024):
         # 调用配置管理器获取配置
         oneapi_url, oneapi_token = config_manager.get_api_config()
 
@@ -2380,6 +2382,8 @@ class Flux2Node:
             if custom_size:
                 payload["width"] = width
                 payload["height"] = height
+            if input_images is None and aspect_ratio == "auto":
+                payload["aspect_ratio"] = "4:3"
             if input_images is not None:
                 input_image_base64 = ImageConverter.convert_images_to_base64(input_images)
                 payload["input_image"] = input_image_base64
