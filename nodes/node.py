@@ -122,7 +122,7 @@ class FluxProNode:
     RETURN_TYPES = ("IMAGE",)  # 返回一个或多个IMAGE
     RETURN_NAMES = ("output",)  # 保持为一个返回名
     FUNCTION = "generate"
-    CATEGORY = "🎨MJapiparty/Flux"
+    CATEGORY = "🎨MJapiparty/ImageCreat"
 
     def generate(self, prompt, seed, batch_size, image_input=None, is_translation=False, aspect_ratio="default"):
         # 调用配置管理器获取配置
@@ -219,7 +219,7 @@ class FluxMaxNode:
     RETURN_TYPES = ("IMAGE",)  # 返回一个或多个IMAGE
     RETURN_NAMES = ("output",)  # 保持为一个返回名
     FUNCTION = "generate"
-    CATEGORY = "🎨MJapiparty/Flux"
+    CATEGORY = "🎨MJapiparty/ImageCreat"
 
     def generate(self, prompt, seed, batch_size, image_input=None, is_translation=False, aspect_ratio="default"):
         # 调用配置管理器获取配置
@@ -2364,7 +2364,7 @@ class Flux2Node:
     RETURN_TYPES = ("IMAGE",)  # 返回一个或多个IMAGE
     RETURN_NAMES = ("output",)  # 保持为一个返回名
     FUNCTION = "generate"
-    CATEGORY = "🎨MJapiparty/Flux"
+    CATEGORY = "🎨MJapiparty/ImageCreat"
 
     def generate(self, seed, input_images=None,prompt="",num_images=1,is_translation=False,aspect_ratio="auto",custom_size=False,width=1024,height=1024):
         # 调用配置管理器获取配置
@@ -2437,21 +2437,22 @@ class Flux2Node:
 
 
 NODE_CLASS_MAPPINGS = {
-    "DreaminaI2INode": DreaminaI2INode,
+    "GeminiEditNode": GeminiEditNode,
+    "NanoProNode": NanoProNode,
+    "Flux2Node": Flux2Node,
     "FluxProNode": FluxProNode,
     "FluxMaxNode": FluxMaxNode,
     "ReplaceNode": ReplaceNode,
     "SeedEdit3": SeedEdit3,
+    "DoubaoSeedreamNode": DoubaoSeedreamNode,
+    "QwenImageNode": QwenImageNode,
+    "QwenImageEditNode": QwenImageEditNode,
     "KouTuNode": KouTuNode,
     "DreaminaT2VNode": DreaminaT2VNode,
     "DreaminaI2VNode": DreaminaI2VNode,
-    "QwenImageNode": QwenImageNode,
-    "QwenImageEditNode": QwenImageEditNode,
     "GetDressing": GetDressing,
     "ViduNode": ViduNode,
-    "GeminiEditNode": GeminiEditNode,
     "ReplaceClothesNode": ReplaceClothesNode,
-    "DoubaoSeedreamNode": DoubaoSeedreamNode,
     "ModelGenNode": ModelGenNode,
     "MoterPoseNode": MoterPoseNode,
     "ViduT2VNode": ViduT2VNode,
@@ -2461,30 +2462,27 @@ NODE_CLASS_MAPPINGS = {
     "FurniturePhotoNode": FurniturePhotoNode,
     "DetailPhotoNode": DetailPhotoNode,
     "DetailJinNode": DetailJinNode,
-    "FurnitureAngleNode": FurnitureAngleNode,
-    "NanoProNode": NanoProNode,
-    "Flux2Node": Flux2Node,
-
-
-
+    "FurnitureAngleNode": FurnitureAngleNode, 
+    "DreaminaI2INode": DreaminaI2INode,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
-    "DreaminaI2INode": "Dreamina参考生图",
+    "GeminiEditNode": "Gemini-Nano-1图片编辑",
+    "NanoProNode": "Gemini-Nano-2-pro图片编辑",
+    "Flux2Node": "Flux-2-pro",
     "FluxProNode": "Flux-Kontext-pro",
     "FluxMaxNode": "Flux-Kontext-max",
-    "ReplaceNode": "Redux迁移",
     "SeedEdit3": "seededit_v3.0",
+    "DoubaoSeedreamNode": "seedream-v4.5",
+    "QwenImageNode": "Qwen-image文生图",
+    "QwenImageEditNode": "Qwen-image-edit图片编辑",
+    "ReplaceNode": "Redux迁移",
     "KouTuNode": "自动抠图",
     "DreaminaT2VNode": "Seedance文生视频",
     "DreaminaI2VNode": "Seedance图生视频",
-    "QwenImageNode": "Qwen-image文生图",
-    "QwenImageEditNode": "Qwen-image-edit图片编辑",
     "GetDressing": "AI服装提取",
     "ViduNode": "Vidu参考生视频",
-    "GeminiEditNode": "Gemini-NanoBanana图片编辑",
     "ReplaceClothesNode": "AI同款服装替换",
-    "DoubaoSeedreamNode": "seedream-4.5",
     "ModelGenNode": "服装模特生成",
     "MoterPoseNode": "模特姿势更改",
     "ViduT2VNode": "Vidu文生视频",
@@ -2495,6 +2493,5 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "DetailPhotoNode": "局部细节呈现",
     "DetailJinNode": "细节精修",
     "FurnitureAngleNode": "家具角度图",
-    "NanoProNode": "NanoPro",
-    "Flux2Node": "Flux2",
+    "DreaminaI2INode": "Dreamina参考生图",
 }
