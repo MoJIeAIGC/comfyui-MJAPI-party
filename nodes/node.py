@@ -122,7 +122,7 @@ class FluxProNode:
     RETURN_TYPES = ("IMAGE",)  # 返回一个或多个IMAGE
     RETURN_NAMES = ("output",)  # 保持为一个返回名
     FUNCTION = "generate"
-    CATEGORY = "🎨MJapiparty/Flux"
+    CATEGORY = "🎨MJapiparty/ImageCreat"
 
     def generate(self, prompt, seed, batch_size, image_input=None, is_translation=False, aspect_ratio="default"):
         # 调用配置管理器获取配置
@@ -219,7 +219,7 @@ class FluxMaxNode:
     RETURN_TYPES = ("IMAGE",)  # 返回一个或多个IMAGE
     RETURN_NAMES = ("output",)  # 保持为一个返回名
     FUNCTION = "generate"
-    CATEGORY = "🎨MJapiparty/Flux"
+    CATEGORY = "🎨MJapiparty/ImageCreat"
 
     def generate(self, prompt, seed, batch_size, image_input=None, is_translation=False, aspect_ratio="default"):
         # 调用配置管理器获取配置
@@ -1315,6 +1315,7 @@ class DoubaoSeedreamNode:
             "seed": int(seed+6),
             "watermark": False,
             "max_SetImage": count,
+            "pro": True,
         }
         # 如果有图像输入，加入到payload中
         if image_input is not None:
@@ -1815,7 +1816,7 @@ class FurniturePhotoNode:
                 "input_image": ("IMAGE",),  # 接收多个图片
                 "furniture_types": (parentname_list, {"default": parentname_list[0]}),
                 "style_type": (parentname_dict.get(parentname_list[0], []), {"default": parentname_dict[parentname_list[0]][0]}),
-                "resolution": (["1K", "2K", "4K"], {"default": "2K"}),
+                # "resolution": (["1K", "2K", "4K"], {"default": "2K"}),
                 "aspect_ratio": (["16:9","4:3","1:1", "3:4",  "9:16"], {"default": "4:3"}),
                 "num_images": ("INT", {"default": 1, "min": 1, "max": 2}),  # 新增参数，只能是1或2
                 "seed": ("INT", {"default": -1}),
@@ -1834,7 +1835,7 @@ class FurniturePhotoNode:
         def call_api(seed_override):
             payload = {
                 "model": "furniture-photo",
-                "resolution": resolution,
+                "resolution": "2K",
                 "aspect_ratio": aspect_ratio,
                 "num_images": num_images,
                 "furniture_types": furniture_types,
@@ -2006,10 +2007,16 @@ class DetailPhotoNode:
 class DetailJinNode:
     @classmethod
     def INPUT_TYPES(cls):
+        url = "http://admin.qihuaimage.com/items/furn_cai"
+        response = requests.get(url)
+        response.raise_for_status()
+        result = response.json()
+        data = result.get('data', [])
+        Polished_list = list(set(item['name'] for item in data))
         return {
             "required": {
                 "input_image": ("IMAGE",),  # 接收多个图片
-                "Polished_type": (["金属&木纹","木纹","金属"], {"default": "金属&木纹"}),
+                "Polished_type": (Polished_list, {"default": Polished_list[0]}),
                 "num_images": ("INT", {"default": 1, "min": 1, "max": 2}),  # 新增参数，只能是1或2
                 "seed": ("INT", {"default": -1}),
             }
@@ -2131,8 +2138,7 @@ class FurnitureAngleNode:
         return {
             "required": {
                 "input_image": ("IMAGE",),  # 接收多个图片
-                "angle_type": (["2k-俯视45度","2k-顶视图","2K-对角线拍摄","1k-左侧垂直视图","1k-右侧垂直视图"], {"default": "2k-俯视45度"}),
-                "num_images": ("INT", {"default": 1, "min": 1, "max": 2}),  # 新增参数，只能是1或2
+                "angle_type": (["4k-俯视45度","4K-正视角","4k-顶视图","4K-对角线拍摄","1k-左侧垂直视图","1k-右侧垂直视图"], {"default": "2k-俯视45度"}),
                 "seed": ("INT", {"default": -1}),
             }
         }
@@ -2143,18 +2149,59 @@ class FurnitureAngleNode:
     CATEGORY = "🎨MJapiparty/Product&tool"
 
     def generate(self, seed, input_image=None,angle_type="2k-俯视45度",num_images=1):
+        # 初始化默认宽高
+        width = 1024
+        height = 1024
+        
+        # 从input_image中获取宽高
+        if input_image is not None:
+            # 将张量转换为PIL图像
+            pil_image = ImageConverter.tensor2pil(input_image)
+            if pil_image is not None:
+                width = pil_image.width
+                height = pil_image.height
+        
+        min_pixels = 3986400  # 2560x1440
+        max_pixels = 16777216  # 4096x4096
+        
+        # 计算当前总像素数
+        current_pixels = width * height
+        
+        # 1. 首先处理总像素数不满足的情况
+        if current_pixels < min_pixels:
+            scale_ratio = (min_pixels / current_pixels) ** 0.5
+            width = int(width * scale_ratio)
+            height = int(height * scale_ratio)
+            current_pixels = width * height  # 更新当前像素数
+
+        if current_pixels > max_pixels:
+            # 需要缩小，计算缩小比例
+            scale_ratio = (max_pixels / current_pixels) ** 0.5
+            width = int(width * scale_ratio)
+            height = int(height * scale_ratio)
+            current_pixels = width * height  # 更新当前像素数
+        
+        # print("处理后的图片宽高",f"{width}x{height}")
+            
+
+                
         # 调用配置管理器获取配置
         oneapi_url, oneapi_token = config_manager.get_api_config()
         # 合并图像和遮罩
         merged_image = ImageConverter.tensor_to_base64(input_image)
-
+        
         def cell(num):
             payload = {
                 "model": "furniture-angle",
-                "input_image": merged_image,
+                "input_image": [merged_image],
                 "angle_type": angle_type,
                 "seed": int(seed+num),
+                "watermark": False,
+                "max_SetImage": num_images,
+                "pro": True,
+                "size": f"{width}x{height}",
             }
+
             if "1k" in angle_type:
                 payload["model"] = "multiple-angles"
                 payload["input_image"] = [merged_image]
@@ -2211,23 +2258,201 @@ class FurnitureAngleNode:
 
 
 
+class NanoProNode:
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "prompt": ("STRING", {"default": "A beautiful sunset", "multiline": True}),
+                "is_translation": ("BOOLEAN", {"default": False}),  # 是否是翻译模式
+                # "limit_generations": ("BOOLEAN", {"default": False}),  # 是否是翻译模式
+                "resolution": (["1K", "2K", "4K"], {"default": "2K"}),
+                "aspect_ratio": (["auto","16:9","4:3","2:3","4:5","1:1","3:2","5:4","3:4", "9:16"], {"default": "auto"}),
+                "num_images": ("INT", {"default": 1, "min": 1, "max": 2}),  # 新增参数，只能是1或2
+                "seed": ("INT", {"default": -1}),
+            },
+            "optional": {
+                "input_images": ("IMAGE",),  # 接收多个图片
+            }
+        }
+
+    RETURN_TYPES = ("IMAGE",)  # 返回一个或多个IMAGE
+    RETURN_NAMES = ("output",)  # 保持为一个返回名
+    FUNCTION = "generate"
+    CATEGORY = "🎨MJapiparty/ImageCreat"
+
+    def generate(self, seed, input_images=None, resolution="1K", aspect_ratio="auto", is_translation=False, limit_generations=False, prompt="", num_images=1):
+        # 获取配置
+        oneapi_url, oneapi_token = config_manager.get_api_config()
+        def call_api(seed_override):
+            payload = {
+                "model": "nano-banana-pro",
+                "resolution": resolution,
+                "aspect_ratio": aspect_ratio,
+                "prompt": prompt,
+                "is_translation": is_translation,
+                "limit_generations": limit_generations,
+                "seed": int(seed_override),
+                "num_images": int(num_images),
+            }
+            if input_images is None and aspect_ratio == "auto":
+                payload["aspect_ratio"] = "1:1"
+            if input_images is not None:
+                input_image_base64 = ImageConverter.convert_images_to_base64(input_images)
+                payload["input_image"] = input_image_base64
+            headers = {
+                "Content-Type": "application/json",
+                "Authorization": f"Bearer {oneapi_token}"
+            }
+            response = requests.post(oneapi_url, headers=headers, json=payload, timeout=240)
+
+            response.raise_for_status()
+
+            result = response.json()
+            image_url = result.get("res_url")
+
+            if not image_url:
+                raise ValueError("未找到图片 URL")
+
+            image_urls = image_url.split("|") if image_url else []
+
+            print(image_urls)
+            for image_url in image_urls:
+                if not image_url:
+                    continue
+                try:
+                    # 下载图片
+                    response = requests.get(image_url)
+                    response.raise_for_status()
+                    # 将图片数据转换为 PIL 图像对象
+                    img = Image.open(BytesIO(response.content)).convert("RGB")
+                    output_tensors.append(ImageConverter.pil2tensor(img))
+                except Exception as e:
+                    print(f"下载图片 {image_url} 失败: {str(e)}")
+                    error_tensor = ImageConverter.create_error_image("下载图片失败")
+                    output_tensors.append(error_tensor)
+            if not output_tensors:
+                error_tensor = ImageConverter.create_error_image("未获取到有效图片 URL")
+                output_tensors.append(error_tensor)
+        output_tensors = []
+
+        # 调用API
+        call_api(seed)
+
+        return (torch.cat(output_tensors, dim=0),)  # 拼接为 (数量, H, W, 3)
+
+
+
+class Flux2Node:
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "prompt": ("STRING", {"default": "A beautiful sunset", "multiline": True}),
+                "is_translation": ("BOOLEAN", {"default": False}),  # 是否是翻译模式
+                "aspect_ratio": (["auto","16:9","4:3","1:1", "3:4",  "9:16"], {"default": "auto"}),
+                "custom_size": ("BOOLEAN", {"default": False}),  # 自定义尺寸开关
+                "width": ("INT", {"default": 1024, "min": 1024, "max": 2048}),  # 生成张数
+                "height": ("INT", {"default": 1024, "min": 1024, "max": 2048}),  # 生成张数
+                "seed": ("INT", {"default": -1}),
+            },
+            "optional": {
+                "input_images": ("IMAGE",),  # 接收多个图片
+            }
+        }
+
+    RETURN_TYPES = ("IMAGE",)  # 返回一个或多个IMAGE
+    RETURN_NAMES = ("output",)  # 保持为一个返回名
+    FUNCTION = "generate"
+    CATEGORY = "🎨MJapiparty/ImageCreat"
+
+    def generate(self, seed, input_images=None,prompt="",num_images=1,is_translation=False,aspect_ratio="auto",custom_size=False,width=1024,height=1024):
+        # 调用配置管理器获取配置
+        oneapi_url, oneapi_token = config_manager.get_api_config()
+
+        def cell(num):
+            payload = {
+                "model": "flux2",
+                "prompt": prompt,
+                "num_images": num_images,
+                "is_translation": is_translation,
+                "aspect_ratio": aspect_ratio,
+                "seed": int(seed+num),
+            }
+            if custom_size:
+                payload["width"] = width
+                payload["height"] = height
+            if input_images is None and aspect_ratio == "auto":
+                payload["aspect_ratio"] = "4:3"
+            if input_images is not None:
+                input_image_base64 = ImageConverter.convert_images_to_base64(input_images)
+                payload["input_image"] = input_image_base64
+
+            headers = {
+                "Content-Type": "application/json",
+                "Authorization": f"Bearer {oneapi_token}"
+            }
+            response = requests.post(oneapi_url, headers=headers, json=payload, timeout=1200)
+            # 判断状态码是否为 200
+            if response.status_code != 200:
+                error_msg = ImageConverter.get_status_error_msg(response)
+                print("错误信息",error_msg)
+                output_tensors = []
+                error_tensor = ImageConverter.create_error_image(error_msg)
+                output_tensors.append(error_tensor)
+                return (torch.cat(output_tensors, dim=0),)
+            response.raise_for_status()
+            result = response.json()
+
+            # 从返回的结果中提取图片 URL
+            res_url = result.get("res_url", "")
+            if not res_url:
+                raise ValueError("未找到图片 URL")
+            image_urls = res_url.split("|") if res_url else []
+
+            print(image_urls)
+            for image_url in image_urls:
+                if not image_url:
+                    continue
+                try:
+                    # 下载图片
+                    response = requests.get(image_url)
+                    response.raise_for_status()
+                    # 将图片数据转换为 PIL 图像对象
+                    img = Image.open(BytesIO(response.content)).convert("RGB")
+                    api_tensors.append(ImageConverter.pil2tensor(img))
+                except Exception as e:
+                    print(f"下载图片 {image_url} 失败: {str(e)}")
+                    error_tensor = ImageConverter.create_error_image("下载图片失败")
+                    api_tensors.append(error_tensor)
+        api_tensors = []
+        cell(1)
+        if not api_tensors:
+            error_tensor = ImageConverter.create_error_image("未获取到有效图片 URL")
+            api_tensors.append(error_tensor)
+
+        return (torch.cat(api_tensors, dim=0),)
+
+
+
 
 NODE_CLASS_MAPPINGS = {
-    "DreaminaI2INode": DreaminaI2INode,
+    "GeminiEditNode": GeminiEditNode,
+    "NanoProNode": NanoProNode,
+    "Flux2Node": Flux2Node,
     "FluxProNode": FluxProNode,
     "FluxMaxNode": FluxMaxNode,
     "ReplaceNode": ReplaceNode,
     "SeedEdit3": SeedEdit3,
+    "DoubaoSeedreamNode": DoubaoSeedreamNode,
+    "QwenImageNode": QwenImageNode,
+    "QwenImageEditNode": QwenImageEditNode,
     "KouTuNode": KouTuNode,
     "DreaminaT2VNode": DreaminaT2VNode,
     "DreaminaI2VNode": DreaminaI2VNode,
-    "QwenImageNode": QwenImageNode,
-    "QwenImageEditNode": QwenImageEditNode,
     "GetDressing": GetDressing,
     "ViduNode": ViduNode,
-    "GeminiEditNode": GeminiEditNode,
     "ReplaceClothesNode": ReplaceClothesNode,
-    "DoubaoSeedreamNode": DoubaoSeedreamNode,
     "ModelGenNode": ModelGenNode,
     "MoterPoseNode": MoterPoseNode,
     "ViduT2VNode": ViduT2VNode,
@@ -2237,26 +2462,27 @@ NODE_CLASS_MAPPINGS = {
     "FurniturePhotoNode": FurniturePhotoNode,
     "DetailPhotoNode": DetailPhotoNode,
     "DetailJinNode": DetailJinNode,
-    "FurnitureAngleNode": FurnitureAngleNode,
-
+    "FurnitureAngleNode": FurnitureAngleNode, 
+    "DreaminaI2INode": DreaminaI2INode,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
-    "DreaminaI2INode": "Dreamina参考生图",
+    "GeminiEditNode": "Gemini-Nano-1图片编辑",
+    "NanoProNode": "Gemini-Nano-2-pro图片编辑",
+    "Flux2Node": "Flux-2-pro",
     "FluxProNode": "Flux-Kontext-pro",
     "FluxMaxNode": "Flux-Kontext-max",
-    "ReplaceNode": "Redux迁移",
     "SeedEdit3": "seededit_v3.0",
+    "DoubaoSeedreamNode": "seedream-v4.5",
+    "QwenImageNode": "Qwen-image文生图",
+    "QwenImageEditNode": "Qwen-image-edit图片编辑",
+    "ReplaceNode": "Redux迁移",
     "KouTuNode": "自动抠图",
     "DreaminaT2VNode": "Seedance文生视频",
     "DreaminaI2VNode": "Seedance图生视频",
-    "QwenImageNode": "Qwen-image文生图",
-    "QwenImageEditNode": "Qwen-image-edit图片编辑",
     "GetDressing": "AI服装提取",
     "ViduNode": "Vidu参考生视频",
-    "GeminiEditNode": "Gemini-NanoBanana图片编辑",
     "ReplaceClothesNode": "AI同款服装替换",
-    "DoubaoSeedreamNode": "seedream-4.0",
     "ModelGenNode": "服装模特生成",
     "MoterPoseNode": "模特姿势更改",
     "ViduT2VNode": "Vidu文生视频",
@@ -2267,4 +2493,5 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "DetailPhotoNode": "局部细节呈现",
     "DetailJinNode": "细节精修",
     "FurnitureAngleNode": "家具角度图",
+    "DreaminaI2INode": "Dreamina参考生图",
 }

@@ -1,0 +1,532 @@
+{
+  "id": "974226e4-a7a1-45f8-8fe7-9c50f361e19b",
+  "revision": 0,
+  "last_node_id": 13,
+  "last_link_id": 14,
+  "nodes": [
+    {
+      "id": 7,
+      "type": "ImageBatch",
+      "pos": [
+        -1297.3924268779324,
+        1549.3897398877693
+      ],
+      "size": [
+        140,
+        46
+      ],
+      "flags": {},
+      "order": 8,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "image1",
+          "type": "IMAGE",
+          "link": 4
+        },
+        {
+          "name": "image2",
+          "type": "IMAGE",
+          "link": 5
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            13
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.66",
+        "Node name for S&R": "ImageBatch"
+      },
+      "widgets_values": []
+    },
+    {
+      "id": 8,
+      "type": "ImageBatch",
+      "pos": [
+        -1293.2857951627582,
+        1446.1342854366412
+      ],
+      "size": [
+        140,
+        46
+      ],
+      "flags": {},
+      "order": 6,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "image1",
+          "type": "IMAGE",
+          "link": 6
+        },
+        {
+          "name": "image2",
+          "type": "IMAGE",
+          "link": 7
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            4
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.66",
+        "Node name for S&R": "ImageBatch"
+      },
+      "widgets_values": []
+    },
+    {
+      "id": 11,
+      "type": "SaveImage",
+      "pos": [
+        -657.5426942021229,
+        1457.668558003558
+      ],
+      "size": [
+        350.7299993919057,
+        446.26049867232723
+      ],
+      "flags": {},
+      "order": 10,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 14
+        }
+      ],
+      "outputs": [],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.66"
+      },
+      "widgets_values": [
+        "ComfyUI"
+      ]
+    },
+    {
+      "id": 1,
+      "type": "LoadImage",
+      "pos": [
+        -1678.699835989879,
+        853.8897549990552
+      ],
+      "size": [
+        260.37967507246503,
+        418.34352421403804
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            10
+          ]
+        },
+        {
+          "name": "MASK",
+          "type": "MASK",
+          "links": null
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.66",
+        "Node name for S&R": "LoadImage"
+      },
+      "widgets_values": [
+        "b756a70b1b5a1686aafe631deb31d88ca7525ddb-1600x1200.png",
+        "image"
+      ]
+    },
+    {
+      "id": 13,
+      "type": "Flux2Node",
+      "pos": [
+        -1094.1539172794655,
+        1458.2286616386439
+      ],
+      "size": [
+        400,
+        256
+      ],
+      "flags": {},
+      "order": 9,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "input_images",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": 13
+        }
+      ],
+      "outputs": [
+        {
+          "name": "output",
+          "type": "IMAGE",
+          "links": [
+            14
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "Mojie-API-Party",
+        "ver": "6e20ab45261b5fbe3513243f90fcee98ba08ae31",
+        "Node name for S&R": "Flux2Node"
+      },
+      "widgets_values": [
+        "The person from image 1 is petting the cat from image 2, the bird from image 3 is next to them",
+        false,
+        "auto",
+        false,
+        1024,
+        1024,
+        1016,
+        "randomize"
+      ]
+    },
+    {
+      "id": 3,
+      "type": "LoadImage",
+      "pos": [
+        -1683.4015508012394,
+        1408.2544992959947
+      ],
+      "size": [
+        252.51367855756553,
+        363.2815486097392
+      ],
+      "flags": {},
+      "order": 1,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            6
+          ]
+        },
+        {
+          "name": "MASK",
+          "type": "MASK",
+          "links": null
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.66",
+        "Node name for S&R": "LoadImage"
+      },
+      "widgets_values": [
+        "83238423bfee53164679707c8ce6848339f4cf1e-4160x6240 (1).jpg",
+        "image"
+      ]
+    },
+    {
+      "id": 9,
+      "type": "LoadImage",
+      "pos": [
+        -1693.3510485355189,
+        1817.837059079186
+      ],
+      "size": [
+        270,
+        314
+      ],
+      "flags": {},
+      "order": 2,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            7
+          ]
+        },
+        {
+          "name": "MASK",
+          "type": "MASK",
+          "links": null
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.66",
+        "Node name for S&R": "LoadImage"
+      },
+      "widgets_values": [
+        "830bfac74da873e1125f41442b4dd1af5a21de7f-3433x5149 (1).jpg",
+        "image"
+      ]
+    },
+    {
+      "id": 10,
+      "type": "LoadImage",
+      "pos": [
+        -1398.371282671482,
+        1660.4999619610362
+      ],
+      "size": [
+        270,
+        314
+      ],
+      "flags": {},
+      "order": 3,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            5
+          ]
+        },
+        {
+          "name": "MASK",
+          "type": "MASK",
+          "links": null
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.66",
+        "Node name for S&R": "LoadImage"
+      },
+      "widgets_values": [
+        "2c2b2e393e1e51e94462e89d5bb879978b66a8a6-3136x3920 (1).jpg",
+        "image"
+      ]
+    },
+    {
+      "id": 5,
+      "type": "SaveImage",
+      "pos": [
+        -953.3934381772092,
+        856.2676581096888
+      ],
+      "size": [
+        391.6889700583845,
+        435.68715610197074
+      ],
+      "flags": {},
+      "order": 7,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 11
+        }
+      ],
+      "outputs": [],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.66"
+      },
+      "widgets_values": [
+        "ComfyUI"
+      ]
+    },
+    {
+      "id": 12,
+      "type": "Flux2Node",
+      "pos": [
+        -1383.6407912350069,
+        869.8339201169084
+      ],
+      "size": [
+        400,
+        256
+      ],
+      "flags": {},
+      "order": 5,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "input_images",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": 10
+        }
+      ],
+      "outputs": [
+        {
+          "name": "output",
+          "type": "IMAGE",
+          "links": [
+            11
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "Mojie-API-Party",
+        "ver": "6e20ab45261b5fbe3513243f90fcee98ba08ae31",
+        "Node name for S&R": "Flux2Node"
+      },
+      "widgets_values": [
+        "Create room using colors from reference images,On the room wall it is written in big characters \"支持中文\"",
+        false,
+        "auto",
+        false,
+        1024,
+        1024,
+        83,
+        "randomize"
+      ]
+    },
+    {
+      "id": 4,
+      "type": "MarkdownNote",
+      "pos": [
+        -2326.781059537186,
+        808.2531227692261
+      ],
+      "size": [
+        547.7635325266642,
+        812.779129287981
+      ],
+      "flags": {},
+      "order": 4,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [],
+      "title": "使用说明",
+      "properties": {},
+      "widgets_values": [
+        "### flux-2(pro)使用说明\n\nflux-2(pro)是黑森林AI旗下FLUX系列产品，支持中英文输入输出。支持多图编辑，在图像表现上和Nano各有特色。\n\n- is_translation是翻译开关，如果中文输入效果不理想，可以把翻译开关打开，翻译过后再试。\n\n- aspect_ratio是输出图像的尺寸比例\n- custom_size是自定义尺寸开关，开启后可自定义输出尺寸，最大支持2048px\n- 不接图像输入也可以直接文生图\n- 单图编辑没什么好讲的。\n- 多图编辑据说最高可组合15种元素。可直接使用图像批次节点把图像按顺序串联起来.\n\n更多图组合请自行搭建。\n所有工作流放一起会同时运行，因此你需要将3种工作流自行拆开复制到其他空白工作流上。或者框选后使用ctrl+B,使其暂时忽略。\n\n工作流如果加载不成功请升级comfyui\n\n有问题加微信:mojieaigc"
+      ],
+      "color": "#432",
+      "bgcolor": "#653"
+    }
+  ],
+  "links": [
+    [
+      4,
+      8,
+      0,
+      7,
+      0,
+      "IMAGE"
+    ],
+    [
+      5,
+      10,
+      0,
+      7,
+      1,
+      "IMAGE"
+    ],
+    [
+      6,
+      3,
+      0,
+      8,
+      0,
+      "IMAGE"
+    ],
+    [
+      7,
+      9,
+      0,
+      8,
+      1,
+      "IMAGE"
+    ],
+    [
+      10,
+      1,
+      0,
+      12,
+      0,
+      "IMAGE"
+    ],
+    [
+      11,
+      12,
+      0,
+      5,
+      0,
+      "IMAGE"
+    ],
+    [
+      13,
+      7,
+      0,
+      13,
+      0,
+      "IMAGE"
+    ],
+    [
+      14,
+      13,
+      0,
+      11,
+      0,
+      "IMAGE"
+    ]
+  ],
+  "groups": [
+    {
+      "id": 1,
+      "title": "单图",
+      "bounding": [
+        -1710.0717996723215,
+        775.3017643140604,
+        1183.517555120511,
+        547.8025524828031
+      ],
+      "color": "#3f789e",
+      "font_size": 24,
+      "flags": {}
+    },
+    {
+      "id": 2,
+      "title": "多图组合",
+      "bounding": [
+        -1708.007007759751,
+        1336.5846128983726,
+        1458.8403874941396,
+        820.9947489683688
+      ],
+      "color": "#3f789e",
+      "font_size": 24,
+      "flags": {}
+    }
+  ],
+  "config": {},
+  "extra": {
+    "ds": {
+      "scale": 0.5730855330116957,
+      "offset": [
+        2520.4592501655093,
+        -643.8987487835724
+      ]
+    },
+    "frontendVersion": "1.28.7"
+  },
+  "version": 0.4
+}

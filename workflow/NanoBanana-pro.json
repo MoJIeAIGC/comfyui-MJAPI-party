@@ -1,0 +1,528 @@
+{
+  "id": "bbd69410-84fe-4215-af07-657087b0bd97",
+  "revision": 0,
+  "last_node_id": 12,
+  "last_link_id": 10,
+  "nodes": [
+    {
+      "id": 2,
+      "type": "LoadImage",
+      "pos": [
+        -2432.6762863503395,
+        504.53109062285904
+      ],
+      "size": [
+        260.37967507246503,
+        418.34352421403804
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            1
+          ]
+        },
+        {
+          "name": "MASK",
+          "type": "MASK",
+          "links": null
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.66",
+        "Node name for S&R": "LoadImage"
+      },
+      "widgets_values": [
+        "ComfyUI_01700_.png",
+        "image"
+      ]
+    },
+    {
+      "id": 1,
+      "type": "NanoProNode",
+      "pos": [
+        -2139.380395442665,
+        512.2209543025721
+      ],
+      "size": [
+        400.74002499442577,
+        252.7206998439226
+      ],
+      "flags": {},
+      "order": 5,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "input_images",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": 1
+        }
+      ],
+      "outputs": [
+        {
+          "name": "output",
+          "type": "IMAGE",
+          "links": [
+            3
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "Mojie-API-Party",
+        "ver": "6e20ab45261b5fbe3513243f90fcee98ba08ae31",
+        "Node name for S&R": "NanoProNode"
+      },
+      "widgets_values": [
+        "生成图片，把它打印出来，然后用红墨水疯狂地加上手写中文批注、涂鸦、乱画，如果你想的话，检索这个账户内容，涂鸦的内容主要为吐槽他，还可以加点小剪贴画",
+        false,
+        "2K",
+        "auto",
+        1,
+        716,
+        "randomize"
+      ]
+    },
+    {
+      "id": 7,
+      "type": "LoadImage",
+      "pos": [
+        -2437.3780011617,
+        1058.8958349197985
+      ],
+      "size": [
+        252.51367855756553,
+        363.2815486097392
+      ],
+      "flags": {},
+      "order": 1,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            6
+          ]
+        },
+        {
+          "name": "MASK",
+          "type": "MASK",
+          "links": null
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.66",
+        "Node name for S&R": "LoadImage"
+      },
+      "widgets_values": [
+        "乔伊.png",
+        "image"
+      ]
+    },
+    {
+      "id": 5,
+      "type": "MarkdownNote",
+      "pos": [
+        -3080.7575098976467,
+        458.89445839303
+      ],
+      "size": [
+        547.7635325266642,
+        812.779129287981
+      ],
+      "flags": {},
+      "order": 2,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [],
+      "title": "使用说明",
+      "properties": {},
+      "widgets_values": [
+        "### NanoBanana-pro 使用说明\n\nNanoBanana-pro又名Gemini 3 Flash Image Preview,是google旗下的图像生成模型，功能强大，支持中英文输入和中英文文字输出，对图像理解能力非常强。\n\nis_translation是翻译开关，如果中文输入效果不理想，可以把翻译开关打开，翻译过后再试。\n\n- size是输出图像的尺寸比例\n- resolution是输出的分辨率，1k,2K,4K,注意4K会双倍收费\n- 不接图像输入也可以直接文生图\n- 单图编辑没什么好讲的。\n- 多图编辑据说最高可组合15种元素。可直接使用图像批次节点把图像按顺序串联起来.\n\n以下列了三种使用方式，单图，三图组合。更多图组合请自行搭建。\n所有工作流放一起会同时运行，因此你需要将3种工作流自行拆开复制到其他空白工作流上。或者框选后使用ctrl+B,使其暂时忽略。\n\n工作流如果加载不成功请升级comfyui\n\n有问题加微信:mojieaigc"
+      ],
+      "color": "#432",
+      "bgcolor": "#653"
+    },
+    {
+      "id": 4,
+      "type": "SaveImage",
+      "pos": [
+        -1714.5333304837113,
+        499.7455517874511
+      ],
+      "size": [
+        337.9631554630714,
+        441.3853485590494
+      ],
+      "flags": {},
+      "order": 7,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 3
+        }
+      ],
+      "outputs": [],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.66"
+      },
+      "widgets_values": [
+        "ComfyUI"
+      ]
+    },
+    {
+      "id": 6,
+      "type": "NanoProNode",
+      "pos": [
+        -1847.3780011617,
+        1101.3648471176498
+      ],
+      "size": [
+        400.74002499442577,
+        252.7206998439226
+      ],
+      "flags": {},
+      "order": 9,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "input_images",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": 8
+        }
+      ],
+      "outputs": [
+        {
+          "name": "output",
+          "type": "IMAGE",
+          "links": [
+            4
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "Mojie-API-Party",
+        "ver": "6e20ab45261b5fbe3513243f90fcee98ba08ae31",
+        "Node name for S&R": "NanoProNode"
+      },
+      "widgets_values": [
+        "图1的女性穿着图2的衣服，提着图3的包，在商场里逛街",
+        false,
+        "2K",
+        "auto",
+        1,
+        499,
+        "randomize"
+      ]
+    },
+    {
+      "id": 8,
+      "type": "SaveImage",
+      "pos": [
+        -1411.5191445625835,
+        1096.3917170896348
+      ],
+      "size": [
+        270,
+        58
+      ],
+      "flags": {},
+      "order": 10,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 4
+        }
+      ],
+      "outputs": [],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.66"
+      },
+      "widgets_values": [
+        "ComfyUI"
+      ]
+    },
+    {
+      "id": 11,
+      "type": "ImageBatch",
+      "pos": [
+        -2051.368877238393,
+        1200.0310755115731
+      ],
+      "size": [
+        140,
+        46
+      ],
+      "flags": {},
+      "order": 8,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "image1",
+          "type": "IMAGE",
+          "link": 9
+        },
+        {
+          "name": "image2",
+          "type": "IMAGE",
+          "link": 10
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            8
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.66",
+        "Node name for S&R": "ImageBatch"
+      }
+    },
+    {
+      "id": 9,
+      "type": "ImageBatch",
+      "pos": [
+        -2047.2622455232188,
+        1096.775621060445
+      ],
+      "size": [
+        140,
+        46
+      ],
+      "flags": {},
+      "order": 6,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "image1",
+          "type": "IMAGE",
+          "link": 6
+        },
+        {
+          "name": "image2",
+          "type": "IMAGE",
+          "link": 7
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            9
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.66",
+        "Node name for S&R": "ImageBatch"
+      }
+    },
+    {
+      "id": 10,
+      "type": "LoadImage",
+      "pos": [
+        -2459.8635223015526,
+        1455.9423712974165
+      ],
+      "size": [
+        270,
+        314
+      ],
+      "flags": {},
+      "order": 3,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            7
+          ]
+        },
+        {
+          "name": "MASK",
+          "type": "MASK",
+          "links": null
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.66",
+        "Node name for S&R": "LoadImage"
+      },
+      "widgets_values": [
+        "1024___00027_.png",
+        "image"
+      ]
+    },
+    {
+      "id": 12,
+      "type": "LoadImage",
+      "pos": [
+        -2144.416186546085,
+        1312.7276068820115
+      ],
+      "size": [
+        270,
+        314
+      ],
+      "flags": {},
+      "order": 4,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            10
+          ]
+        },
+        {
+          "name": "MASK",
+          "type": "MASK",
+          "links": null
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.66",
+        "Node name for S&R": "LoadImage"
+      },
+      "widgets_values": [
+        "768 (1).png",
+        "image"
+      ]
+    }
+  ],
+  "links": [
+    [
+      1,
+      2,
+      0,
+      1,
+      0,
+      "IMAGE"
+    ],
+    [
+      3,
+      1,
+      0,
+      4,
+      0,
+      "IMAGE"
+    ],
+    [
+      4,
+      6,
+      0,
+      8,
+      0,
+      "IMAGE"
+    ],
+    [
+      6,
+      7,
+      0,
+      9,
+      0,
+      "IMAGE"
+    ],
+    [
+      7,
+      10,
+      0,
+      9,
+      1,
+      "IMAGE"
+    ],
+    [
+      8,
+      11,
+      0,
+      6,
+      0,
+      "IMAGE"
+    ],
+    [
+      9,
+      9,
+      0,
+      11,
+      0,
+      "IMAGE"
+    ],
+    [
+      10,
+      12,
+      0,
+      11,
+      1,
+      "IMAGE"
+    ]
+  ],
+  "groups": [
+    {
+      "id": 1,
+      "title": "单图",
+      "bounding": [
+        -2464.048250032782,
+        425.94309993786425,
+        1137.1179879700132,
+        545.3604700011979
+      ],
+      "color": "#3f789e",
+      "font_size": 24,
+      "flags": {}
+    },
+    {
+      "id": 2,
+      "title": "多图组合",
+      "bounding": [
+        -2461.9834581202117,
+        987.2259485221765,
+        1394.482234190414,
+        838.8720137749593
+      ],
+      "color": "#3f789e",
+      "font_size": 24,
+      "flags": {}
+    }
+  ],
+  "config": {},
+  "extra": {
+    "ds": {
+      "scale": 0.5730855330116916,
+      "offset": [
+        3546.3301908553835,
+        -162.9095278038072
+      ]
+    },
+    "frontendVersion": "1.28.7"
+  },
+  "version": 0.4
+}
