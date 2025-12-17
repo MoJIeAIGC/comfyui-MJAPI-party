@@ -2266,8 +2266,8 @@ class NanoProNode:
                 "prompt": ("STRING", {"default": "A beautiful sunset", "multiline": True}),
                 "is_translation": ("BOOLEAN", {"default": False}),  # 是否是翻译模式
                 # "limit_generations": ("BOOLEAN", {"default": False}),  # 是否是翻译模式
-                "resolution": (["1K", "2K", "4K"], {"default": "1K"}),
-                "aspect_ratio": (["auto","16:9","4:3","2:3","4:5","1:1","3:2","5:4","3:4",  "9:16"], {"default": "auto"}),
+                "resolution": (["1K", "2K", "4K"], {"default": "2K"}),
+                "aspect_ratio": (["auto","16:9","4:3","2:3","4:5","1:1","3:2","5:4","3:4", "9:16"], {"default": "auto"}),
                 "num_images": ("INT", {"default": 1, "min": 1, "max": 2}),  # 新增参数，只能是1或2
                 "seed": ("INT", {"default": -1}),
             },

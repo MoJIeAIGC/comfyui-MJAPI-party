@@ -1,5 +1,7 @@
 #### 所有API节点列表
 所有的节点示例工作流都可以在workflow目录下找到
+- [Nano-pro节点](#nano-pro节点)
+- [Flux-2-pro节点](#Flux-2-pro节点)
 - [图片翻译节点](#图片翻译节点)
 - [图片高清放大节点](#图片高清放大节点)
 - [seedance 视频生成节点](#seedance-视频生成节点使用说明)
@@ -15,6 +17,15 @@
 - [Dreamina(即梦参考生图)](#dreamina即梦参考生图)
 
 ***
+
+#### Nano-pro节点
+NanoBanana-pro又名Gemini 3 Flash Image Preview,是google旗下的图像生成模型，功能强大，支持中英文输入和中英文文字输出，对图像理解能力非常强。支持1K、2K、4K分辨率
+![alt text](assets/nano-pro.png)
+
+#### Flux-2-pro节点
+flux-2(pro)是黑森林AI旗下FLUX系列产品，支持中英文输入输出。支持多图编辑，在图像表现上和Nano各有特色，并且支持精准的颜色编辑。
+![alt text](assets/flux-2-pro.png)
+
 #### 图片翻译节点
 该节点支持20多种语言，包括中文、英文、日文、韩文、法文、德文、西班牙文、葡萄牙文、意大利文、俄语等，可以将图片中的文字翻译成其他语言。
 ![alt text](assets/图片翻译.png)

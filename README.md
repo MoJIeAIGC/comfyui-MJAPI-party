@@ -31,6 +31,8 @@
 [传送门](https://space.bilibili.com/483532108)
 
 ### 目前已支持的节点
+- [Nano-pro节点](#nano-pro节点)
+- [Flux-2-pro节点](#flux-2-pro节点)
 - [图片翻译节点](/doc/node_list.md#图片翻译节点)
 - [图片高清放大节点](/doc/node_list.md#图片高清放大节点)
 - [seedance视频生成](/doc/node_list.md#seedance视频生成)
@@ -54,6 +56,17 @@
 
 在comfyui节点列表中找到mjapiparty
 ![alt text](doc/assets/node.png)
+
+- 251217 mojie-api-party-2.0版本更新
+#### Nano-pro节点
+NanoBanana-pro又名Gemini 3 Flash Image Preview,是google旗下的图像生成模型，功能强大，支持中英文输入和中英文文字输出，对图像理解能力非常强。支持1K、2K、4K分辨率
+![alt text](doc/assets/nano-pro.png)
+
+#### Flux-2-pro节点
+flux-2(pro)是黑森林AI旗下FLUX系列产品，支持中英文输入输出。支持多图编辑，在图像表现上和Nano各有特色。并且支持精准的颜色编辑。
+![alt text](doc/assets/flux-2-pro.png)
+
+
 - 251203-最近实在是太忙了，为客户定制了一套家具生成节点，感兴趣的朋友也可以试试。2.0版本会更新Nanp-pro和flux-2
 
 - 251030-主要更新更新了Google-Nano节点
