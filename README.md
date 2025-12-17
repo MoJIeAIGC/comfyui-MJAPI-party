@@ -60,7 +60,7 @@
 - 251217 mojie-api-party-2.0版本更新
 #### Nano-pro节点
 NanoBanana-pro又名Gemini 3 Flash Image Preview,是google旗下的图像生成模型，功能强大，支持中英文输入和中英文文字输出，对图像理解能力非常强。支持1K、2K、4K分辨率
-![alt text](doc/assets/nano-pro.png)
+![alt text](doc/assets/Nano-pro.png)
 
 #### Flux-2-pro节点
 flux-2(pro)是黑森林AI旗下FLUX系列产品，支持中英文输入输出。支持多图编辑，在图像表现上和Nano各有特色。并且支持精准的颜色编辑。
