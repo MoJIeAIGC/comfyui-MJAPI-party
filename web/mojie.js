@@ -48,7 +48,7 @@ app.registerExtension({
 
                 const button = document.createElement("button");
                 button.className = "comfy-btn";
-                button.innerText = "更新";
+                button.innerText = "更新api-key";
                 button.onclick = async () => {
                     const resp = await api.fetchApi("/my_node/set_key", {
                         method: "POST",
