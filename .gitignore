@@ -4,11 +4,7 @@
 *.ptx
 *.cubin
 *.fatbin
-*.ini
-config.ini
 .idea
 __pycache__/
 *.pyc
 *.pyo
-*.ini
-config.ini
