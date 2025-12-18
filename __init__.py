@@ -155,7 +155,7 @@ async def update(request):
         if oneapi_token:
             config_manager.set_api_key(oneapi_token)
             logging.info(f"更新完成,设置API_KEY长度: {len(oneapi_token)}")
-        return web.json_response({"msg": "ok"})
+        return web.json_response({"msg": "更新完成,已是最新版本,重启comfyui生效"})
     except Exception as e:
         logging.exception("[update] 发生异常")
         return web.json_response({"msg": f"更新失败: {e}"}, status=500)
