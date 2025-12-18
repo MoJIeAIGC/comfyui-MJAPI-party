@@ -76,11 +76,51 @@ app.registerExtension({
                 const cell = document.createElement("td");
                 const button = document.createElement("button");
                 button.className = "comfy-btn";
+                button.style.cssText = `
+                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    color: white;
+                    border: none;
+                    border-radius: 6px;
+                    padding: 8px 16px;
+                    font-weight: bold;
+                    cursor: pointer;
+                    transition: all 0.3s ease;
+                    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+                `;
+                
+                // 添加鼠标悬停效果
+                button.addEventListener('mouseenter', () => {
+                    button.style.transform = 'translateY(-2px)';
+                    button.style.boxShadow = '0 4px 8px rgba(0,0,0,0.3)';
+                });
+                
+                button.addEventListener('mouseleave', () => {
+                    button.style.transform = 'translateY(0)';
+                    button.style.boxShadow = '0 2px 5px rgba(0,0,0,0.2)';
+                });
+                
                 button.innerText = "立即更新";
                 button.onclick = async () => {
-                    const resp = await api.fetchApi("/my_node/update", { method: "POST" });
-                    const data = await resp.json();
-                    alert("更新结果: " + data.msg);
+                    // 禁用按钮并显示加载状态
+                    button.disabled = true;
+                    button.style.opacity = '0.7';
+                    button.style.cursor = 'not-allowed';
+                    const originalText = button.innerText;
+                    button.innerText = "更新中...";
+                    
+                    try {
+                        const resp = await api.fetchApi("/my_node/update", { method: "POST" });
+                        const data = await resp.json();
+                        alert("更新结果: " + data.msg);
+                    } catch (error) {
+                        alert("更新失败: " + error.message);
+                    } finally {
+                        // 恢复按钮状态
+                        button.disabled = false;
+                        button.style.opacity = '1';
+                        button.style.cursor = 'pointer';
+                        button.innerText = originalText;
+                    }
                 };
                 cell.appendChild(button);
                 row.appendChild(cell);

@@ -1309,7 +1309,7 @@ class DoubaoSeedreamNode:
         count = 1 if max_SetImage == 'off' else 15
 
         payload = {
-            "model": "doubao-seedream-4.0",
+            "model": "doubao-seedream-4.5",
             "prompt": prompt,
             "size": resl_size, 
             "seed": int(seed+6),
