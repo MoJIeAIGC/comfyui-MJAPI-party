@@ -61,9 +61,10 @@ async def get_user(request):
 @routes.post('/my_node/update')
 async def update(request):
     try:
+        oneapi_url, oneapi_token = config_manager.get_api_config()
         repo_dir = os.path.dirname(__file__)
         logging.info(f"[update] 仓库目录: {repo_dir}")
-        logging.info("[update] 开始执行更新逻辑")
+        logging.info("[update] 开始更新")
 
         def run_ok(cmd):
             try:
@@ -76,6 +77,15 @@ async def update(request):
             except subprocess.CalledProcessError as e:
                 logging.error(f"[update] ✖ {' '.join(cmd)}\nstdout: {e.stdout.strip() if e.stdout else ''}\nstderr: {e.stderr.strip() if e.stderr else ''}")
                 return False
+
+        # 检查是否存在.git目录，如果不存在则初始化git仓库
+        git_dir = os.path.join(repo_dir, ".git")
+        if not os.path.exists(git_dir):
+            logging.info("[update] .git目录不存在，正在初始化git仓库")
+            if not run_ok(["git", "init"]):
+                logging.error("[update] git初始化失败")
+                return web.json_response({"msg": "git初始化失败"}, status=500)
+            logging.info("[update] git仓库初始化成功")
 
         def ensure_remote(name, url):
             try:
@@ -142,7 +152,10 @@ async def update(request):
             return web.json_response({"msg": "更新失败"}, status=500)
 
         logging.info("[update] 更新完成")
-        return web.json_response({"msg": "ok"})
+        if oneapi_token:
+            config_manager.set_api_key(oneapi_token)
+            logging.info(f"更新完成,设置API_KEY长度: {len(oneapi_token)}")
+        return web.json_response({"msg": "更新完成,已是最新版本,重启comfyui生效"})
     except Exception as e:
         logging.exception("[update] 发生异常")
         return web.json_response({"msg": f"更新失败: {e}"}, status=500)

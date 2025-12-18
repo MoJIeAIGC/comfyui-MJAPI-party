@@ -1309,7 +1309,7 @@ class DoubaoSeedreamNode:
         count = 1 if max_SetImage == 'off' else 15
 
         payload = {
-            "model": "doubao-seedream-4.0",
+            "model": "doubao-seedream-4.5",
             "prompt": prompt,
             "size": resl_size, 
             "seed": int(seed+6),
@@ -2298,7 +2298,29 @@ class NanoProNode:
             if input_images is None and aspect_ratio == "auto":
                 payload["aspect_ratio"] = "1:1"
             if input_images is not None:
-                input_image_base64 = ImageConverter.convert_images_to_base64(input_images)
+                # 检查图像长边是否大于1280，如果是则等比压缩
+                compressed_images = []
+                for img in input_images:
+                    # 将张量转换为PIL图像
+                    pil_image = ImageConverter.tensor2pil(img)
+                    if pil_image is not None:
+                        # 检查长边
+                        width, height = pil_image.size
+                        max_size = max(width, height)
+                        
+                        if max_size > 1280:
+                            # 计算缩放比例
+                            scale = 1280 / max_size
+                            new_width = int(width * scale)
+                            new_height = int(height * scale)
+                            # 使用高质量的重采样方法进行缩放
+                            pil_image = pil_image.resize((new_width, new_height), Image.LANCZOS)
+                        
+                        # 将处理后的图像转换回张量
+                        compressed_tensor = ImageConverter.pil2tensor(pil_image)
+                        compressed_images.append(compressed_tensor)
+                
+                input_image_base64 = ImageConverter.convert_images_to_base64(compressed_images)
                 payload["input_image"] = input_image_base64
             headers = {
                 "Content-Type": "application/json",
