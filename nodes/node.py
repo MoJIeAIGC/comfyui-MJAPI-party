@@ -1762,7 +1762,7 @@ class ImageUpscaleNode:
 
                 # 如果宽高*multiple大于10240，就直接原图输出
                 if new_width * multiple > 10240 or new_height * multiple > 10240:
-                    print(f"图片尺寸 {new_width}x{new_height} 超过最大限制 10240x10240，直接输出原图")
+                    print(f"图片尺寸 {new_width}x{new_height} 超过最大限制 10240x10240,直接输出原图")
                     api_tensors.append(img)
                     continue
 

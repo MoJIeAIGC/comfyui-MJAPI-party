@@ -171,6 +171,13 @@ BASE_URL = https://www.mojieaigc.com/v1/completions
 请求地址不要动，填入KEY就行了。
 填入密钥key后记得重启comfyui,才能生效
 
+8. 更新节点
+```
+现在可以直接在comfyui的设置中找到mjapi设置项，更新节点即可。
+```
+![alt text](doc/assets/update.png)
+
+
 ### 联系我们
 wechat:mojie_AIGC
 扫描下方二维码
