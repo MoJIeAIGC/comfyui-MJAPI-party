@@ -1848,10 +1848,43 @@ class FurniturePhotoNode:
                 "Authorization": f"Bearer {oneapi_token}"
             }
             response = requests.post(oneapi_url, headers=headers, json=payload, timeout=240)
-
-            response.raise_for_status()
+            try:
+                response.raise_for_status()
+            except requests.exceptions.HTTPError as e:
+                print(f"HTTP错误: {e}")
+                print(f"响应内容: {response.text}")
+                
+                # 尝试解析错误信息
+                try:
+                    response_data = response.json()
+                    if "error" in response_data and "message" in response_data["error"]:
+                        error_message = response_data["error"]["message"]
+                        # 提取JSON部分（去除request id等额外信息）
+                        import re
+                        json_match = re.search(r'\{.*\}', error_message)
+                        if json_match:
+                            json_str = json_match.group(0)
+                            import json
+                            error_json = json.loads(json_str)
+                            if "error" in error_json:
+                                print(f"具体错误: {error_json['error']}")
+                                if error_json["error"]:
+                                    error_msg = error_json["error"]
+                                else:
+                                    error_msg = "server error,please try again laters"
+                                error_tensor = ImageConverter.create_error_image(error_msg, 1024, 1024)
+                                output_tensors.append(error_tensor)
+                                return
+                    raise
+                except:
+                    # 如果解析失败，忽略错误
+                    error_msg = "server error,please try again laters"
+                    error_tensor = ImageConverter.create_error_image(error_msg, 1024, 1024)
+                    output_tensors.append(error_tensor)
+                    return
 
             result = response.json()
+            print(result)
             image_url = result.get("res_url")
 
             if not image_url:
