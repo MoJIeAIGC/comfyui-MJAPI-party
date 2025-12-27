@@ -1,8 +1,131 @@
 import { app } from "../../scripts/app.js";
 import { api } from "../../scripts/api.js";
 
+// 辅助函数：根据名称查找控件
+const findWidgetByName = (node, name) => {
+    return node.widgets ? node.widgets.find((w) => w.name === name) : null;
+};
+
+// 家具照片节点的处理函数
+function handleFurniturePhotoNode(node) {
+    console.log('[FurniturePhotoNode] 开始处理节点:', node.comfyClass);
+    
+    if (node.comfyClass !== "FurniturePhotoNode") {
+        console.log('[FurniturePhotoNode] 节点类型不匹配:', node.comfyClass);
+        return;
+    }
+
+    // 定义默认的家具类型对应的风格列表
+    const parentname_dict = {
+        '主卧床': ['中古风', '浅灰现代风', '法式奶油风'],
+        ' 客厅大沙发': ['中古风', '浅灰现代风', '法式奶油风', '宋氏美学'],
+        '餐桌': ['中古风', '浅灰现代风', '法式奶油风'],
+        '斗柜': ['中古风', '宋氏美学']
+    };
+    
+    console.log('[FurniturePhotoNode] 使用的风格数据:', parentname_dict);
+
+    // 查找控件
+    const furnitureTypesWidget = findWidgetByName(node, "furniture_types");
+    const styleTypeWidget = findWidgetByName(node, "style_type");
+
+    console.log('[FurniturePhotoNode] 找到的控件:', {
+        furnitureTypesWidget: furnitureTypesWidget ? furnitureTypesWidget.name : '未找到',
+        styleTypeWidget: styleTypeWidget ? styleTypeWidget.name : '未找到'
+    });
+
+    if (!furnitureTypesWidget || !styleTypeWidget) {
+        console.error('[FurniturePhotoNode] 找不到必要的控件');
+        return;
+    }
+
+    // 更新style_type选项的函数
+    const updateStyleOptions = () => {
+        console.log('[FurniturePhotoNode] 开始更新风格选项');
+        const selectedFurniture = furnitureTypesWidget.value;
+        console.log('[FurniturePhotoNode] 当前选择的家具类型:', selectedFurniture);
+        
+        const availableStyles = parentname_dict[selectedFurniture] || [];
+        console.log('[FurniturePhotoNode] 可用的风格列表:', availableStyles);
+
+        // 更新控件选项
+        if (styleTypeWidget.options) {
+            console.log('[FurniturePhotoNode] 更新控件选项:', availableStyles);
+            styleTypeWidget.options.values = availableStyles;
+            styleTypeWidget.options.labels = availableStyles;
+        } else {
+            console.error('[FurniturePhotoNode] styleTypeWidget.options 不存在');
+        }
+
+        // 如果当前选中的风格不在新选项中，选择第一个选项
+        if (availableStyles.length > 0) {
+            if (!availableStyles.includes(styleTypeWidget.value)) {
+                console.log('[FurniturePhotoNode] 选中的风格不在新选项中，切换到第一个选项:', availableStyles[0]);
+                styleTypeWidget.value = availableStyles[0];
+            }
+        } else {
+            console.warn('[FurniturePhotoNode] 没有可用的风格选项');
+        }
+
+        // 触发UI更新
+        if (styleTypeWidget.callback) {
+            console.log('[FurniturePhotoNode] 触发UI更新回调');
+            styleTypeWidget.callback(styleTypeWidget.value);
+        }
+        
+        // 强制刷新节点UI
+        if (node.onResize) {
+            console.log('[FurniturePhotoNode] 调用节点onResize方法刷新UI');
+            node.onResize();
+        }
+    };
+
+    // 初始化时更新一次
+    console.log('[FurniturePhotoNode] 初始化更新风格选项');
+    updateStyleOptions();
+
+    // 为家具类型控件添加值变化监听
+    console.log('[FurniturePhotoNode] 为家具类型控件添加值变化监听');
+    
+    // 保存原始的value setter
+    const originalDescriptor = Object.getOwnPropertyDescriptor(furnitureTypesWidget, 'value') || 
+        Object.getOwnPropertyDescriptor(Object.getPrototypeOf(furnitureTypesWidget), 'value');
+
+    if (!originalDescriptor) {
+        console.log('[FurniturePhotoNode] 未找到原始的value描述符，使用直接赋值方式');
+    }
+
+    let widgetValue = furnitureTypesWidget.value;
+
+    // 重写value属性，添加监听
+    Object.defineProperty(furnitureTypesWidget, 'value', {
+        get() {
+            const value = originalDescriptor && originalDescriptor.get 
+                ? originalDescriptor.get.call(furnitureTypesWidget) 
+                : widgetValue;
+            return value;
+        },
+        set(newVal) {
+            console.log('[FurniturePhotoNode] 家具类型值变化:', newVal);
+            if (originalDescriptor && originalDescriptor.set) {
+                originalDescriptor.set.call(furnitureTypesWidget, newVal);
+            } else {
+                widgetValue = newVal;
+            }
+            // 更新风格选项
+            updateStyleOptions();
+        }
+    });
+
+    console.log('[FurniturePhotoNode] 节点处理完成');
+}
+
 app.registerExtension({
     name: "ComfyUI.Mjapi",
+    nodeCreated(node) {
+        console.log('[FurniturePhotoNode] 检测到节点创建:', node.comfyClass);
+        handleFurniturePhotoNode(node);
+    },
     async setup() {
 
         app.ui.settings.addSetting({

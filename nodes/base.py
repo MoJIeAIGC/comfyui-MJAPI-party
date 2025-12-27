@@ -369,14 +369,14 @@ class ImageConverter:
         right = min(image_pil.width, max_x + margin + 1)
         bottom = min(image_pil.height, max_y + margin + 1)
         
-        # 检查矩形范围，如果小于1000px则扩大至1000px
+        # 检查矩形范围，如果小于500px则扩大至500px
         rect_width = right - left
         rect_height = bottom - top
         
-        if rect_width < 1000 or rect_height < 1000:
+        if rect_width < 500 or rect_height < 500:
             # 计算需要扩展的像素数
-            expand_x = max(0, (1000 - rect_width) // 2)
-            expand_y = max(0, (1000 - rect_height) // 2)
+            expand_x = max(0, (500 - rect_width) // 2)
+            expand_y = max(0, (500 - rect_height) // 2)
             
             # 扩展矩形边界，确保不超出图像范围
             left = max(0, left - expand_x)
@@ -384,20 +384,20 @@ class ImageConverter:
             right = min(image_pil.width, right + expand_x)
             bottom = min(image_pil.height, bottom + expand_y)
             
-            # 如果扩展后仍然小于1000px，则从另一侧继续扩展
+            # 如果扩展后仍然小于500px，则从另一侧继续扩展
             new_width = right - left
             new_height = bottom - top
             
-            if new_width < 1000:
-                additional_expand = 1000 - new_width
+            if new_width < 500:
+                additional_expand = 500 - new_width
                 if left >= additional_expand:
                     left -= additional_expand
                 else:
                     right = min(image_pil.width, right + (additional_expand - left))
                     left = 0
                     
-            if new_height < 1000:
-                additional_expand = 1000 - new_height
+            if new_height < 500:
+                additional_expand = 500 - new_height
                 if top >= additional_expand:
                     top -= additional_expand
                 else:
