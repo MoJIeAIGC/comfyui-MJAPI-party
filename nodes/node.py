@@ -2676,6 +2676,118 @@ class GeminiLLMNode:
 
 
 
+
+class Gemini3NanoNode:
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "prompt": ("STRING", {"default": "A beautiful sunset", "multiline": True}),
+                "model": (["Gemini 2.5 Flash Image", "Gemini-3-pro-image-preview"], {"default": "Gemini 2.5 Flash Image"}),  # 值需和后端 MODEL_MAPPING 的 key 完全一致
+                "thinking_level": (["Minimal","Low","Medium","High"], {"default": "High"}),  # 值需和后端 THINKING_LEVEL_MAPPING 的 key 完全一致
+                "safe_level": (["high","medium","low"], {"default": "medium"}),  # 值需和后端 THINKING_LEVEL_MAPPING 的 key 完全一致
+                "resolution": (["1K", "2K", "4K"], {"default": "1K"}),
+                "aspect_ratio": (["16:9","4:3","2:3","4:5","1:1","3:2","5:4","3:4", "9:16"], {"default": "1:1"}),
+                "System_prompt": ("STRING", {"default": ""}),
+                "Web_search": ("BOOLEAN", {"default": True}),  # 是否是翻译模式
+                "seed": ("INT", {"default": -1}),
+            },
+            "optional": {
+                "input_images": ("IMAGE",),  # 接收多个图片
+            }
+        }
+
+    RETURN_TYPES = ("IMAGE",)  # 返回一个或多个IMAGE
+    RETURN_NAMES = ("output",)  # 保持为一个返回名
+    FUNCTION = "generate"
+    CATEGORY = "🎨MJapiparty/ImageCreat"
+
+    def generate(self, seed, input_images=None, resolution="1K", aspect_ratio="1:1",  prompt="", safe_level="medium", thinking_level="High", System_prompt="", Web_search=True, model="Gemini 2.5 Flash Image"):
+        # 获取配置
+        oneapi_url, oneapi_token = config_manager.get_api_config()
+        def call_api(seed_override):
+            payload = {
+                "model": "Gemini3_Nano",
+                "modelr": model,
+                "resolution": resolution,
+                "prompt": prompt,
+                "seed": seed_override,
+                "safe_level": safe_level,
+                "System_prompt": System_prompt,
+                "Web_search": Web_search,
+                "aspect_ratio": aspect_ratio,
+            }
+            if model != "Gemini 2.5 Flash Image":
+                payload["thinking_level"] = thinking_level 
+            if input_images is not None:
+                # 检查图像长边是否大于1280，如果是则等比压缩
+                compressed_images = []
+                for img in input_images:
+                    # 将张量转换为PIL图像
+                    pil_image = ImageConverter.tensor2pil(img)
+                    if pil_image is not None:
+                        # 检查长边
+                        width, height = pil_image.size
+                        max_size = max(width, height)
+                        
+                        if max_size > 1280:
+                            # 计算缩放比例
+                            scale = 1280 / max_size
+                            new_width = int(width * scale)
+                            new_height = int(height * scale)
+                            # 使用高质量的重采样方法进行缩放
+                            pil_image = pil_image.resize((new_width, new_height), Image.LANCZOS)
+                        
+                        # 将处理后的图像转换回张量
+                        compressed_tensor = ImageConverter.pil2tensor(pil_image)
+                        compressed_images.append(compressed_tensor)
+                
+                input_image_base64 = ImageConverter.convert_images_to_base64(compressed_images)
+                payload["input_image"] = input_image_base64
+            headers = {
+                "Content-Type": "application/json",
+                "Authorization": f"Bearer {oneapi_token}"
+            }
+            response = requests.post(oneapi_url, headers=headers, json=payload, timeout=240)
+
+            response.raise_for_status()
+
+            result = response.json()
+            image_url = result.get("res_url")
+
+            if not image_url:
+                raise ValueError("未找到图片 URL")
+
+            image_urls = image_url.split("|") if image_url else []
+
+            print(image_urls)
+            for image_url in image_urls:
+                if not image_url:
+                    continue
+                try:
+                    # 下载图片
+                    response = requests.get(image_url)
+                    response.raise_for_status()
+                    # 将图片数据转换为 PIL 图像对象
+                    img = Image.open(BytesIO(response.content)).convert("RGB")
+                    output_tensors.append(ImageConverter.pil2tensor(img))
+                except Exception as e:
+                    print(f"下载图片 {image_url} 失败: {str(e)}")
+                    error_tensor = ImageConverter.create_error_image("下载图片失败")
+                    output_tensors.append(error_tensor)
+            if not output_tensors:
+                error_tensor = ImageConverter.create_error_image("未获取到有效图片 URL")
+                output_tensors.append(error_tensor)
+        output_tensors = []
+
+        # 调用API
+        call_api(seed)
+
+        return (torch.cat(output_tensors, dim=0),)  # 拼接为 (数量, H, W, 3)
+
+
+
+
 NODE_CLASS_MAPPINGS = {
     "GeminiEditNode": GeminiEditNode,
     "NanoProNode": NanoProNode,
@@ -2705,6 +2817,7 @@ NODE_CLASS_MAPPINGS = {
     "FurnitureAngleNode": FurnitureAngleNode, 
     "DreaminaI2INode": DreaminaI2INode,
     "GeminiLLMNode": GeminiLLMNode,
+    "Gemini3NanoNode": Gemini3NanoNode,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
@@ -2736,4 +2849,5 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "FurnitureAngleNode": "家具角度图",
     "DreaminaI2INode": "Dreamina参考生图",
     "GeminiLLMNode": "Gemini3-LLM",
+    "Gemini3NanoNode": "Gemini3-image-Nano",
 }
