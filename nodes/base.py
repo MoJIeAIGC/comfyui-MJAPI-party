@@ -416,6 +416,88 @@ class ImageConverter:
 
 
     @staticmethod
+    def video_to_full_base64_list(video_list):
+        """
+        适配 ComfyUI VideoFromFile 对象 → 输出完整视频文件的Base64列表（不拆帧）
+        :param video_list: 视频对象列表（VideoFromFile/路径/张量）
+        :return: 完整视频文件的Base64字符串列表（纯编码，无data:前缀）
+        """
+        import base64
+        import torch
+        import os
+        import traceback
+        
+        all_video_base64 = []  # 完整视频的Base64列表
+        if not isinstance(video_list, list):
+            video_list = [video_list]
+        
+        for video in video_list:
+            try:
+                if video is None:
+                    print("警告：跳过空视频对象")
+                    continue
+
+                video_path = None
+                # ========== 适配 ComfyUI VideoFromFile 对象（路径获取逻辑复用） ==========
+                if hasattr(video, '__class__') and 'VideoFromFile' in str(video.__class__):
+                    print("检测到 ComfyUI VideoFromFile 对象，获取完整视频路径...")
+                    # 方法1：调用 get_stream_source()
+                    if hasattr(video, 'get_stream_source'):
+                        try:
+                            stream_source = video.get_stream_source()
+                            if stream_source and isinstance(stream_source, str):
+                                video_path = stream_source
+                                print(f"通过 get_stream_source 获取路径: {video_path}")
+                        except:
+                            pass
+                    # 方法2：私有属性 __file
+                    if video_path is None and hasattr(video, '_VideoFromFile__file'):
+                        video_path = video._VideoFromFile__file
+                        print(f"通过私有属性 __file 获取路径: {video_path}")
+                    # 方法3：遍历 __dict__ 找路径
+                    if video_path is None and hasattr(video, '__dict__'):
+                        for k, v in video.__dict__.items():
+                            if isinstance(v, str) and (v.endswith(('.mp4', '.avi', '.mov', '.mkv')) or os.path.exists(v)):
+                                video_path = v
+                                print(f"通过 __dict__ 遍历获取路径: {k} = {video_path}")
+                                break
+                
+                # 张量类型（暂不支持，提示需文件路径）
+                elif isinstance(video, torch.Tensor):
+                    print("警告：张量类型视频暂不支持直接转完整Base64，请提供文件路径")
+                    continue
+                
+                # 普通文件路径
+                else:
+                    if isinstance(video, str) and os.path.exists(video):
+                        video_path = video
+
+                # ========== 路径校验 + 读取完整视频文件转Base64 ==========
+                if video_path is None:
+                    print(f"警告：无法从 {type(video).__name__} 对象获取有效路径，跳过")
+                    continue
+                
+                video_path = os.path.abspath(video_path)
+                if not os.path.exists(video_path):
+                    print(f"警告：视频文件不存在: {video_path}")
+                    continue
+
+                # 读取完整视频文件二进制 → 转Base64（纯编码，无data:前缀）
+                with open(video_path, "rb") as f:
+                    video_bytes = f.read()
+                video_base64 = base64.b64encode(video_bytes).decode("utf-8")
+                all_video_base64.append(video_base64)
+                print(f"完整视频 {video_path} 转Base64完成，长度：{len(video_base64)} 字符")
+            
+            except Exception as e:
+                print(f"处理完整视频失败: {str(e)}")
+                traceback.print_exc()
+                continue
+        
+        print(f"所有视频处理完成，共生成 {len(all_video_base64)} 个完整视频Base64")
+        return all_video_base64  # 返回完整视频Base64列表
+
+    @staticmethod
     def download_video(video_url: str, save_path: str = "temp_video.mp4") -> str:
         """
         下载视频文件到本地
@@ -445,6 +527,47 @@ class ImageConverter:
             img_base64 = ImageConverter.tensor_to_base64(img)
             base64_images.append(img_base64)
         return base64_images
+    
+    @staticmethod
+    def files_to_base64_list(file_list):
+        """
+        将文件列表转换为 base64 字符串列表
+        :param file_list: 文件对象列表
+        :return: base64 字符串列表
+        """
+        import base64
+        import os
+        
+        file_base64_list = []
+        
+        for file in file_list:
+            try:
+                # 检查文件类型
+                if hasattr(file, 'path'):
+                    # 从 File 对象获取文件路径
+                    file_path = file.path
+                elif isinstance(file, (str, bytes)):
+                    # 假设是文件路径字符串
+                    file_path = file
+                else:
+                    continue
+                
+                # 检查文件是否存在
+                if not os.path.exists(file_path):
+                    print(f"文件不存在: {file_path}")
+                    continue
+                
+                # 读取文件内容
+                with open(file_path, "rb") as f:
+                    file_content = f.read()
+                
+                # 转换为 base64
+                file_base64 = base64.b64encode(file_content).decode("utf-8")
+                file_base64_list.append(file_base64)
+            except Exception as e:
+                print(f"文件处理错误 {file_path}: {str(e)}")
+        
+        return file_base64_list if file_base64_list else None
 
     @staticmethod
     def get_right_part_of_image(img):

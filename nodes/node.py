@@ -2490,6 +2490,191 @@ class Flux2Node:
 
 
 
+class GeminiLLMNode:
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "prompt": ("STRING", ),
+                # "limit_generations": ("BOOLEAN", {"default": False}),  # 是否是翻译模式
+                "model": (["Gemini 3 Pro Preview", "Gemini 3 Flash Preview", "Gemini 3 Flash Preview Free"], {"default": "Gemini 3 Flash Preview Free"}),  # 值需和后端 MODEL_MAPPING 的 key 完全一致
+                "media_resolution": (["Default","Low","Medium","High"], {"default": "Default"}),  # 值需和后端 RESOLUTION_MAPPING 的 key 完全一致
+                "thinking_level": (["Minimal","Low","Medium","High"], {"default": "High"}),  # 值需和后端 THINKING_LEVEL_MAPPING 的 key 完全一致
+                "System_prompt": ("STRING", {"default": ""}),
+                "Web_search": ("BOOLEAN", {"default": True}),  # 是否是翻译模式
+                "format": ("BOOLEAN", {"default": False}),  # 是否是翻译模式
+                "seed": ("INT", {"default": -1}),
+            },
+            "optional": {
+                "Image": ("IMAGE",),  # 支持多输入，传递时会转为 base64 列表
+                "video": ("VIDEO",),  # 支持多输入，传递时会转为 base64 列表（拆帧后）
+                "file": ("FILE",),  # 支持多输入，传递时会转为 base64 列表
+                # "context": ("STRING", {"default": "", "multiline": True}),
+            }
+        }
+
+    # 返回字符串文本
+    RETURN_TYPES = ("STRING",)  # 返回一个或多个STRING
+    RETURN_NAMES = ("output",)  # 保持为一个返回名
+    FUNCTION = "generate"
+    CATEGORY = "🎨MJapiparty/ImageCreat"
+
+
+    def generate(self, seed, prompt="", model="Gemini 3 Flash Preview Free", media_resolution="Default", thinking_level="High", System_prompt="", Web_search=True, format=False, Image=None, video=None, file=None):
+        # 输入非空校验 - 更严格地检查prompt是否为空
+        prompt_stripped = prompt.strip() if prompt else ""
+        if not prompt_stripped and not Image and not video and not file:
+            return ("错误：至少需要输入文本、图片、视频或文件中的一种",)
+        
+        # 参数值校验
+        valid_models = ["Gemini 3 Pro Preview", "Gemini 3 Flash Preview", "Gemini 3 Flash Preview Free"]
+        valid_resolutions = ["Default", "Low", "Medium", "High"]
+        valid_thinking_levels = ["Minimal", "Low", "Medium", "High"]
+        
+        if model not in valid_models:
+            return (f"错误：无效的模型选择，可选值为：{', '.join(valid_models)}",)
+        
+        if media_resolution not in valid_resolutions:
+            return (f"错误：无效的分辨率选择，可选值为：{', '.join(valid_resolutions)}",)
+        
+        if thinking_level not in valid_thinking_levels:
+            return (f"错误：无效的思维水平选择，可选值为：{', '.join(valid_thinking_levels)}",)
+        
+        # 获取配置
+        oneapi_url, oneapi_token = config_manager.get_api_config()
+        # 处理图片输入
+        input_image_base64 = None
+        if Image is not None:
+            try:
+                input_image_base64 = ImageConverter.convert_images_to_base64(Image)
+                if not input_image_base64:
+                    return ("错误：图片转换为base64失败",)
+            except Exception as e:
+                return (f"错误：图片处理失败：{str(e)}",)
+        
+        # 处理视频输入
+        video_base64 = None
+        if video is not None:
+            try:
+                # 确保video是列表形式
+                video_list = [video] if not isinstance(video, list) else video
+                video_base64 = ImageConverter.video_to_full_base64_list(video_list)
+                if not video_base64:
+                    return ("错误：视频转帧或base64转换失败",)
+            except Exception as e:
+                return (f"错误：视频处理失败：{str(e)}",)
+        
+        # 处理文件输入
+        file_base64 = None
+        if file is not None:
+            try:
+                # 确保file是列表形式
+                file_list = [file] if not isinstance(file, list) else file
+                file_base64 = ImageConverter.files_to_base64_list(file_list)
+                if not file_base64:
+                    return ("错误：文件转base64失败",)
+            except Exception as e:
+                return (f"错误：文件处理失败：{str(e)}",)
+        
+        # 记录处理的媒体文件数量
+        print(f"处理媒体文件数量: 图片{len(input_image_base64) if input_image_base64 else 0}张, 视频帧{len(video_base64) if video_base64 else 0}帧, 文件{len(file_base64) if file_base64 else 0}个")
+        
+        def call_api(seed_override):
+            print("=== 准备调用API ===")
+            # 构建payload，包含所有参数
+            payload = {
+                "model": "gemini-3-llm",
+                "prompt": prompt,
+                "seed": int(seed_override),
+                "model_type": model,
+                "media_resolution": media_resolution,
+                "thinking_level": thinking_level,
+                "system_prompt": System_prompt,
+                "web_search": Web_search,
+                "format": format,
+            }
+            
+            # 添加图片输入（如果有）
+            if input_image_base64 is not None:
+                payload["input_image"] = input_image_base64
+                print(f"API请求包含图片: {len(input_image_base64)}张")
+            
+            # 添加视频输入（如果有）
+            if video_base64 is not None:
+                payload["video"] = video_base64
+                print(f"API请求包含视频帧: {len(video_base64)}帧")
+            
+            # 添加文件输入（如果有）
+            if file_base64 is not None:
+                payload["file"] = file_base64
+                print(f"API请求包含文件: {len(file_base64)}个")
+            
+            # 日志：打印API请求基本信息（不包含大的base64数据）
+            payload_info = {
+                "model": payload["model"],
+                "model_type": payload["model_type"],
+                "seed": payload["seed"],
+                "has_prompt": bool(payload["prompt"].strip()),
+                "has_system_prompt": bool(payload["system_prompt"].strip()),
+                "web_search": payload["web_search"],
+                "format": payload["format"],
+                "media_resolution": payload["media_resolution"],
+                "thinking_level": payload["thinking_level"],
+                "has_images": "input_image" in payload,
+                "has_videos": "video" in payload,
+                "has_files": "file" in payload
+            }
+            print(f"API请求参数: {payload_info}")
+            
+            headers = {
+                "Content-Type": "application/json",
+                "Authorization": f"Bearer {oneapi_token}"
+            }
+            print(f"正在调用API: {oneapi_url}")
+            print(f"API调用超时设置: 240秒")
+            response = requests.post(oneapi_url, headers=headers, json=payload, timeout=240)
+            print(f"API调用完成，状态码: {response.status_code}")
+
+            response.raise_for_status()
+
+            result = response.json()
+            print(f"API响应结构: {list(result.keys())}")
+            restext = result.get("restext", "")
+            
+            if not restext:
+                print("警告：API响应中restext字段为空")
+                restext = "未找到响应文本"
+            else:
+                print(f"API返回restext，长度: {len(restext)}字符")
+            
+            return restext
+        try:
+            print("=== 执行API调用 ===")
+            # 调用API
+            restext = call_api(seed)
+            print("=== GeminiLLMNode 执行完成 ===")
+            return (restext,)
+        except requests.exceptions.RequestException as e:
+            print(f"=== API调用失败 ===")
+            print(f"错误类型: 请求异常")
+            print(f"错误详情: {str(e)}")
+            if hasattr(e, 'response') and e.response is not None:
+                print(f"错误状态码: {e.response.status_code}")
+                try:
+                    error_response = e.response.json()
+                    print(f"错误响应内容: {error_response}")
+                except:
+                    print(f"错误响应文本: {e.response.text[:500]}...")
+            # 返回错误信息作为字符串
+            return (f"API调用失败: {str(e)}",)
+        except Exception as e:
+            print(f"=== GeminiLLMNode 执行失败 ===")
+            print(f"错误类型: 其他异常")
+            print(f"错误详情: {str(e)}")
+            # 返回错误信息作为字符串
+            return (f"API调用失败: {str(e)}",)
+
+
 
 NODE_CLASS_MAPPINGS = {
     "GeminiEditNode": GeminiEditNode,
@@ -2519,6 +2704,7 @@ NODE_CLASS_MAPPINGS = {
     "DetailJinNode": DetailJinNode,
     "FurnitureAngleNode": FurnitureAngleNode, 
     "DreaminaI2INode": DreaminaI2INode,
+    "GeminiLLMNode": GeminiLLMNode,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
@@ -2549,4 +2735,5 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "DetailJinNode": "细节精修",
     "FurnitureAngleNode": "家具角度图",
     "DreaminaI2INode": "Dreamina参考生图",
+    "GeminiLLMNode": "Gemini3-LLM",
 }
