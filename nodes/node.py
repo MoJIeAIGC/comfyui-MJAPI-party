@@ -2684,7 +2684,7 @@ class Gemini3NanoNode:
             "required": {
                 "prompt": ("STRING", {"default": "A beautiful sunset", "multiline": True}),
                 "model": (["Gemini 2.5 Flash Image", "Gemini-3-pro-image-preview"], {"default": "Gemini 2.5 Flash Image"}),  # 值需和后端 MODEL_MAPPING 的 key 完全一致
-                "thinking_level": (["Minimal","Low","Medium","High"], {"default": "High"}),  # 值需和后端 THINKING_LEVEL_MAPPING 的 key 完全一致
+                "thinking_level": (["minimal","low","medium","high"], {"default": "high"}),  # 值需和后端 THINKING_LEVEL_MAPPING 的 key 完全一致
                 "safe_level": (["high","medium","low"], {"default": "medium"}),  # 值需和后端 THINKING_LEVEL_MAPPING 的 key 完全一致
                 "resolution": (["1K", "2K", "4K"], {"default": "1K"}),
                 "aspect_ratio": (["16:9","4:3","2:3","4:5","1:1","3:2","5:4","3:4", "9:16"], {"default": "1:1"}),
