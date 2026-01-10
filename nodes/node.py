@@ -2697,15 +2697,17 @@ class Gemini3NanoNode:
             }
         }
 
-    RETURN_TYPES = ("IMAGE",)  # 返回一个或多个IMAGE
-    RETURN_NAMES = ("output",)  # 保持为一个返回名
+    RETURN_TYPES = ("IMAGE", "ANY")  # 返回图片和对话历史（ANY类型兼容conversation_history数组）
+    RETURN_NAMES = ("output", "conversation_history")  # 输出端口名称
     FUNCTION = "generate"
     CATEGORY = "🎨MJapiparty/ImageCreat"
 
     def generate(self, seed, input_images=None, resolution="1K", aspect_ratio="1:1",  prompt="", safe_level="medium", thinking_level="High", System_prompt="", Web_search=True, model="Gemini 2.5 Flash Image"):
         # 获取配置
         oneapi_url, oneapi_token = config_manager.get_api_config()
+        conversation_history = []  # 存储对话历史的变量
         def call_api(seed_override):
+            nonlocal conversation_history  # 允许在内部函数中修改外部变量
             payload = {
                 "model": "Gemini3_Nano",
                 "modelr": model,
@@ -2759,6 +2761,7 @@ class Gemini3NanoNode:
                 raise ValueError("未找到图片 URL")
 
             image_urls = image_url.split("|") if image_url else []
+            conversation_history = result.get("conversation_history", [])  # 提取对话历史
 
             print(image_urls)
             for image_url in image_urls:
@@ -2782,9 +2785,51 @@ class Gemini3NanoNode:
 
         # 调用API
         call_api(seed)
+        return (torch.cat(output_tensors, dim=0), conversation_history)
 
-        return (torch.cat(output_tensors, dim=0),)  # 拼接为 (数量, H, W, 3)
 
+class ContextNode:
+    # 节点显示名称
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "conversation_history": ("ANY", {"default": []}),  # 输入类型：ANY（兼容任意数据结构，适配conversation_history数组）
+            }
+        }
+
+    RETURN_TYPES = ("ANY",)  # 输出类型：ANY（兼容任意数据结构，适配conversation_history数组）
+    RETURN_NAMES = ("conversation_history",)  # 输出端口名称
+    FUNCTION = "save_and_forward"  # 核心执行方法
+    CATEGORY = "自定义节点/对话管理"  # 节点分类（方便在菜单中查找）
+    DESCRIPTION = "接收并保存conversation_history对话历史数组，支持转发给下游节点"
+
+    def __init__(self):
+        """初始化节点实例，用于保存对话历史数据"""
+        self.saved_history = None  # 持久化保存对话历史的属性
+
+    def save_and_forward(self, conversation_history):
+        """
+        核心方法：接收并保存对话历史，同时返回供下游节点使用
+        :param conversation_history: 输入的对话历史数组（符合指定结构）
+        :return: 包含对话历史的元组（ComfyUI要求返回元组格式）
+        """
+        # 1. 验证输入数据格式（可选，增强鲁棒性）
+        if isinstance(conversation_history, list):
+            # 简单校验核心字段（避免非法数据）
+            for item in conversation_history:
+                if not isinstance(item, dict) or "role" not in item or "parts" not in item:
+                    print(f"[警告] 对话历史格式异常：{item}，请检查输入数据结构")
+        else:
+            print(f"[错误] 输入不是数组类型，当前类型：{type(conversation_history)}")
+            return (None,)
+
+        # 2. 保存数据到节点实例（即使无输出连线，数据也会保存在self中）
+        self.saved_history = conversation_history
+        print(f"[成功] 已保存对话历史，共{len(conversation_history)}轮对话")
+        
+        # 3. 返回数据供下游节点使用
+        return (self.saved_history,)
 
 
 
@@ -2808,6 +2853,7 @@ NODE_CLASS_MAPPINGS = {
     "ModelGenNode": ModelGenNode,
     "MoterPoseNode": MoterPoseNode,
     "ViduT2VNode": ViduT2VNode,
+    "ContextNode": ContextNode,
     "ViduI2VNode": ViduI2VNode,
     "ImageUpscaleNode": ImageUpscaleNode,
     "ImageTranslateNode": ImageTranslateNode,
@@ -2850,4 +2896,5 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "DreaminaI2INode": "Dreamina参考生图",
     "GeminiLLMNode": "Gemini3-LLM",
     "Gemini3NanoNode": "Gemini3-image-Nano",
+    "ContextNode": "对话上下文管理",
 }
