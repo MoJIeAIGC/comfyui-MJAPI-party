@@ -2694,6 +2694,7 @@ class Gemini3NanoNode:
             },
             "optional": {
                 "input_images": ("IMAGE",),  # 接收多个图片
+                "context": ("ANY",),  # 接收对话历史上下文数据
             }
         }
 
@@ -2702,10 +2703,13 @@ class Gemini3NanoNode:
     FUNCTION = "generate"
     CATEGORY = "🎨MJapiparty/ImageCreat"
 
-    def generate(self, seed, input_images=None, resolution="1K", aspect_ratio="1:1",  prompt="", safe_level="medium", thinking_level="High", System_prompt="", Web_search=True, model="Gemini 2.5 Flash Image"):
+    def generate(self, seed, input_images=None, resolution="1K", aspect_ratio="1:1",  prompt="", safe_level="medium", thinking_level="High", System_prompt="", Web_search=True, model="Gemini 2.5 Flash Image", context=None):
         # 获取配置
         oneapi_url, oneapi_token = config_manager.get_api_config()
-        conversation_history = []  # 存储对话历史的变量
+        # 如果没有提供对话历史，初始化为空列表
+        conversation_history = context
+        if conversation_history is None:
+            conversation_history = []
         def call_api(seed_override):
             nonlocal conversation_history  # 允许在内部函数中修改外部变量
             payload = {
@@ -2718,6 +2722,7 @@ class Gemini3NanoNode:
                 "System_prompt": System_prompt,
                 "Web_search": Web_search,
                 "aspect_ratio": aspect_ratio,
+                "conversation_history": conversation_history,  # 发送API请求时带上上下文数据
             }
             if model != "Gemini 2.5 Flash Image":
                 payload["thinking_level"] = thinking_level 
@@ -2789,48 +2794,80 @@ class Gemini3NanoNode:
 
 
 class ContextNode:
-    # 节点显示名称
+    # ========== 关键配置：强制节点执行（解决未运行问题） ==========
+    OUTPUT_NODE = True
+    FORCE_ATTN = True  # 核心属性：强制ComfyUI执行该节点，即使输出未被使用
+    # 节点输入定义（官方文档规范格式）
     @classmethod
     def INPUT_TYPES(cls):
         return {
-            "required": {
-                "conversation_history": ("ANY", {"default": []}),  # 输入类型：ANY（兼容任意数据结构，适配conversation_history数组）
+            "optional": {
+                "conversation_history": ("ANY", {
+                    "default": [],
+                    "description": "接收符合格式的conversation_history数组"  # 补充描述（官方规范）
+                }),
+            },
+            # 可选：添加隐藏输入，不影响使用，但符合官方完整配置
+            "hidden": {
+                "unique_id": "UNIQUE_ID",  # 节点唯一ID（ComfyUI内置）
+                "prompt": "PROMPT"          # 整个prompt数据（可选）
             }
         }
 
-    RETURN_TYPES = ("ANY",)  # 输出类型：ANY（兼容任意数据结构，适配conversation_history数组）
-    RETURN_NAMES = ("conversation_history",)  # 输出端口名称
-    FUNCTION = "save_and_forward"  # 核心执行方法
-    CATEGORY = "自定义节点/对话管理"  # 节点分类（方便在菜单中查找）
-    DESCRIPTION = "接收并保存conversation_history对话历史数组，支持转发给下游节点"
+    # 节点输出定义
+    RETURN_TYPES = ("ANY",)
+    RETURN_NAMES = ("conversation_history",)
+    FUNCTION = "save_and_forward"
+    CATEGORY = "自定义节点/对话管理"
+    DESCRIPTION = "接收并保存conversation_history对话历史数组（强制执行，支持离线保存）"
 
     def __init__(self):
-        """初始化节点实例，用于保存对话历史数据"""
-        self.saved_history = None  # 持久化保存对话历史的属性
+        """初始化：持久化保存对话历史，新增实例ID便于日志排查"""
+        self.saved_history = []  # 初始化为空列表
+        self.node_id = None      # 记录节点唯一ID，方便多实例排查
 
-    def save_and_forward(self, conversation_history):
+    def save_and_forward(self, conversation_history=None, unique_id=None, prompt=None):
         """
-        核心方法：接收并保存对话历史，同时返回供下游节点使用
-        :param conversation_history: 输入的对话历史数组（符合指定结构）
-        :return: 包含对话历史的元组（ComfyUI要求返回元组格式）
+        核心执行方法（强制运行）
+        :param conversation_history: 输入的对话历史（可选）
+        :param unique_id: 节点唯一ID（隐藏参数，ComfyUI自动传入）
+        :param prompt: 整个prompt数据（隐藏参数，可选）
+        :return: 对话历史元组
         """
-        # 1. 验证输入数据格式（可选，增强鲁棒性）
-        if isinstance(conversation_history, list):
-            # 简单校验核心字段（避免非法数据）
-            for item in conversation_history:
-                if not isinstance(item, dict) or "role" not in item or "parts" not in item:
-                    print(f"[警告] 对话历史格式异常：{item}，请检查输入数据结构")
-        else:
-            print(f"[错误] 输入不是数组类型，当前类型：{type(conversation_history)}")
-            return (None,)
-
-        # 2. 保存数据到节点实例（即使无输出连线，数据也会保存在self中）
-        self.saved_history = conversation_history
-        print(f"[成功] 已保存对话历史，共{len(conversation_history)}轮对话")
+        # 记录节点ID，方便多实例日志区分
+        if unique_id:
+            self.node_id = unique_id
         
-        # 3. 返回数据供下游节点使用
-        return (self.saved_history,)
+        # ========== 1. 处理输入数据 ==========
+        log_prefix = f"[对话历史节点-{self.node_id[:8] if self.node_id else '未知'}]"
+        if conversation_history is not None:
+            # 校验并过滤有效数据
+            if isinstance(conversation_history, list):
+                valid_history = []
+                for idx, item in enumerate(conversation_history):
+                    if isinstance(item, dict) and "role" in item and "parts" in item:
+                        valid_history.append(item)
+                    else:
+                        print(f"{log_prefix} 警告：第{idx+1}条对话格式异常，跳过 → {item}")
+                
+                # 更新保存的历史
+                if valid_history:
+                    self.saved_history = valid_history
+                    print(f"{log_prefix} 成功：已保存对话历史，共{len(self.saved_history)}轮")
+                else:
+                    print(f"{log_prefix} 提示：输入为空或全为无效数据，保留原有历史（{len(self.saved_history)}轮）")
+            else:
+                print(f"{log_prefix} 警告：输入不是数组类型 → {type(conversation_history)}，保留原有历史")
+        else:
+            # 无输入时复用已保存数据
+            print(f"{log_prefix} 提示：无新输入，复用已保存的对话历史（{len(self.saved_history)}轮）")
 
+        # ========== 2. 确保返回数据合法性 ==========
+        if not isinstance(self.saved_history, list):
+            self.saved_history = []
+        
+        # ========== 3. 返回数据 ==========
+        return (self.saved_history,)
 
 
 NODE_CLASS_MAPPINGS = {
