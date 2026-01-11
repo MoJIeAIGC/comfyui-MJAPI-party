@@ -2509,23 +2509,27 @@ class GeminiLLMNode:
                 "Image": ("IMAGE",),  # 支持多输入，传递时会转为 base64 列表
                 "video": ("VIDEO",),  # 支持多输入，传递时会转为 base64 列表（拆帧后）
                 "file": ("FILE",),  # 支持多输入，传递时会转为 base64 列表
-                # "context": ("STRING", {"default": "", "multiline": True}),
+                "context": ("ANY",),  # 接收对话历史上下文数据
             }
         }
 
     # 返回字符串文本
-    RETURN_TYPES = ("STRING",)  # 返回一个或多个STRING
-    RETURN_NAMES = ("output",)  # 保持为一个返回名
+    RETURN_TYPES = ("STRING", "ANY")  # 返回一个或多个STRING
+    RETURN_NAMES = ("output", "context")  # 保持为一个返回名
     FUNCTION = "generate"
     CATEGORY = "🎨MJapiparty/ImageCreat"
 
 
-    def generate(self, seed, prompt="", model="Gemini 3 Flash Preview Free", media_resolution="Default", thinking_level="High", System_prompt="", Web_search=True, format=False, Image=None, video=None, file=None):
+    def generate(self, seed, prompt="", model="Gemini 3 Flash Preview Free", media_resolution="Default", thinking_level="High", System_prompt="", Web_search=True, format=False, Image=None, video=None, file=None, context=None):
         # 输入非空校验 - 更严格地检查prompt是否为空
         prompt_stripped = prompt.strip() if prompt else ""
         if not prompt_stripped and not Image and not video and not file:
             return ("错误：至少需要输入文本、图片、视频或文件中的一种",)
-        
+
+        conversation_history = context
+        if conversation_history is None:
+            conversation_history = []
+
         # 参数值校验
         valid_models = ["Gemini 3 Pro Preview", "Gemini 3 Flash Preview", "Gemini 3 Flash Preview Free"]
         valid_resolutions = ["Default", "Low", "Medium", "High"]
@@ -2582,6 +2586,7 @@ class GeminiLLMNode:
         def call_api(seed_override):
             print("=== 准备调用API ===")
             # 构建payload，包含所有参数
+            nonlocal conversation_history  # 允许在内部函数中修改外部变量
             payload = {
                 "model": "gemini-3-llm",
                 "prompt": prompt,
@@ -2592,6 +2597,7 @@ class GeminiLLMNode:
                 "system_prompt": System_prompt,
                 "web_search": Web_search,
                 "format": format,
+                "conversation_history": conversation_history,
             }
             
             # 添加图片输入（如果有）
@@ -2640,6 +2646,7 @@ class GeminiLLMNode:
             result = response.json()
             print(f"API响应结构: {list(result.keys())}")
             restext = result.get("restext", "")
+            conversation_history = result.get("conversation_history", [])  # 提取对话历史
             
             if not restext:
                 print("警告：API响应中restext字段为空")
@@ -2653,7 +2660,7 @@ class GeminiLLMNode:
             # 调用API
             restext = call_api(seed)
             print("=== GeminiLLMNode 执行完成 ===")
-            return (restext,)
+            return (restext, conversation_history)
         except requests.exceptions.RequestException as e:
             print(f"=== API调用失败 ===")
             print(f"错误类型: 请求异常")
@@ -2699,7 +2706,7 @@ class Gemini3NanoNode:
         }
 
     RETURN_TYPES = ("IMAGE", "ANY")  # 返回图片和对话历史（ANY类型兼容conversation_history数组）
-    RETURN_NAMES = ("output", "conversation_history")  # 输出端口名称
+    RETURN_NAMES = ("output", "context")  # 输出端口名称
     FUNCTION = "generate"
     CATEGORY = "🎨MJapiparty/ImageCreat"
 
@@ -2802,9 +2809,9 @@ class ContextNode:
     def INPUT_TYPES(cls):
         return {
             "optional": {
-                "conversation_history": ("ANY", {
+                "context": ("ANY", {
                     "default": [],
-                    "description": "接收符合格式的conversation_history数组"  # 补充描述（官方规范）
+                    "description": "接收符合格式的context数组"  # 补充描述（官方规范）
                 }),
             },
             # 可选：添加隐藏输入，不影响使用，但符合官方完整配置
@@ -2816,7 +2823,7 @@ class ContextNode:
 
     # 节点输出定义
     RETURN_TYPES = ("ANY",)
-    RETURN_NAMES = ("conversation_history",)
+    RETURN_NAMES = ("context",)
     FUNCTION = "save_and_forward"
     CATEGORY = "自定义节点/对话管理"
     DESCRIPTION = "接收并保存conversation_history对话历史数组（强制执行，支持离线保存）"
@@ -2826,10 +2833,10 @@ class ContextNode:
         self.saved_history = []  # 初始化为空列表
         self.node_id = None      # 记录节点唯一ID，方便多实例排查
 
-    def save_and_forward(self, conversation_history=None, unique_id=None, prompt=None):
+    def save_and_forward(self, context=None, unique_id=None, prompt=None):
         """
         核心执行方法（强制运行）
-        :param conversation_history: 输入的对话历史（可选）
+        :param context: 输入的对话历史（可选）
         :param unique_id: 节点唯一ID（隐藏参数，ComfyUI自动传入）
         :param prompt: 整个prompt数据（隐藏参数，可选）
         :return: 对话历史元组
@@ -2837,6 +2844,7 @@ class ContextNode:
         # 记录节点ID，方便多实例日志区分
         if unique_id:
             self.node_id = unique_id
+        conversation_history = context
         
         # ========== 1. 处理输入数据 ==========
         log_prefix = f"[对话历史节点-{self.node_id[:8] if self.node_id else '未知'}]"
@@ -2845,7 +2853,7 @@ class ContextNode:
             if isinstance(conversation_history, list):
                 valid_history = []
                 for idx, item in enumerate(conversation_history):
-                    if isinstance(item, dict) and "role" in item and "parts" in item:
+                    if isinstance(item, dict) and "role" in item and ("parts" in item or "content" in item):
                         valid_history.append(item)
                     else:
                         print(f"{log_prefix} 警告：第{idx+1}条对话格式异常，跳过 → {item}")
