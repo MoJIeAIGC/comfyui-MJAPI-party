@@ -2514,8 +2514,8 @@ class GeminiLLMNode:
         }
 
     # 返回字符串文本
-    RETURN_TYPES = ("STRING",)  # 返回一个或多个STRING
-    RETURN_NAMES = ("output",)  # 保持为一个返回名
+    RETURN_TYPES = ("STRING","ANY")  # 返回一个或多个STRING
+    RETURN_NAMES = ("output","context")  # 保持为一个返回名
     FUNCTION = "generate"
     CATEGORY = "🎨MJapiparty/ImageCreat"
 
@@ -2650,7 +2650,7 @@ class GeminiLLMNode:
             if conversation_history:
                 # print(f"API返回对话历史: {conversation_history}")
                 ImageConverter.conversation_context = conversation_history
-                print("ContextNode 保存对话历史:", ImageConverter.conversation_context)
+                # print("ContextNode 保存对话历史:", ImageConverter.conversation_context)
             
             if not restext:
                 print("警告：API响应中restext字段为空")
@@ -2664,7 +2664,7 @@ class GeminiLLMNode:
             # 调用API
             restext = call_api(seed)
             print("=== GeminiLLMNode 执行完成 ===")
-            return (restext,)
+            return (restext,conversation_history)
         except requests.exceptions.RequestException as e:
             print(f"=== API调用失败 ===")
             print(f"错误类型: 请求异常")
@@ -2709,8 +2709,8 @@ class Gemini3NanoNode:
             }
         }
 
-    RETURN_TYPES = ("IMAGE",)  # 返回图片和对话历史（ANY类型兼容conversation_history数组）
-    RETURN_NAMES = ("output",)  # 输出端口名称
+    RETURN_TYPES = ("IMAGE", "ANY")  # 返回图片和对话历史（ANY类型兼容conversation_history数组）
+    RETURN_NAMES = ("output", "context")  # 输出端口名称
     FUNCTION = "generate"
     CATEGORY = "🎨MJapiparty/ImageCreat"
 
@@ -2781,7 +2781,7 @@ class Gemini3NanoNode:
             if conversation_history:
                 # print(f"API返回对话历史: {conversation_history}")
                 ImageConverter.conversation_context = conversation_history
-                print("ContextNode 保存对话历史:", ImageConverter.conversation_context)
+                # print("ContextNode 保存对话历史:", ImageConverter.conversation_context)
             print(image_urls)
             for image_url in image_urls:
                 if not image_url:
@@ -2804,7 +2804,7 @@ class Gemini3NanoNode:
 
         # 调用API
         call_api(seed)
-        return (torch.cat(output_tensors, dim=0),)
+        return (torch.cat(output_tensors, dim=0),conversation_history)
 
 
 class ContextNode:
