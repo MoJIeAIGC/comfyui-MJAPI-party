@@ -2804,7 +2804,7 @@ class Gemini3NanoNode:
 
         # 调用API
         call_api(seed)
-        return (torch.cat(output_tensors, dim=0))
+        return (torch.cat(output_tensors, dim=0),)
 
 
 class ContextNode:
