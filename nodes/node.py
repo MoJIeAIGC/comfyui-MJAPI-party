@@ -2497,7 +2497,7 @@ class GeminiLLMNode:
             "required": {
                 "prompt": ("STRING", ),
                 # "limit_generations": ("BOOLEAN", {"default": False}),  # 是否是翻译模式
-                "model": (["Gemini 3 Pro Preview", "Gemini 3 Flash Preview", "Gemini 3 Flash Preview Free"], {"default": "Gemini 3 Flash Preview Free"}),  # 值需和后端 MODEL_MAPPING 的 key 完全一致
+                "model": (["Gemini 3 Pro Preview", "Gemini 3 Flash Preview"], {"default": "Gemini 3 Flash Preview"}),  # 值需和后端 MODEL_MAPPING 的 key 完全一致
                 "media_resolution": (["Default","Low","Medium","High"], {"default": "Default"}),  # 值需和后端 RESOLUTION_MAPPING 的 key 完全一致
                 "thinking_level": (["Minimal","Low","Medium","High"], {"default": "High"}),  # 值需和后端 THINKING_LEVEL_MAPPING 的 key 完全一致
                 "System_prompt": ("STRING", {"default": ""}),
@@ -2514,8 +2514,8 @@ class GeminiLLMNode:
         }
 
     # 返回字符串文本
-    RETURN_TYPES = ("STRING", "ANY")  # 返回一个或多个STRING
-    RETURN_NAMES = ("output", "context")  # 保持为一个返回名
+    RETURN_TYPES = ("STRING",)  # 返回一个或多个STRING
+    RETURN_NAMES = ("output",)  # 保持为一个返回名
     FUNCTION = "generate"
     CATEGORY = "🎨MJapiparty/ImageCreat"
 
@@ -2647,6 +2647,10 @@ class GeminiLLMNode:
             print(f"API响应结构: {list(result.keys())}")
             restext = result.get("restext", "")
             conversation_history = result.get("conversation_history", [])  # 提取对话历史
+            if conversation_history:
+                # print(f"API返回对话历史: {conversation_history}")
+                ImageConverter.conversation_context = conversation_history
+                print("ContextNode 保存对话历史:", ImageConverter.conversation_context)
             
             if not restext:
                 print("警告：API响应中restext字段为空")
@@ -2660,7 +2664,7 @@ class GeminiLLMNode:
             # 调用API
             restext = call_api(seed)
             print("=== GeminiLLMNode 执行完成 ===")
-            return (restext, conversation_history)
+            return (restext,)
         except requests.exceptions.RequestException as e:
             print(f"=== API调用失败 ===")
             print(f"错误类型: 请求异常")
@@ -2705,8 +2709,8 @@ class Gemini3NanoNode:
             }
         }
 
-    RETURN_TYPES = ("IMAGE", "ANY")  # 返回图片和对话历史（ANY类型兼容conversation_history数组）
-    RETURN_NAMES = ("output", "context")  # 输出端口名称
+    RETURN_TYPES = ("IMAGE",)  # 返回图片和对话历史（ANY类型兼容conversation_history数组）
+    RETURN_NAMES = ("output",)  # 输出端口名称
     FUNCTION = "generate"
     CATEGORY = "🎨MJapiparty/ImageCreat"
 
@@ -2774,7 +2778,10 @@ class Gemini3NanoNode:
 
             image_urls = image_url.split("|") if image_url else []
             conversation_history = result.get("conversation_history", [])  # 提取对话历史
-
+            if conversation_history:
+                # print(f"API返回对话历史: {conversation_history}")
+                ImageConverter.conversation_context = conversation_history
+                print("ContextNode 保存对话历史:", ImageConverter.conversation_context)
             print(image_urls)
             for image_url in image_urls:
                 if not image_url:
@@ -2797,86 +2804,49 @@ class Gemini3NanoNode:
 
         # 调用API
         call_api(seed)
-        return (torch.cat(output_tensors, dim=0), conversation_history)
+        return (torch.cat(output_tensors, dim=0))
 
 
 class ContextNode:
-    # ========== 关键配置：强制节点执行（解决未运行问题） ==========
-    OUTPUT_NODE = True
-    FORCE_ATTN = True  # 核心属性：强制ComfyUI执行该节点，即使输出未被使用
-    # 节点输入定义（官方文档规范格式）
+    # ========== 核心强制执行配置（缺一不可） ==========
+    OUTPUT_NODE = True       # 标记为输出节点，优先执行
+    FORCE_ATTN = True        # 强制ComfyUI关注该节点，无视输出是否被使用
+    CACHEABLE = False        # 禁用结果缓存，绝不复用旧结果
+    
     @classmethod
     def INPUT_TYPES(cls):
         return {
-            "optional": {
-                "context": ("ANY", {
-                    "default": [],
-                    "description": "接收符合格式的context数组"  # 补充描述（官方规范）
-                }),
+            # ========== 关键：加一个“可变伪输入”（seed），触发节点重新执行 ==========
+            "required": {
+                "seed": ("INT", {"default": -1, "min": 0, "max": 0xffffffffffffffff}),
             },
-            # 可选：添加隐藏输入，不影响使用，但符合官方完整配置
+            # 保留原有隐藏参数
             "hidden": {
-                "unique_id": "UNIQUE_ID",  # 节点唯一ID（ComfyUI内置）
-                "prompt": "PROMPT"          # 整个prompt数据（可选）
+                "unique_id": "UNIQUE_ID",
+                "prompt": "PROMPT"
             }
         }
 
-    # 节点输出定义
     RETURN_TYPES = ("ANY",)
     RETURN_NAMES = ("context",)
-    FUNCTION = "save_and_forward"
-    CATEGORY = "自定义节点/对话管理"
-    DESCRIPTION = "接收并保存conversation_history对话历史数组（强制执行，支持离线保存）"
+    FUNCTION = "read_global_context"
+    CATEGORY = "comfyui-MJAPI-party"
+    DESCRIPTION = "读取全局对话上下文并输出（强制每次执行）"
 
-    def __init__(self):
-        """初始化：持久化保存对话历史，新增实例ID便于日志排查"""
-        self.saved_history = []  # 初始化为空列表
-        self.node_id = None      # 记录节点唯一ID，方便多实例排查
-
-    def save_and_forward(self, context=None, unique_id=None, prompt=None):
-        """
-        核心执行方法（强制运行）
-        :param context: 输入的对话历史（可选）
-        :param unique_id: 节点唯一ID（隐藏参数，ComfyUI自动传入）
-        :param prompt: 整个prompt数据（隐藏参数，可选）
-        :return: 对话历史元组
-        """
-        # 记录节点ID，方便多实例日志区分
-        if unique_id:
-            self.node_id = unique_id
-        conversation_history = context
+    def read_global_context(self, seed, unique_id=None, prompt=None):
+        # 初始化容错：确保ImageConverter有conversation_context属性
+        if not hasattr(ImageConverter, 'conversation_context'):
+            ImageConverter.conversation_context = []
         
-        # ========== 1. 处理输入数据 ==========
-        log_prefix = f"[对话历史节点-{self.node_id[:8] if self.node_id else '未知'}]"
-        if conversation_history is not None:
-            # 校验并过滤有效数据
-            if isinstance(conversation_history, list):
-                valid_history = []
-                for idx, item in enumerate(conversation_history):
-                    if isinstance(item, dict) and "role" in item and ("parts" in item or "content" in item):
-                        valid_history.append(item)
-                    else:
-                        print(f"{log_prefix} 警告：第{idx+1}条对话格式异常，跳过 → {item}")
-                
-                # 更新保存的历史
-                if valid_history:
-                    self.saved_history = valid_history
-                    print(f"{log_prefix} 成功：已保存对话历史，共{len(self.saved_history)}轮")
-                else:
-                    print(f"{log_prefix} 提示：输入为空或全为无效数据，保留原有历史（{len(self.saved_history)}轮）")
-            else:
-                print(f"{log_prefix} 警告：输入不是数组类型 → {type(conversation_history)}，保留原有历史")
-        else:
-            # 无输入时复用已保存数据
-            print(f"{log_prefix} 提示：无新输入，复用已保存的对话历史（{len(self.saved_history)}轮）")
-
-        # ========== 2. 确保返回数据合法性 ==========
-        if not isinstance(self.saved_history, list):
-            self.saved_history = []
+        # 读取最新全局上下文
+        conversation_history = ImageConverter.conversation_context
+        log_prefix = f"[ContextNode-{unique_id[:8] if unique_id else '未知'}]"
+        # 打印日志（验证每次都执行）
+        print(f"{log_prefix} 本次传入Gemini的上下文：{len(conversation_history)}条")
+        print(f"{log_prefix} 本次执行seed：{seed}")  # 验证seed变化触发执行
         
-        # ========== 3. 返回数据 ==========
-        return (self.saved_history,)
-
+        # 确保返回合法列表
+        return (conversation_history if isinstance(conversation_history, list) else [],)
 
 NODE_CLASS_MAPPINGS = {
     "GeminiEditNode": GeminiEditNode,

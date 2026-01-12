@@ -8,6 +8,7 @@ import requests
 import logging
 from comfy_api.input_impl.video_types import VideoFromFile
 class ImageConverter:
+    conversation_context = []
     @staticmethod
     def pil2tensor(image):
         img_array = np.array(image).astype(np.float32) / 255.0  # (H, W, 3)
