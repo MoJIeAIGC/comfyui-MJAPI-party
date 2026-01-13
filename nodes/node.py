@@ -2489,6 +2489,56 @@ class Flux2Node:
         return (torch.cat(api_tensors, dim=0),)
 
 
+# 确保ComfyUI的核心模块能被导入
+import sys
+sys.path.append(os.path.join(os.path.dirname(__file__), "..", ".."))
+from typing import Any, Dict, List
+# ComfyUI核心节点基类（不同版本路径可能略有差异）
+try:
+    from nodes import NODE_CLASS_MAPPINGS, NODE_DISPLAY_NAME_MAPPINGS
+except ImportError:
+    NODE_CLASS_MAPPINGS = {}
+    NODE_DISPLAY_NAME_MAPPINGS = {}
+
+# --------------------------
+# 基础文件加载节点（解决FILE输入问题）
+# --------------------------
+class FileLoaderNode:
+    """文件加载节点：点击弹出系统文件选择框，支持docx/pdf等文件"""
+    @classmethod
+    def INPUT_TYPES(cls) -> Dict[str, Any]:
+        return {
+            "required": {
+                "file_path": ("STRING", {
+                    "default": "",
+                    "multiline": False,
+                    "widget": "file_upload",  # 关键：触发原生文件选择框
+                    "file_types": [".pdf", ".docx", ".doc"],  # 只允许选择这些类型
+                    "placeholder": "点击输入框右侧图标选择文件"
+                }),
+            },
+            "hidden": {
+                "unique_id": "UNIQUE_ID",
+                "extra_pnginfo": "EXTRA_PNGINFO",
+            },
+        }
+
+    RETURN_TYPES = ("FILE",)
+    RETURN_NAMES = ("file",)
+    FUNCTION = "load_file"
+    CATEGORY = "GeminiLLM/File"
+    DISPLAY_NAME = "文件加载器（PDF/Word）"
+
+    def load_file(self, file_path: str) -> tuple:
+        if not os.path.exists(file_path):
+            raise ValueError(f"文件不存在：{file_path}")
+        allowed_extensions = (".docx", ".pdf", ".doc")
+        if not file_path.lower().endswith(allowed_extensions):
+            raise ValueError(f"仅支持以下文件类型：{allowed_extensions}")
+        return (file_path,)
+
+
+
 
 class GeminiLLMNode:
     @classmethod
@@ -2526,8 +2576,9 @@ class GeminiLLMNode:
         if not prompt_stripped and not Image and not video and not file:
             return ("错误：至少需要输入文本、图片、视频或文件中的一种",)
 
-        conversation_history = context
-        if conversation_history is None:
+        if context is not None:
+            conversation_history = context.get("llm", [])
+        else:
             conversation_history = []
 
         # 参数值校验
@@ -2649,7 +2700,7 @@ class GeminiLLMNode:
             conversation_history = result.get("conversation_history", [])  # 提取对话历史
             if conversation_history:
                 # print(f"API返回对话历史: {conversation_history}")
-                ImageConverter.conversation_context = conversation_history
+                ImageConverter.conversation_context["llm"] = conversation_history
                 # print("ContextNode 保存对话历史:", ImageConverter.conversation_context)
             
             if not restext:
@@ -2718,8 +2769,9 @@ class Gemini3NanoNode:
         # 获取配置
         oneapi_url, oneapi_token = config_manager.get_api_config()
         # 如果没有提供对话历史，初始化为空列表
-        conversation_history = context
-        if conversation_history is None:
+        if context is not None:
+            conversation_history = context.get("image", [])
+        else:
             conversation_history = []
         def call_api(seed_override):
             nonlocal conversation_history  # 允许在内部函数中修改外部变量
@@ -2780,7 +2832,7 @@ class Gemini3NanoNode:
             conversation_history = result.get("conversation_history", [])  # 提取对话历史
             if conversation_history:
                 # print(f"API返回对话历史: {conversation_history}")
-                ImageConverter.conversation_context = conversation_history
+                ImageConverter.conversation_context["image"] = conversation_history
                 # print("ContextNode 保存对话历史:", ImageConverter.conversation_context)
             print(image_urls)
             for image_url in image_urls:
@@ -2846,7 +2898,7 @@ class ContextNode:
         print(f"{log_prefix} 本次执行seed：{seed}")  # 验证seed变化触发执行
         
         # 确保返回合法列表
-        return (conversation_history if isinstance(conversation_history, list) else [],)
+        return (conversation_history,)
 
 NODE_CLASS_MAPPINGS = {
     "GeminiEditNode": GeminiEditNode,
@@ -2879,6 +2931,7 @@ NODE_CLASS_MAPPINGS = {
     "DreaminaI2INode": DreaminaI2INode,
     "GeminiLLMNode": GeminiLLMNode,
     "Gemini3NanoNode": Gemini3NanoNode,
+    "FileLoaderNode": FileLoaderNode,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
@@ -2912,4 +2965,5 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "GeminiLLMNode": "Gemini3-LLM",
     "Gemini3NanoNode": "Gemini3-image-Nano",
     "ContextNode": "对话上下文管理",
+    "FileLoaderNode": "文件加载器",
 }

@@ -120,11 +120,114 @@ function handleFurniturePhotoNode(node) {
     console.log('[FurniturePhotoNode] 节点处理完成');
 }
 
+// 文件加载节点的处理函数
+function handleFileLoaderNode(node) {
+    console.log('[FileLoaderNode] 开始处理节点:', node.comfyClass);
+    
+    if (node.comfyClass !== "FileLoaderNode") {
+        console.log('[FileLoaderNode] 节点类型不匹配:', node.comfyClass);
+        return;
+    }
+
+    // 查找file_path输入框
+    const filePathWidget = findWidgetByName(node, "file_path");
+    console.log('[FileLoaderNode] 找到的file_path控件:', filePathWidget ? filePathWidget.name : '未找到');
+
+    if (!filePathWidget) {
+        console.error('[FileLoaderNode] 找不到file_path输入框');
+        return;
+    }
+
+    // 检查是否已经创建了上传按钮
+    if (filePathWidget.uploadButton) {
+        console.log('[FileLoaderNode] 上传按钮已存在');
+        return;
+    }
+
+    // 创建文件输入元素（隐藏）
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.accept = '.pdf,.docx,.doc';
+    fileInput.style.display = 'none';
+    
+    // 处理文件选择事件
+    fileInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            console.log('[FileLoaderNode] 选择了文件:', file.name);
+            // 设置文件路径到输入框
+            filePathWidget.value = file.path;
+            
+            // 触发输入框的更新事件
+            if (filePathWidget.callback) {
+                filePathWidget.callback(filePathWidget.value);
+            }
+            
+            // 刷新节点UI
+            if (node.onResize) {
+                node.onResize();
+            }
+        }
+    });
+    
+    // 添加到文档中
+    document.body.appendChild(fileInput);
+    
+    // 创建上传按钮
+    const uploadButton = document.createElement('button');
+    uploadButton.className = 'comfy-btn';
+    uploadButton.innerText = '上传文件';
+    uploadButton.style.marginLeft = '8px';
+    uploadButton.style.padding = '4px 8px';
+    uploadButton.style.fontSize = '12px';
+    
+    // 点击按钮触发文件选择
+    uploadButton.addEventListener('click', () => {
+        console.log('[FileLoaderNode] 点击上传按钮');
+        fileInput.click();
+    });
+    
+    // 将按钮添加到节点界面
+    // 等待节点渲染完成后添加按钮
+    setTimeout(() => {
+        try {
+            // 查找输入框元素
+            const widgetElement = document.querySelector(`#node-${node.id} .comfy-widget.string`);
+            if (widgetElement) {
+                // 创建容器
+                const container = document.createElement('div');
+                container.style.display = 'flex';
+                container.style.alignItems = 'center';
+                container.style.gap = '8px';
+                
+                // 将现有的输入框移到容器中
+                const inputElement = widgetElement.querySelector('input');
+                if (inputElement) {
+                    container.appendChild(inputElement);
+                    container.appendChild(uploadButton);
+                    widgetElement.appendChild(container);
+                    
+                    // 保存按钮引用
+                    filePathWidget.uploadButton = uploadButton;
+                    filePathWidget.fileInput = fileInput;
+                    
+                    console.log('[FileLoaderNode] 上传按钮添加成功');
+                }
+            }
+        } catch (e) {
+            console.error('[FileLoaderNode] 添加按钮失败:', e);
+        }
+    }, 100);
+
+    console.log('[FileLoaderNode] 节点处理完成');
+}
+
 app.registerExtension({
     name: "ComfyUI.Mjapi",
     nodeCreated(node) {
-        console.log('[FurniturePhotoNode] 检测到节点创建:', node.comfyClass);
+        console.log('[节点创建] 检测到节点创建:', node.comfyClass);
         handleFurniturePhotoNode(node);
+        handleFileLoaderNode(node);
     },
     async setup() {
 

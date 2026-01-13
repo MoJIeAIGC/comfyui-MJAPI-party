@@ -8,7 +8,10 @@ import requests
 import logging
 from comfy_api.input_impl.video_types import VideoFromFile
 class ImageConverter:
-    conversation_context = []
+    conversation_context = {
+        "llm": [],
+        "image": [],
+    }
     @staticmethod
     def pil2tensor(image):
         img_array = np.array(image).astype(np.float32) / 255.0  # (H, W, 3)
@@ -496,7 +499,7 @@ class ImageConverter:
                 continue
         
         print(f"所有视频处理完成，共生成 {len(all_video_base64)} 个完整视频Base64")
-        return all_video_base64  # 返回完整视频Base64列表
+        return all_video_base64 if all_video_base64 else []  # 返回完整视频Base64列表，确保不为空
 
     @staticmethod
     def download_video(video_url: str, save_path: str = "temp_video.mp4") -> str:
@@ -532,12 +535,13 @@ class ImageConverter:
     @staticmethod
     def files_to_base64_list(file_list):
         """
-        将文件列表转换为 base64 字符串列表
+        将文件列表转换为 base64 字符串列表，包含文件类型信息
         :param file_list: 文件对象列表
-        :return: base64 字符串列表
+        :return: base64 字符串列表（包含文件类型前缀）
         """
         import base64
         import os
+        import mimetypes
         
         file_base64_list = []
         
@@ -558,17 +562,25 @@ class ImageConverter:
                     print(f"文件不存在: {file_path}")
                     continue
                 
+                # 获取文件的 MIME 类型
+                mime_type, _ = mimetypes.guess_type(file_path)
+                if not mime_type:
+                    # 如果无法猜测 MIME 类型，使用默认值
+                    mime_type = "application/octet-stream"
+                
                 # 读取文件内容
                 with open(file_path, "rb") as f:
                     file_content = f.read()
                 
-                # 转换为 base64
+                # 转换为 base64 并添加文件类型前缀
                 file_base64 = base64.b64encode(file_content).decode("utf-8")
-                file_base64_list.append(file_base64)
+                # 格式：data:{mime_type};base64,{base64_content}
+                file_base64_with_prefix = f"data:{mime_type};base64,{file_base64}"
+                file_base64_list.append(file_base64_with_prefix)
             except Exception as e:
                 print(f"文件处理错误 {file_path}: {str(e)}")
         
-        return file_base64_list if file_base64_list else None
+        return file_base64_list if file_base64_list else []
 
     @staticmethod
     def get_right_part_of_image(img):
