@@ -2512,15 +2512,10 @@ class FileLoaderNode:
                 "file_path": ("STRING", {
                     "default": "",
                     "multiline": False,
-                    "widget": "file_upload",  # 关键：触发原生文件选择框
-                    "file_types": [".pdf", ".docx", ".doc"],  # 只允许选择这些类型
-                    "placeholder": "点击输入框右侧图标选择文件"
+                    "widget": "string",  # 使用标准string widget，配合JavaScript添加上传按钮
+                    "placeholder": "文件路径或点击上传按钮选择文件"
                 }),
-            },
-            "hidden": {
-                "unique_id": "UNIQUE_ID",
-                "extra_pnginfo": "EXTRA_PNGINFO",
-            },
+            }
         }
 
     RETURN_TYPES = ("FILE",)

@@ -187,37 +187,120 @@ function handleFileLoaderNode(node) {
         fileInput.click();
     });
     
-    // 将按钮添加到节点界面
-    // 等待节点渲染完成后添加按钮
-    setTimeout(() => {
-        try {
-            // 查找输入框元素
-            const widgetElement = document.querySelector(`#node-${node.id} .comfy-widget.string`);
-            if (widgetElement) {
-                // 创建容器
-                const container = document.createElement('div');
-                container.style.display = 'flex';
-                container.style.alignItems = 'center';
-                container.style.gap = '8px';
+    // 将按钮添加到节点界面 - 使用更可靠的DOM查找策略
+    function findNodeElement() {
+        let nodeElement = null;
+        const nodeId = node.id;
+        
+        // 尝试多种选择器策略
+        const selectors = [
+            `#node-${nodeId}`,  // 原选择器
+            `[data-node-id="${nodeId}"]`,  // 数据属性选择器
+            `[id*="node-${nodeId}"]`,  // 包含节点ID的选择器
+            `.node[data-id="${nodeId}"]`  // 节点类+数据ID
+        ];
+        
+        for (const selector of selectors) {
+            nodeElement = document.querySelector(selector);
+            if (nodeElement) {
+                console.log(`[FileLoaderNode] 使用选择器 "${selector}" 找到节点DOM`);
+                break;
+            }
+        }
+        
+        // 如果还是没找到，尝试查找所有节点元素
+        if (!nodeElement) {
+            console.log('[FileLoaderNode] 尝试查找所有节点元素...');
+            const allNodes = document.querySelectorAll('.node, [class*="node-"]');
+            console.log(`[FileLoaderNode] 找到 ${allNodes.length} 个潜在的节点元素`);
+            
+            for (const element of allNodes) {
+                const idAttr = element.id;
+                const dataIdAttr = element.dataset.nodeId || element.dataset.id;
                 
-                // 将现有的输入框移到容器中
-                const inputElement = widgetElement.querySelector('input');
-                if (inputElement) {
-                    container.appendChild(inputElement);
-                    container.appendChild(uploadButton);
-                    widgetElement.appendChild(container);
-                    
-                    // 保存按钮引用
-                    filePathWidget.uploadButton = uploadButton;
-                    filePathWidget.fileInput = fileInput;
-                    
-                    console.log('[FileLoaderNode] 上传按钮添加成功');
+                if (idAttr && idAttr.includes(nodeId.toString())) {
+                    nodeElement = element;
+                    console.log(`[FileLoaderNode] 通过ID包含找到节点DOM: ${idAttr}`);
+                    break;
+                } else if (dataIdAttr && dataIdAttr == nodeId.toString()) {
+                    nodeElement = element;
+                    console.log(`[FileLoaderNode] 通过数据属性找到节点DOM: data-id="${dataIdAttr}"`);
+                    break;
                 }
             }
-        } catch (e) {
-            console.error('[FileLoaderNode] 添加按钮失败:', e);
         }
-    }, 100);
+        
+        return nodeElement;
+    }
+    
+    // 等待节点DOM出现并添加按钮
+    function waitForNodeDOM() {
+        const nodeElement = findNodeElement();
+        
+        if (nodeElement) {
+            console.log('[FileLoaderNode] 找到节点DOM，开始添加按钮');
+            
+            try {
+                // 查找string widget容器
+                const stringWidgets = nodeElement.querySelectorAll('.comfy-widget.string');
+                if (stringWidgets.length > 0) {
+                    // 找到第一个string widget（应该是file_path）
+                    const widgetContainer = stringWidgets[0];
+                    console.log('[FileLoaderNode] 找到string widget容器');
+                    
+                    // 查找输入框
+                    const inputElement = widgetContainer.querySelector('input[type="text"], input.comfy-input');
+                    if (inputElement) {
+                        console.log('[FileLoaderNode] 找到输入框，在其旁边添加按钮');
+                        widgetContainer.appendChild(uploadButton);
+                        filePathWidget.uploadButton = uploadButton;
+                        filePathWidget.fileInput = fileInput;
+                        console.log('[FileLoaderNode] 上传按钮添加成功');
+                        return;
+                    }
+                }
+                
+                // 备用方案：查找所有输入框
+                const allInputs = nodeElement.querySelectorAll('input[type="text"], input.comfy-input');
+                if (allInputs.length > 0) {
+                    console.log('[FileLoaderNode] 找到输入框，在其旁边添加按钮');
+                    const inputElement = allInputs[0];
+                    inputElement.parentElement.appendChild(uploadButton);
+                    filePathWidget.uploadButton = uploadButton;
+                    filePathWidget.fileInput = fileInput;
+                    console.log('[FileLoaderNode] 上传按钮添加成功');
+                    return;
+                }
+                
+                // 最终方案：在节点的任何位置添加按钮
+                console.log('[FileLoaderNode] 在节点中添加按钮');
+                nodeElement.appendChild(uploadButton);
+                filePathWidget.uploadButton = uploadButton;
+                filePathWidget.fileInput = fileInput;
+                console.log('[FileLoaderNode] 上传按钮添加成功');
+                
+            } catch (e) {
+                console.error('[FileLoaderNode] 添加按钮失败:', e);
+                console.error('[FileLoaderNode] 错误栈:', e.stack);
+            }
+        } else {
+            // 如果没找到，继续等待（最多尝试15次，每次间隔300ms）
+            if (!waitForNodeDOM.attempts) waitForNodeDOM.attempts = 0;
+            waitForNodeDOM.attempts++;
+            
+            if (waitForNodeDOM.attempts <= 15) {
+                console.log(`[FileLoaderNode] 等待节点DOM出现 (尝试 ${waitForNodeDOM.attempts}/15)`);
+                setTimeout(waitForNodeDOM, 300);
+            } else {
+                console.error('[FileLoaderNode] 超时：无法找到节点DOM元素');
+                console.error('[FileLoaderNode] 节点ID:', node.id);
+                console.error('[FileLoaderNode] 尝试的选择器:', `#node-${node.id}, [data-node-id="${node.id}"], [id*="node-${node.id}"]`);
+            }
+        }
+    }
+    
+    // 开始等待节点DOM出现
+    waitForNodeDOM();
 
     console.log('[FileLoaderNode] 节点处理完成');
 }
