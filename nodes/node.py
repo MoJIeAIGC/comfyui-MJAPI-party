@@ -2742,8 +2742,9 @@ class Gemini3NanoNode:
     def INPUT_TYPES(cls):
         return {
             "required": {
-                "prompt": ("STRING", {"default": "A beautiful sunset", "multiline": True}),
+                "prompt": ("STRING", ),
                 "model": (["Gemini 2.5 Flash Image", "Gemini-3-pro-image-preview"], {"default": "Gemini 2.5 Flash Image"}),  # 值需和后端 MODEL_MAPPING 的 key 完全一致
+                "media_resolution": (["Default","Low","Medium","High"], {"default": "Default"}),  # 值需和后端 RESOLUTION_MAPPING 的 key 完全一致
                 "thinking_level": (["minimal","low","medium","high"], {"default": "high"}),  # 值需和后端 THINKING_LEVEL_MAPPING 的 key 完全一致
                 "safe_level": (["high","medium","low"], {"default": "medium"}),  # 值需和后端 THINKING_LEVEL_MAPPING 的 key 完全一致
                 "resolution": (["1K", "2K", "4K"], {"default": "1K"}),
@@ -2763,7 +2764,7 @@ class Gemini3NanoNode:
     FUNCTION = "generate"
     CATEGORY = "🎨MJapiparty/ImageCreat"
 
-    def generate(self, seed, input_images=None, resolution="1K", aspect_ratio="1:1",  prompt="", safe_level="medium", thinking_level="High", System_prompt="", Web_search=True, model="Gemini 2.5 Flash Image", context=None):
+    def generate(self, seed, input_images=None, resolution="1K", aspect_ratio="1:1",  prompt="", safe_level="medium", thinking_level="High", System_prompt="", Web_search=True, model="Gemini 2.5 Flash Image", context=None, media_resolution="Default"):
         # 获取配置
         oneapi_url, oneapi_token = config_manager.get_api_config()
         # 如果没有提供对话历史，初始化为空列表
@@ -2777,6 +2778,7 @@ class Gemini3NanoNode:
                 "model": "Gemini3_Nano",
                 "modelr": model,
                 "resolution": resolution,
+                "media_resolution": media_resolution,
                 "prompt": prompt,
                 "seed": seed_override,
                 "safe_level": safe_level,
