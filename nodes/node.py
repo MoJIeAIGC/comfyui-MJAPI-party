@@ -2696,6 +2696,9 @@ class GeminiLLMNode:
             if conversation_history:
                 # print(f"API返回对话历史: {conversation_history}")
                 ImageConverter.conversation_context["llm"] = conversation_history
+                conversation_history = {
+                    "llm": conversation_history
+                }
                 # print("ContextNode 保存对话历史:", ImageConverter.conversation_context)
             
             if not restext:
@@ -2828,6 +2831,9 @@ class Gemini3NanoNode:
             if conversation_history:
                 # print(f"API返回对话历史: {conversation_history}")
                 ImageConverter.conversation_context["image"] = conversation_history
+                conversation_history = {
+                    "image": conversation_history
+                }
                 # print("ContextNode 保存对话历史:", ImageConverter.conversation_context)
             print(image_urls)
             for image_url in image_urls:
@@ -2865,7 +2871,7 @@ class ContextNode:
         return {
             # ========== 关键：加一个“可变伪输入”（seed），触发节点重新执行 ==========
             "required": {
-                "seed": ("INT", {"default": -1, "min": 0, "max": 0xffffffffffffffff}),
+                "seed": ("INT", {"default": 1, "min": 1, "max": 0xffffffffffffffff}),
             },
             # 保留原有隐藏参数
             "hidden": {
