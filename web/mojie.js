@@ -15,16 +15,6 @@ function handleFurniturePhotoNode(node) {
         return;
     }
 
-    // 定义默认的家具类型对应的风格列表
-    const parentname_dict = {
-        '主卧床': ['中古风', '浅灰现代风', '法式奶油风'],
-        ' 客厅大沙发': ['中古风', '浅灰现代风', '法式奶油风', '宋氏美学'],
-        '餐桌': ['中古风', '浅灰现代风', '法式奶油风'],
-        '斗柜': ['中古风', '宋氏美学']
-    };
-    
-    console.log('[FurniturePhotoNode] 使用的风格数据:', parentname_dict);
-
     // 查找控件
     const furnitureTypesWidget = findWidgetByName(node, "furniture_types");
     const styleTypeWidget = findWidgetByName(node, "style_type");
@@ -38,6 +28,36 @@ function handleFurniturePhotoNode(node) {
         console.error('[FurniturePhotoNode] 找不到必要的控件');
         return;
     }
+
+    // 从API获取家具风格数据
+    let parentname_dict = {};
+    
+    // 获取家具风格数据的函数
+    const fetchFurnitureStyles = async () => {
+        try {
+            console.log('[FurniturePhotoNode] 开始从API获取家具风格数据');
+            const response = await fetch('/my_node/get_furniture_styles');
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const data = await response.json();
+            console.log('[FurniturePhotoNode] API返回的家具风格数据:', data);
+            
+            return data;
+        } catch (error) {
+            console.error('[FurniturePhotoNode] 获取家具风格数据失败:', error);
+            // 如果API调用失败，使用默认数据
+            return {
+                furniture_types: ['主卧床', '客厅大沙发', '餐桌', '斗柜'],
+                style_dict: {
+                    '主卧床': ['中古风', '浅灰现代风', '法式奶油风'],
+                    '客厅大沙发': ['中古风', '浅灰现代风', '法式奶油风', '宋氏美学'],
+                    '餐桌': ['中古风', '浅灰现代风', '法式奶油风'],
+                    '斗柜': ['中古风', '宋氏美学']
+                }
+            };
+        }
+    };
 
     // 更新style_type选项的函数
     const updateStyleOptions = () => {
@@ -80,44 +100,63 @@ function handleFurniturePhotoNode(node) {
         }
     };
 
-    // 初始化时更新一次
-    console.log('[FurniturePhotoNode] 初始化更新风格选项');
-    updateStyleOptions();
-
-    // 为家具类型控件添加值变化监听
-    console.log('[FurniturePhotoNode] 为家具类型控件添加值变化监听');
-    
-    // 保存原始的value setter
-    const originalDescriptor = Object.getOwnPropertyDescriptor(furnitureTypesWidget, 'value') || 
-        Object.getOwnPropertyDescriptor(Object.getPrototypeOf(furnitureTypesWidget), 'value');
-
-    if (!originalDescriptor) {
-        console.log('[FurniturePhotoNode] 未找到原始的value描述符，使用直接赋值方式');
-    }
-
-    let widgetValue = furnitureTypesWidget.value;
-
-    // 重写value属性，添加监听
-    Object.defineProperty(furnitureTypesWidget, 'value', {
-        get() {
-            const value = originalDescriptor && originalDescriptor.get 
-                ? originalDescriptor.get.call(furnitureTypesWidget) 
-                : widgetValue;
-            return value;
-        },
-        set(newVal) {
-            console.log('[FurniturePhotoNode] 家具类型值变化:', newVal);
-            if (originalDescriptor && originalDescriptor.set) {
-                originalDescriptor.set.call(furnitureTypesWidget, newVal);
-            } else {
-                widgetValue = newVal;
-            }
-            // 更新风格选项
-            updateStyleOptions();
+    // 初始化函数
+    const init = async () => {
+        // 获取家具风格数据
+        const styleData = await fetchFurnitureStyles();
+        parentname_dict = styleData.style_dict;
+        
+        // 如果家具类型控件的选项是空的，使用API返回的数据
+        if (!furnitureTypesWidget.options || furnitureTypesWidget.options.values.length === 0) {
+            console.log('[FurniturePhotoNode] 家具类型控件选项为空，使用API返回的数据');
+            furnitureTypesWidget.options = {
+                values: styleData.furniture_types,
+                labels: styleData.furniture_types
+            };
         }
-    });
+        
+        // 初始化时更新一次风格选项
+        console.log('[FurniturePhotoNode] 初始化更新风格选项');
+        updateStyleOptions();
+        
+        // 为家具类型控件添加值变化监听
+        console.log('[FurniturePhotoNode] 为家具类型控件添加值变化监听');
+        
+        // 保存原始的value setter
+        const originalDescriptor = Object.getOwnPropertyDescriptor(furnitureTypesWidget, 'value') || 
+            Object.getOwnPropertyDescriptor(Object.getPrototypeOf(furnitureTypesWidget), 'value');
 
-    console.log('[FurniturePhotoNode] 节点处理完成');
+        if (!originalDescriptor) {
+            console.log('[FurniturePhotoNode] 未找到原始的value描述符，使用直接赋值方式');
+        }
+
+        let widgetValue = furnitureTypesWidget.value;
+
+        // 重写value属性，添加监听
+        Object.defineProperty(furnitureTypesWidget, 'value', {
+            get() {
+                const value = originalDescriptor && originalDescriptor.get 
+                    ? originalDescriptor.get.call(furnitureTypesWidget) 
+                    : widgetValue;
+                return value;
+            },
+            set(newVal) {
+                console.log('[FurniturePhotoNode] 家具类型值变化:', newVal);
+                if (originalDescriptor && originalDescriptor.set) {
+                    originalDescriptor.set.call(furnitureTypesWidget, newVal);
+                } else {
+                    widgetValue = newVal;
+                }
+                // 更新风格选项
+                updateStyleOptions();
+            }
+        });
+
+        console.log('[FurniturePhotoNode] 节点处理完成');
+    };
+    
+    // 调用初始化函数
+    init();
 }
 
 // 文件加载节点的处理函数
