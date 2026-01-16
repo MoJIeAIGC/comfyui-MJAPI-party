@@ -2521,7 +2521,7 @@ class FileLoaderNode:
     RETURN_TYPES = ("FILE",)
     RETURN_NAMES = ("file",)
     FUNCTION = "load_file"
-    CATEGORY = "GeminiLLM/File"
+    CATEGORY = "🎨MJapiparty/LLM"
     DISPLAY_NAME = "文件加载器（PDF/Word）"
 
     def load_file(self, file_path: str) -> tuple:
@@ -2562,7 +2562,7 @@ class GeminiLLMNode:
     RETURN_TYPES = ("STRING","ANY")  # 返回一个或多个STRING
     RETURN_NAMES = ("output","context")  # 保持为一个返回名
     FUNCTION = "generate"
-    CATEGORY = "🎨MJapiparty/ImageCreat"
+    CATEGORY = "🎨MJapiparty/LLM"
 
 
     def generate(self, seed, prompt="", model="Gemini 3 Flash Preview Free", media_resolution="Default", thinking_level="High", System_prompt="", Web_search=True, format=False, Image=None, video=None, file=None, context=None):
@@ -2762,7 +2762,7 @@ class Gemini3NanoNode:
     RETURN_TYPES = ("IMAGE", "ANY")  # 返回图片和对话历史（ANY类型兼容conversation_history数组）
     RETURN_NAMES = ("output", "context")  # 输出端口名称
     FUNCTION = "generate"
-    CATEGORY = "🎨MJapiparty/ImageCreat"
+    CATEGORY = "🎨MJapiparty/LLM"
 
     def generate(self, seed, input_images=None, resolution="1K", aspect_ratio="1:1",  prompt="", safe_level="medium", thinking_level="High", System_prompt="", Web_search=True, model="Gemini 2.5 Flash Image", context=None, media_resolution="Default"):
         # 获取配置
@@ -2885,7 +2885,7 @@ class ContextNode:
     RETURN_TYPES = ("ANY",)
     RETURN_NAMES = ("context",)
     FUNCTION = "read_global_context"
-    CATEGORY = "comfyui-MJAPI-party"
+    CATEGORY = "🎨MJapiparty/LLM"
     DESCRIPTION = "读取全局对话上下文并输出（强制每次执行）"
 
     def read_global_context(self, seed, unique_id=None, prompt=None):
