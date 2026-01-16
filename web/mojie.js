@@ -15,16 +15,6 @@ function handleFurniturePhotoNode(node) {
         return;
     }
 
-    // 定义默认的家具类型对应的风格列表
-    const parentname_dict = {
-        '主卧床': ['中古风', '浅灰现代风', '法式奶油风'],
-        ' 客厅大沙发': ['中古风', '浅灰现代风', '法式奶油风', '宋氏美学'],
-        '餐桌': ['中古风', '浅灰现代风', '法式奶油风'],
-        '斗柜': ['中古风', '宋氏美学']
-    };
-    
-    console.log('[FurniturePhotoNode] 使用的风格数据:', parentname_dict);
-
     // 查找控件
     const furnitureTypesWidget = findWidgetByName(node, "furniture_types");
     const styleTypeWidget = findWidgetByName(node, "style_type");
@@ -38,6 +28,36 @@ function handleFurniturePhotoNode(node) {
         console.error('[FurniturePhotoNode] 找不到必要的控件');
         return;
     }
+
+    // 从API获取家具风格数据
+    let parentname_dict = {};
+    
+    // 获取家具风格数据的函数
+    const fetchFurnitureStyles = async () => {
+        try {
+            console.log('[FurniturePhotoNode] 开始从API获取家具风格数据');
+            const response = await fetch('/my_node/get_furniture_styles');
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const data = await response.json();
+            console.log('[FurniturePhotoNode] API返回的家具风格数据:', data);
+            
+            return data;
+        } catch (error) {
+            console.error('[FurniturePhotoNode] 获取家具风格数据失败:', error);
+            // 如果API调用失败，使用默认数据
+            return {
+                furniture_types: ['主卧床', '客厅大沙发', '餐桌', '斗柜'],
+                style_dict: {
+                    '主卧床': ['中古风', '浅灰现代风', '法式奶油风'],
+                    '客厅大沙发': ['中古风', '浅灰现代风', '法式奶油风', '宋氏美学'],
+                    '餐桌': ['中古风', '浅灰现代风', '法式奶油风'],
+                    '斗柜': ['中古风', '宋氏美学']
+                }
+            };
+        }
+    };
 
     // 更新style_type选项的函数
     const updateStyleOptions = () => {
@@ -80,51 +100,256 @@ function handleFurniturePhotoNode(node) {
         }
     };
 
-    // 初始化时更新一次
-    console.log('[FurniturePhotoNode] 初始化更新风格选项');
-    updateStyleOptions();
+    // 初始化函数
+    const init = async () => {
+        // 获取家具风格数据
+        const styleData = await fetchFurnitureStyles();
+        parentname_dict = styleData.style_dict;
+        
+        // 如果家具类型控件的选项是空的，使用API返回的数据
+        if (!furnitureTypesWidget.options || furnitureTypesWidget.options.values.length === 0) {
+            console.log('[FurniturePhotoNode] 家具类型控件选项为空，使用API返回的数据');
+            furnitureTypesWidget.options = {
+                values: styleData.furniture_types,
+                labels: styleData.furniture_types
+            };
+        }
+        
+        // 初始化时更新一次风格选项
+        console.log('[FurniturePhotoNode] 初始化更新风格选项');
+        updateStyleOptions();
+        
+        // 为家具类型控件添加值变化监听
+        console.log('[FurniturePhotoNode] 为家具类型控件添加值变化监听');
+        
+        // 保存原始的value setter
+        const originalDescriptor = Object.getOwnPropertyDescriptor(furnitureTypesWidget, 'value') || 
+            Object.getOwnPropertyDescriptor(Object.getPrototypeOf(furnitureTypesWidget), 'value');
 
-    // 为家具类型控件添加值变化监听
-    console.log('[FurniturePhotoNode] 为家具类型控件添加值变化监听');
+        if (!originalDescriptor) {
+            console.log('[FurniturePhotoNode] 未找到原始的value描述符，使用直接赋值方式');
+        }
+
+        let widgetValue = furnitureTypesWidget.value;
+
+        // 重写value属性，添加监听
+        Object.defineProperty(furnitureTypesWidget, 'value', {
+            get() {
+                const value = originalDescriptor && originalDescriptor.get 
+                    ? originalDescriptor.get.call(furnitureTypesWidget) 
+                    : widgetValue;
+                return value;
+            },
+            set(newVal) {
+                console.log('[FurniturePhotoNode] 家具类型值变化:', newVal);
+                if (originalDescriptor && originalDescriptor.set) {
+                    originalDescriptor.set.call(furnitureTypesWidget, newVal);
+                } else {
+                    widgetValue = newVal;
+                }
+                // 更新风格选项
+                updateStyleOptions();
+            }
+        });
+
+        console.log('[FurniturePhotoNode] 节点处理完成');
+    };
     
-    // 保存原始的value setter
-    const originalDescriptor = Object.getOwnPropertyDescriptor(furnitureTypesWidget, 'value') || 
-        Object.getOwnPropertyDescriptor(Object.getPrototypeOf(furnitureTypesWidget), 'value');
+    // 调用初始化函数
+    init();
+}
 
-    if (!originalDescriptor) {
-        console.log('[FurniturePhotoNode] 未找到原始的value描述符，使用直接赋值方式');
+// 文件加载节点的处理函数
+function handleFileLoaderNode(node) {
+    console.log('[FileLoaderNode] 开始处理节点:', node.comfyClass);
+    
+    if (node.comfyClass !== "FileLoaderNode") {
+        console.log('[FileLoaderNode] 节点类型不匹配:', node.comfyClass);
+        return;
     }
 
-    let widgetValue = furnitureTypesWidget.value;
+    // 查找file_path输入框
+    const filePathWidget = findWidgetByName(node, "file_path");
+    console.log('[FileLoaderNode] 找到的file_path控件:', filePathWidget ? filePathWidget.name : '未找到');
 
-    // 重写value属性，添加监听
-    Object.defineProperty(furnitureTypesWidget, 'value', {
-        get() {
-            const value = originalDescriptor && originalDescriptor.get 
-                ? originalDescriptor.get.call(furnitureTypesWidget) 
-                : widgetValue;
-            return value;
-        },
-        set(newVal) {
-            console.log('[FurniturePhotoNode] 家具类型值变化:', newVal);
-            if (originalDescriptor && originalDescriptor.set) {
-                originalDescriptor.set.call(furnitureTypesWidget, newVal);
-            } else {
-                widgetValue = newVal;
+    if (!filePathWidget) {
+        console.error('[FileLoaderNode] 找不到file_path输入框');
+        return;
+    }
+
+    // 检查是否已经创建了上传按钮
+    if (filePathWidget.uploadButton) {
+        console.log('[FileLoaderNode] 上传按钮已存在');
+        return;
+    }
+
+    // 创建文件输入元素（隐藏）
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.accept = '.pdf,.docx,.doc';
+    fileInput.style.display = 'none';
+    
+    // 处理文件选择事件
+    fileInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            console.log('[FileLoaderNode] 选择了文件:', file.name);
+            // 设置文件路径到输入框
+            filePathWidget.value = file.path;
+            
+            // 触发输入框的更新事件
+            if (filePathWidget.callback) {
+                filePathWidget.callback(filePathWidget.value);
             }
-            // 更新风格选项
-            updateStyleOptions();
+            
+            // 刷新节点UI
+            if (node.onResize) {
+                node.onResize();
+            }
         }
     });
+    
+    // 添加到文档中
+    document.body.appendChild(fileInput);
+    
+    // 创建上传按钮
+    const uploadButton = document.createElement('button');
+    uploadButton.className = 'comfy-btn';
+    uploadButton.innerText = '上传文件';
+    uploadButton.style.marginLeft = '8px';
+    uploadButton.style.padding = '4px 8px';
+    uploadButton.style.fontSize = '12px';
+    
+    // 点击按钮触发文件选择
+    uploadButton.addEventListener('click', () => {
+        console.log('[FileLoaderNode] 点击上传按钮');
+        fileInput.click();
+    });
+    
+    // 将按钮添加到节点界面 - 使用更可靠的DOM查找策略
+    function findNodeElement() {
+        let nodeElement = null;
+        const nodeId = node.id;
+        
+        // 尝试多种选择器策略
+        const selectors = [
+            `#node-${nodeId}`,  // 原选择器
+            `[data-node-id="${nodeId}"]`,  // 数据属性选择器
+            `[id*="node-${nodeId}"]`,  // 包含节点ID的选择器
+            `.node[data-id="${nodeId}"]`  // 节点类+数据ID
+        ];
+        
+        for (const selector of selectors) {
+            nodeElement = document.querySelector(selector);
+            if (nodeElement) {
+                console.log(`[FileLoaderNode] 使用选择器 "${selector}" 找到节点DOM`);
+                break;
+            }
+        }
+        
+        // 如果还是没找到，尝试查找所有节点元素
+        if (!nodeElement) {
+            console.log('[FileLoaderNode] 尝试查找所有节点元素...');
+            const allNodes = document.querySelectorAll('.node, [class*="node-"]');
+            console.log(`[FileLoaderNode] 找到 ${allNodes.length} 个潜在的节点元素`);
+            
+            for (const element of allNodes) {
+                const idAttr = element.id;
+                const dataIdAttr = element.dataset.nodeId || element.dataset.id;
+                
+                if (idAttr && idAttr.includes(nodeId.toString())) {
+                    nodeElement = element;
+                    console.log(`[FileLoaderNode] 通过ID包含找到节点DOM: ${idAttr}`);
+                    break;
+                } else if (dataIdAttr && dataIdAttr == nodeId.toString()) {
+                    nodeElement = element;
+                    console.log(`[FileLoaderNode] 通过数据属性找到节点DOM: data-id="${dataIdAttr}"`);
+                    break;
+                }
+            }
+        }
+        
+        return nodeElement;
+    }
+    
+    // 等待节点DOM出现并添加按钮
+    function waitForNodeDOM() {
+        const nodeElement = findNodeElement();
+        
+        if (nodeElement) {
+            console.log('[FileLoaderNode] 找到节点DOM，开始添加按钮');
+            
+            try {
+                // 查找string widget容器
+                const stringWidgets = nodeElement.querySelectorAll('.comfy-widget.string');
+                if (stringWidgets.length > 0) {
+                    // 找到第一个string widget（应该是file_path）
+                    const widgetContainer = stringWidgets[0];
+                    console.log('[FileLoaderNode] 找到string widget容器');
+                    
+                    // 查找输入框
+                    const inputElement = widgetContainer.querySelector('input[type="text"], input.comfy-input');
+                    if (inputElement) {
+                        console.log('[FileLoaderNode] 找到输入框，在其旁边添加按钮');
+                        widgetContainer.appendChild(uploadButton);
+                        filePathWidget.uploadButton = uploadButton;
+                        filePathWidget.fileInput = fileInput;
+                        console.log('[FileLoaderNode] 上传按钮添加成功');
+                        return;
+                    }
+                }
+                
+                // 备用方案：查找所有输入框
+                const allInputs = nodeElement.querySelectorAll('input[type="text"], input.comfy-input');
+                if (allInputs.length > 0) {
+                    console.log('[FileLoaderNode] 找到输入框，在其旁边添加按钮');
+                    const inputElement = allInputs[0];
+                    inputElement.parentElement.appendChild(uploadButton);
+                    filePathWidget.uploadButton = uploadButton;
+                    filePathWidget.fileInput = fileInput;
+                    console.log('[FileLoaderNode] 上传按钮添加成功');
+                    return;
+                }
+                
+                // 最终方案：在节点的任何位置添加按钮
+                console.log('[FileLoaderNode] 在节点中添加按钮');
+                nodeElement.appendChild(uploadButton);
+                filePathWidget.uploadButton = uploadButton;
+                filePathWidget.fileInput = fileInput;
+                console.log('[FileLoaderNode] 上传按钮添加成功');
+                
+            } catch (e) {
+                console.error('[FileLoaderNode] 添加按钮失败:', e);
+                console.error('[FileLoaderNode] 错误栈:', e.stack);
+            }
+        } else {
+            // 如果没找到，继续等待（最多尝试15次，每次间隔300ms）
+            if (!waitForNodeDOM.attempts) waitForNodeDOM.attempts = 0;
+            waitForNodeDOM.attempts++;
+            
+            if (waitForNodeDOM.attempts <= 15) {
+                console.log(`[FileLoaderNode] 等待节点DOM出现 (尝试 ${waitForNodeDOM.attempts}/15)`);
+                setTimeout(waitForNodeDOM, 300);
+            } else {
+                console.error('[FileLoaderNode] 超时：无法找到节点DOM元素');
+                console.error('[FileLoaderNode] 节点ID:', node.id);
+                console.error('[FileLoaderNode] 尝试的选择器:', `#node-${node.id}, [data-node-id="${node.id}"], [id*="node-${node.id}"]`);
+            }
+        }
+    }
+    
+    // 开始等待节点DOM出现
+    waitForNodeDOM();
 
-    console.log('[FurniturePhotoNode] 节点处理完成');
+    console.log('[FileLoaderNode] 节点处理完成');
 }
 
 app.registerExtension({
     name: "ComfyUI.Mjapi",
     nodeCreated(node) {
-        console.log('[FurniturePhotoNode] 检测到节点创建:', node.comfyClass);
+        console.log('[节点创建] 检测到节点创建:', node.comfyClass);
         handleFurniturePhotoNode(node);
+        handleFileLoaderNode(node);
     },
     async setup() {
 

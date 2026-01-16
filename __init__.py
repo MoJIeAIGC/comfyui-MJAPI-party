@@ -58,6 +58,39 @@ async def get_user(request):
     })
 
 
+@routes.get('/my_node/get_furniture_styles')
+async def get_furniture_styles(request):
+    try:
+        url = "http://admin.qihuaimage.com/items/furniture_style"
+        response = requests.get(url)
+        response.raise_for_status()
+        result = response.json()
+        
+        # 处理数据：创建去重的parentname列表和以parentname为键的字典
+        data = result.get('data', [])
+        
+        # 创建去重的parentname列表
+        parentname_list = list(set(item['parentname'] for item in data))
+        parentname_list.sort()  # 排序
+        
+        # 创建以parentname为键，typename列表为值的字典
+        parentname_dict = {}
+        for item in data:
+            parentname = item['parentname']
+            typename = item['typename']
+            if parentname not in parentname_dict:
+                parentname_dict[parentname] = []
+            parentname_dict[parentname].append(typename)
+        
+        # 返回家具风格数据
+        return web.json_response({
+            "furniture_types": parentname_list,
+            "style_dict": parentname_dict
+        })
+    except Exception as e:
+        logging.error(f"获取家具风格数据失败: {str(e)}")
+        return web.json_response({"error": str(e)}, status=500)
+
 @routes.post('/my_node/update')
 async def update(request):
     try:

@@ -2489,7 +2489,419 @@ class Flux2Node:
         return (torch.cat(api_tensors, dim=0),)
 
 
+# 确保ComfyUI的核心模块能被导入
+import sys
+sys.path.append(os.path.join(os.path.dirname(__file__), "..", ".."))
+from typing import Any, Dict, List
+# ComfyUI核心节点基类（不同版本路径可能略有差异）
+try:
+    from nodes import NODE_CLASS_MAPPINGS, NODE_DISPLAY_NAME_MAPPINGS
+except ImportError:
+    NODE_CLASS_MAPPINGS = {}
+    NODE_DISPLAY_NAME_MAPPINGS = {}
 
+# --------------------------
+# 基础文件加载节点（解决FILE输入问题）
+# --------------------------
+class FileLoaderNode:
+    """文件加载节点：点击弹出系统文件选择框，支持docx/pdf等文件"""
+    @classmethod
+    def INPUT_TYPES(cls) -> Dict[str, Any]:
+        return {
+            "required": {
+                "file_path": ("STRING", {
+                    "default": "",
+                    "multiline": False,
+                    "widget": "string",  # 使用标准string widget，配合JavaScript添加上传按钮
+                    "placeholder": "文件路径或点击上传按钮选择文件"
+                }),
+            }
+        }
+
+    RETURN_TYPES = ("FILE",)
+    RETURN_NAMES = ("file",)
+    FUNCTION = "load_file"
+    CATEGORY = "🎨MJapiparty/LLM"
+    DISPLAY_NAME = "文件加载器（PDF/Word）"
+
+    def load_file(self, file_path: str) -> tuple:
+        if not os.path.exists(file_path):
+            raise ValueError(f"文件不存在：{file_path}")
+        allowed_extensions = (".docx", ".pdf", ".doc")
+        if not file_path.lower().endswith(allowed_extensions):
+            raise ValueError(f"仅支持以下文件类型：{allowed_extensions}")
+        return (file_path,)
+
+
+
+
+class GeminiLLMNode:
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "prompt": ("STRING", ),
+                # "limit_generations": ("BOOLEAN", {"default": False}),  # 是否是翻译模式
+                "model": (["Gemini 3 Pro Preview", "Gemini 3 Flash Preview"], {"default": "Gemini 3 Flash Preview"}),  # 值需和后端 MODEL_MAPPING 的 key 完全一致
+                "media_resolution": (["Default","Low","Medium","High"], {"default": "Default"}),  # 值需和后端 RESOLUTION_MAPPING 的 key 完全一致
+                "thinking_level": (["Minimal","Low","Medium","High"], {"default": "High"}),  # 值需和后端 THINKING_LEVEL_MAPPING 的 key 完全一致
+                "System_prompt": ("STRING", {"default": ""}),
+                "Web_search": ("BOOLEAN", {"default": True}),  # 是否是翻译模式
+                "format": ("BOOLEAN", {"default": False}),  # 是否是翻译模式
+                "seed": ("INT", {"default": -1}),
+            },
+            "optional": {
+                "Image": ("IMAGE",),  # 支持多输入，传递时会转为 base64 列表
+                "video": ("VIDEO",),  # 支持多输入，传递时会转为 base64 列表（拆帧后）
+                "file": ("FILE",),  # 支持多输入，传递时会转为 base64 列表
+                "context": ("ANY",),  # 接收对话历史上下文数据
+            }
+        }
+
+    # 返回字符串文本
+    RETURN_TYPES = ("STRING","ANY")  # 返回一个或多个STRING
+    RETURN_NAMES = ("output","context")  # 保持为一个返回名
+    FUNCTION = "generate"
+    CATEGORY = "🎨MJapiparty/LLM"
+
+
+    def generate(self, seed, prompt="", model="Gemini 3 Flash Preview Free", media_resolution="Default", thinking_level="High", System_prompt="", Web_search=True, format=False, Image=None, video=None, file=None, context=None):
+        # 输入非空校验 - 更严格地检查prompt是否为空
+        prompt_stripped = prompt.strip() if prompt else ""
+        if not prompt_stripped and not Image and not video and not file:
+            return ("错误：至少需要输入文本、图片、视频或文件中的一种",)
+
+        if context is not None:
+            conversation_history = context.get("llm", [])
+        else:
+            conversation_history = []
+
+        # 参数值校验
+        valid_models = ["Gemini 3 Pro Preview", "Gemini 3 Flash Preview", "Gemini 3 Flash Preview Free"]
+        valid_resolutions = ["Default", "Low", "Medium", "High"]
+        valid_thinking_levels = ["Minimal", "Low", "Medium", "High"]
+        
+        if model not in valid_models:
+            return (f"错误：无效的模型选择，可选值为：{', '.join(valid_models)}",)
+        
+        if media_resolution not in valid_resolutions:
+            return (f"错误：无效的分辨率选择，可选值为：{', '.join(valid_resolutions)}",)
+        
+        if thinking_level not in valid_thinking_levels:
+            return (f"错误：无效的思维水平选择，可选值为：{', '.join(valid_thinking_levels)}",)
+        
+        # 获取配置
+        oneapi_url, oneapi_token = config_manager.get_api_config()
+        # 处理图片输入
+        input_image_base64 = None
+        if Image is not None:
+            try:
+                input_image_base64 = ImageConverter.convert_images_to_base64(Image)
+                if not input_image_base64:
+                    return ("错误：图片转换为base64失败",)
+            except Exception as e:
+                return (f"错误：图片处理失败：{str(e)}",)
+        
+        # 处理视频输入
+        video_base64 = None
+        if video is not None:
+            try:
+                # 确保video是列表形式
+                video_list = [video] if not isinstance(video, list) else video
+                video_base64 = ImageConverter.video_to_full_base64_list(video_list)
+                if not video_base64:
+                    return ("错误：视频转帧或base64转换失败",)
+            except Exception as e:
+                return (f"错误：视频处理失败：{str(e)}",)
+        
+        # 处理文件输入
+        file_base64 = None
+        if file is not None:
+            try:
+                # 确保file是列表形式
+                file_list = [file] if not isinstance(file, list) else file
+                file_base64 = ImageConverter.files_to_base64_list(file_list)
+                if not file_base64:
+                    return ("错误：文件转base64失败",)
+            except Exception as e:
+                return (f"错误：文件处理失败：{str(e)}",)
+        
+        # 记录处理的媒体文件数量
+        print(f"处理媒体文件数量: 图片{len(input_image_base64) if input_image_base64 else 0}张, 视频帧{len(video_base64) if video_base64 else 0}帧, 文件{len(file_base64) if file_base64 else 0}个")
+        
+        def call_api(seed_override):
+            print("=== 准备调用API ===")
+            # 构建payload，包含所有参数
+            nonlocal conversation_history  # 允许在内部函数中修改外部变量
+            payload = {
+                "model": "gemini-3-llm",
+                "prompt": prompt,
+                "seed": int(seed_override),
+                "model_type": model,
+                "media_resolution": media_resolution,
+                "thinking_level": thinking_level,
+                "system_prompt": System_prompt,
+                "web_search": Web_search,
+                "format": format,
+                "conversation_history": conversation_history,
+            }
+            
+            # 添加图片输入（如果有）
+            if input_image_base64 is not None:
+                payload["input_image"] = input_image_base64
+                print(f"API请求包含图片: {len(input_image_base64)}张")
+            
+            # 添加视频输入（如果有）
+            if video_base64 is not None:
+                payload["video"] = video_base64
+                print(f"API请求包含视频帧: {len(video_base64)}帧")
+            
+            # 添加文件输入（如果有）
+            if file_base64 is not None:
+                payload["file"] = file_base64
+                print(f"API请求包含文件: {len(file_base64)}个")
+            
+            # 日志：打印API请求基本信息（不包含大的base64数据）
+            payload_info = {
+                "model": payload["model"],
+                "model_type": payload["model_type"],
+                "seed": payload["seed"],
+                "has_prompt": bool(payload["prompt"].strip()),
+                "has_system_prompt": bool(payload["system_prompt"].strip()),
+                "web_search": payload["web_search"],
+                "format": payload["format"],
+                "media_resolution": payload["media_resolution"],
+                "thinking_level": payload["thinking_level"],
+                "has_images": "input_image" in payload,
+                "has_videos": "video" in payload,
+                "has_files": "file" in payload
+            }
+            print(f"API请求参数: {payload_info}")
+            
+            headers = {
+                "Content-Type": "application/json",
+                "Authorization": f"Bearer {oneapi_token}"
+            }
+            print(f"正在调用API: {oneapi_url}")
+            print(f"API调用超时设置: 240秒")
+            response = requests.post(oneapi_url, headers=headers, json=payload, timeout=240)
+            print(f"API调用完成，状态码: {response.status_code}")
+
+            response.raise_for_status()
+
+            result = response.json()
+            print(f"API响应结构: {list(result.keys())}")
+            restext = result.get("restext", "")
+            conversation_history = result.get("conversation_history", [])  # 提取对话历史
+            if conversation_history:
+                # print(f"API返回对话历史: {conversation_history}")
+                ImageConverter.conversation_context["llm"] = conversation_history
+                conversation_history = {
+                    "llm": conversation_history
+                }
+                # print("ContextNode 保存对话历史:", ImageConverter.conversation_context)
+            
+            if not restext:
+                print("警告：API响应中restext字段为空")
+                restext = "未找到响应文本"
+            else:
+                print(f"API返回restext，长度: {len(restext)}字符")
+            
+            return restext
+        try:
+            print("=== 执行API调用 ===")
+            # 调用API
+            restext = call_api(seed)
+            print("=== GeminiLLMNode 执行完成 ===")
+            return (restext,conversation_history)
+        except requests.exceptions.RequestException as e:
+            print(f"=== API调用失败 ===")
+            print(f"错误类型: 请求异常")
+            print(f"错误详情: {str(e)}")
+            if hasattr(e, 'response') and e.response is not None:
+                print(f"错误状态码: {e.response.status_code}")
+                try:
+                    error_response = e.response.json()
+                    print(f"错误响应内容: {error_response}")
+                except:
+                    print(f"错误响应文本: {e.response.text[:500]}...")
+            # 返回错误信息作为字符串
+            return (f"API调用失败: {str(e)}",)
+        except Exception as e:
+            print(f"=== GeminiLLMNode 执行失败 ===")
+            print(f"错误类型: 其他异常")
+            print(f"错误详情: {str(e)}")
+            # 返回错误信息作为字符串
+            return (f"API调用失败: {str(e)}",)
+
+
+
+
+class Gemini3NanoNode:
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "prompt": ("STRING", ),
+                "model": (["Gemini 2.5 Flash Image", "Gemini-3-pro-image-preview"], {"default": "Gemini 2.5 Flash Image"}),  # 值需和后端 MODEL_MAPPING 的 key 完全一致
+                "media_resolution": (["Default","Low","Medium","High"], {"default": "Default"}),  # 值需和后端 RESOLUTION_MAPPING 的 key 完全一致
+                "thinking_level": (["minimal","low","medium","high"], {"default": "high"}),  # 值需和后端 THINKING_LEVEL_MAPPING 的 key 完全一致
+                "safe_level": (["high","medium","low"], {"default": "medium"}),  # 值需和后端 THINKING_LEVEL_MAPPING 的 key 完全一致
+                "resolution": (["1K", "2K", "4K"], {"default": "1K"}),
+                "aspect_ratio": (["16:9","4:3","2:3","4:5","1:1","3:2","5:4","3:4", "9:16"], {"default": "1:1"}),
+                "System_prompt": ("STRING", {"default": ""}),
+                "Web_search": ("BOOLEAN", {"default": True}),  # 是否是翻译模式
+                "seed": ("INT", {"default": -1}),
+            },
+            "optional": {
+                "input_images": ("IMAGE",),  # 接收多个图片
+                "context": ("ANY",),  # 接收对话历史上下文数据
+            }
+        }
+
+    RETURN_TYPES = ("IMAGE", "ANY")  # 返回图片和对话历史（ANY类型兼容conversation_history数组）
+    RETURN_NAMES = ("output", "context")  # 输出端口名称
+    FUNCTION = "generate"
+    CATEGORY = "🎨MJapiparty/LLM"
+
+    def generate(self, seed, input_images=None, resolution="1K", aspect_ratio="1:1",  prompt="", safe_level="medium", thinking_level="High", System_prompt="", Web_search=True, model="Gemini 2.5 Flash Image", context=None, media_resolution="Default"):
+        # 获取配置
+        oneapi_url, oneapi_token = config_manager.get_api_config()
+        # 如果没有提供对话历史，初始化为空列表
+        if context is not None:
+            conversation_history = context.get("image", [])
+        else:
+            conversation_history = []
+        def call_api(seed_override):
+            nonlocal conversation_history  # 允许在内部函数中修改外部变量
+            payload = {
+                "model": "Gemini3_Nano",
+                "modelr": model,
+                "resolution": resolution,
+                "media_resolution": media_resolution,
+                "prompt": prompt,
+                "seed": seed_override,
+                "safe_level": safe_level,
+                "System_prompt": System_prompt,
+                "Web_search": Web_search,
+                "aspect_ratio": aspect_ratio,
+                "conversation_history": conversation_history,  # 发送API请求时带上上下文数据
+            }
+            if model != "Gemini 2.5 Flash Image":
+                payload["thinking_level"] = thinking_level 
+            if input_images is not None:
+                # 检查图像长边是否大于1280，如果是则等比压缩
+                compressed_images = []
+                for img in input_images:
+                    # 将张量转换为PIL图像
+                    pil_image = ImageConverter.tensor2pil(img)
+                    if pil_image is not None:
+                        # 检查长边
+                        width, height = pil_image.size
+                        max_size = max(width, height)
+                        
+                        if max_size > 1280:
+                            # 计算缩放比例
+                            scale = 1280 / max_size
+                            new_width = int(width * scale)
+                            new_height = int(height * scale)
+                            # 使用高质量的重采样方法进行缩放
+                            pil_image = pil_image.resize((new_width, new_height), Image.LANCZOS)
+                        
+                        # 将处理后的图像转换回张量
+                        compressed_tensor = ImageConverter.pil2tensor(pil_image)
+                        compressed_images.append(compressed_tensor)
+                
+                input_image_base64 = ImageConverter.convert_images_to_base64(compressed_images)
+                payload["input_image"] = input_image_base64
+            headers = {
+                "Content-Type": "application/json",
+                "Authorization": f"Bearer {oneapi_token}"
+            }
+            response = requests.post(oneapi_url, headers=headers, json=payload, timeout=240)
+
+            response.raise_for_status()
+
+            result = response.json()
+            image_url = result.get("res_url")
+
+            if not image_url:
+                raise ValueError("未找到图片 URL")
+
+            image_urls = image_url.split("|") if image_url else []
+            conversation_history = result.get("conversation_history", [])  # 提取对话历史
+            if conversation_history:
+                # print(f"API返回对话历史: {conversation_history}")
+                ImageConverter.conversation_context["image"] = conversation_history
+                conversation_history = {
+                    "image": conversation_history
+                }
+                # print("ContextNode 保存对话历史:", ImageConverter.conversation_context)
+            print(image_urls)
+            for image_url in image_urls:
+                if not image_url:
+                    continue
+                try:
+                    # 下载图片
+                    response = requests.get(image_url)
+                    response.raise_for_status()
+                    # 将图片数据转换为 PIL 图像对象
+                    img = Image.open(BytesIO(response.content)).convert("RGB")
+                    output_tensors.append(ImageConverter.pil2tensor(img))
+                except Exception as e:
+                    print(f"下载图片 {image_url} 失败: {str(e)}")
+                    error_tensor = ImageConverter.create_error_image("下载图片失败")
+                    output_tensors.append(error_tensor)
+            if not output_tensors:
+                error_tensor = ImageConverter.create_error_image("未获取到有效图片 URL")
+                output_tensors.append(error_tensor)
+        output_tensors = []
+
+        # 调用API
+        call_api(seed)
+        return (torch.cat(output_tensors, dim=0),conversation_history)
+
+
+class ContextNode:
+    # ========== 核心强制执行配置（缺一不可） ==========
+    OUTPUT_NODE = True       # 标记为输出节点，优先执行
+    FORCE_ATTN = True        # 强制ComfyUI关注该节点，无视输出是否被使用
+    CACHEABLE = False        # 禁用结果缓存，绝不复用旧结果
+    
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            # ========== 关键：加一个“可变伪输入”（seed），触发节点重新执行 ==========
+            "required": {
+                "seed": ("INT", {"default": 1, "min": 1, "max": 0xffffffffffffffff}),
+            },
+            # 保留原有隐藏参数
+            "hidden": {
+                "unique_id": "UNIQUE_ID",
+                "prompt": "PROMPT"
+            }
+        }
+
+    RETURN_TYPES = ("ANY",)
+    RETURN_NAMES = ("context",)
+    FUNCTION = "read_global_context"
+    CATEGORY = "🎨MJapiparty/LLM"
+    DESCRIPTION = "读取全局对话上下文并输出（强制每次执行）"
+
+    def read_global_context(self, seed, unique_id=None, prompt=None):
+        # 初始化容错：确保ImageConverter有conversation_context属性
+        if not hasattr(ImageConverter, 'conversation_context'):
+            ImageConverter.conversation_context = []
+        
+        # 读取最新全局上下文
+        conversation_history = ImageConverter.conversation_context
+        log_prefix = f"[ContextNode-{unique_id[:8] if unique_id else '未知'}]"
+        # 打印日志（验证每次都执行）
+        print(f"{log_prefix} 本次传入Gemini的上下文：{len(conversation_history)}条")
+        print(f"{log_prefix} 本次执行seed：{seed}")  # 验证seed变化触发执行
+        
+        # 确保返回合法列表
+        return (conversation_history,)
 
 NODE_CLASS_MAPPINGS = {
     "GeminiEditNode": GeminiEditNode,
@@ -2511,6 +2923,7 @@ NODE_CLASS_MAPPINGS = {
     "ModelGenNode": ModelGenNode,
     "MoterPoseNode": MoterPoseNode,
     "ViduT2VNode": ViduT2VNode,
+    "ContextNode": ContextNode,
     "ViduI2VNode": ViduI2VNode,
     "ImageUpscaleNode": ImageUpscaleNode,
     "ImageTranslateNode": ImageTranslateNode,
@@ -2519,6 +2932,9 @@ NODE_CLASS_MAPPINGS = {
     "DetailJinNode": DetailJinNode,
     "FurnitureAngleNode": FurnitureAngleNode, 
     "DreaminaI2INode": DreaminaI2INode,
+    "GeminiLLMNode": GeminiLLMNode,
+    "Gemini3NanoNode": Gemini3NanoNode,
+    "FileLoaderNode": FileLoaderNode,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
@@ -2549,4 +2965,8 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "DetailJinNode": "细节精修",
     "FurnitureAngleNode": "家具角度图",
     "DreaminaI2INode": "Dreamina参考生图",
+    "GeminiLLMNode": "Gemini3-LLM",
+    "Gemini3NanoNode": "Gemini3-image-Nano",
+    "ContextNode": "对话上下文管理",
+    "FileLoaderNode": "文件加载器",
 }
