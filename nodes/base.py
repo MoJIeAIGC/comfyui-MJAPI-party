@@ -373,40 +373,57 @@ class ImageConverter:
         right = min(image_pil.width, max_x + margin + 1)
         bottom = min(image_pil.height, max_y + margin + 1)
         
-        # 检查矩形范围，如果小于500px则扩大至500px
+        # 计算原始边界框的中心、宽度和高度
+        rect_center_x = (left + right) // 2
+        rect_center_y = (top + bottom) // 2
         rect_width = right - left
         rect_height = bottom - top
         
-        if rect_width < 500 or rect_height < 500:
-            # 计算需要扩展的像素数
-            expand_x = max(0, (500 - rect_width) // 2)
-            expand_y = max(0, (500 - rect_height) // 2)
-            
-            # 扩展矩形边界，确保不超出图像范围
-            left = max(0, left - expand_x)
-            top = max(0, top - expand_y)
-            right = min(image_pil.width, right + expand_x)
-            bottom = min(image_pil.height, bottom + expand_y)
-            
-            # 如果扩展后仍然小于500px，则从另一侧继续扩展
-            new_width = right - left
-            new_height = bottom - top
-            
-            if new_width < 500:
-                additional_expand = 500 - new_width
-                if left >= additional_expand:
-                    left -= additional_expand
-                else:
-                    right = min(image_pil.width, right + (additional_expand - left))
-                    left = 0
-                    
-            if new_height < 500:
-                additional_expand = 500 - new_height
-                if top >= additional_expand:
-                    top -= additional_expand
-                else:
-                    bottom = min(image_pil.height, bottom + (additional_expand - top))
-                    top = 0
+        # 计算正方形的边长（取原始宽高的最大值，并确保至少为500px）
+        square_size = max(rect_width, rect_height, 500)
+        
+        # 计算正方形的边界，确保中心与原边界框中心一致
+        half_size = square_size // 2
+        left = rect_center_x - half_size
+        top = rect_center_y - half_size
+        right = rect_center_x + half_size
+        bottom = rect_center_y + half_size
+        
+        # 确保正方形不会超出图像范围
+        if left < 0:
+            right -= left  # 向右移动整个正方形
+            left = 0
+        if right > image_pil.width:
+            left -= (right - image_pil.width)  # 向左移动整个正方形
+            right = image_pil.width
+        if top < 0:
+            bottom -= top  # 向下移动整个正方形
+            top = 0
+        if bottom > image_pil.height:
+            top -= (bottom - image_pil.height)  # 向上移动整个正方形
+            bottom = image_pil.height
+        
+        # 重新计算正方形的实际边长（可能因为图像边界而调整）
+        actual_square_size = max(right - left, bottom - top)
+        
+        # 确保正方形的完整性（如果因为图像边界而调整后不是正方形，重新计算）
+        if (right - left) < actual_square_size:
+            # 宽度不足，调整左右边界
+            new_width = actual_square_size
+            left = (left + right - new_width) // 2
+            right = left + new_width
+            # 再次确保不超出图像范围
+            left = max(0, left)
+            right = min(image_pil.width, right)
+        
+        if (bottom - top) < actual_square_size:
+            # 高度不足，调整上下边界
+            new_height = actual_square_size
+            top = (top + bottom - new_height) // 2
+            bottom = top + new_height
+            # 再次确保不超出图像范围
+            top = max(0, top)
+            bottom = min(image_pil.height, bottom)
         
         # 绘制红色矩形框
         draw.rectangle([(left, top), (right, bottom)], outline=(255, 0, 0), width=10)
