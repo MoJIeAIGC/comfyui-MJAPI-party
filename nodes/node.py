@@ -2852,6 +2852,7 @@ class Gemini3NanoNode:
                 response = requests.get(image_url)
                 response.raise_for_status()
                 # 将图片数据转换为 PIL 图像对象
+                from PIL import Image
                 img = Image.open(BytesIO(response.content)).convert("RGB")
                 output_tensors.append(ImageConverter.pil2tensor(img))
             except Exception as e:
