@@ -2551,7 +2551,7 @@ class GeminiLLMNode:
                 "seed": ("INT", {"default": -1}),
             },
             "optional": {
-                "Image": ("IMAGE",),  # 支持多输入，传递时会转为 base64 列表
+                "image_input": ("IMAGE",),  # 支持多输入，传递时会转为 base64 列表
                 "video": ("VIDEO",),  # 支持多输入，传递时会转为 base64 列表（拆帧后）
                 "file": ("FILE",),  # 支持多输入，传递时会转为 base64 列表
                 "context": ("ANY",),  # 接收对话历史上下文数据
@@ -2565,10 +2565,10 @@ class GeminiLLMNode:
     CATEGORY = "🎨MJapiparty/LLM"
 
 
-    def generate(self, seed, prompt="", model="Gemini 3 Flash Preview Free", media_resolution="Default", thinking_level="High", System_prompt="", Web_search=True, format=False, Image=None, video=None, file=None, context=None):
+    def generate(self, seed, prompt="", model="Gemini 3 Flash Preview Free", media_resolution="Default", thinking_level="High", System_prompt="", Web_search=True, format=False, image_input=None, video=None, file=None, context=None):
         # 输入非空校验 - 更严格地检查prompt是否为空
         prompt_stripped = prompt.strip() if prompt else ""
-        if not prompt_stripped and not Image and not video and not file:
+        if not prompt_stripped and not image_input and not video and not file:
             return ("错误：至少需要输入文本、图片、视频或文件中的一种",)
 
         if context is not None:
@@ -2594,9 +2594,9 @@ class GeminiLLMNode:
         oneapi_url, oneapi_token = config_manager.get_api_config()
         # 处理图片输入
         input_image_base64 = None
-        if Image is not None:
+        if image_input is not None:
             try:
-                input_image_base64 = ImageConverter.convert_images_to_base64(Image)
+                input_image_base64 = ImageConverter.convert_images_to_base64(image_input)
                 if not input_image_base64:
                     return ("错误：图片转换为base64失败",)
             except Exception as e:
@@ -2766,6 +2766,7 @@ class Gemini3NanoNode:
 
     def generate(self, seed, input_images=None, resolution="1K", aspect_ratio="1:1",  prompt="", safe_level="medium", thinking_level="High", System_prompt="", Web_search=True, model="Gemini 2.5 Flash Image", context=None, media_resolution="Default"):
         # 获取配置
+        from PIL import Image
         oneapi_url, oneapi_token = config_manager.get_api_config()
         # 如果没有提供对话历史，初始化为空列表
         if context is not None:
