@@ -1801,7 +1801,11 @@ class FurniturePhotoNode:
         
         # 创建以parentname为键，typename列表为值的字典
         parentname_dict = {}
+        typename_list = []
         for item in data:
+            typename = item['typename']
+            if typename not in typename_list:
+                typename_list.append(typename)
             parentname = item['parentname']
             typename = item['typename']
             if parentname not in parentname_dict:
@@ -1815,7 +1819,7 @@ class FurniturePhotoNode:
             "required": {
                 "input_image": ("IMAGE",),  # 接收多个图片
                 "furniture_types": (parentname_list, {"default": parentname_list[0]}),
-                "style_type": (parentname_dict.get(parentname_list[0], []), {"default": parentname_dict[parentname_list[0]][0]}),
+                "style_type": (typename_list, {"default": typename_list[0]}),
                 # "resolution": (["1K", "2K", "4K"], {"default": "2K"}),
                 "aspect_ratio": (["16:9","4:3","1:1", "3:4",  "9:16"], {"default": "4:3"}),
                 "num_images": ("INT", {"default": 1, "min": 1, "max": 2}),  # 新增参数，只能是1或2
@@ -2551,7 +2555,7 @@ class GeminiLLMNode:
                 "seed": ("INT", {"default": -1}),
             },
             "optional": {
-                "Image": ("IMAGE",),  # 支持多输入，传递时会转为 base64 列表
+                "image_input": ("IMAGE",),  # 支持多输入，传递时会转为 base64 列表
                 "video": ("VIDEO",),  # 支持多输入，传递时会转为 base64 列表（拆帧后）
                 "file": ("FILE",),  # 支持多输入，传递时会转为 base64 列表
                 "context": ("ANY",),  # 接收对话历史上下文数据
@@ -2565,10 +2569,10 @@ class GeminiLLMNode:
     CATEGORY = "🎨MJapiparty/LLM"
 
 
-    def generate(self, seed, prompt="", model="Gemini 3 Flash Preview Free", media_resolution="Default", thinking_level="High", System_prompt="", Web_search=True, format=False, Image=None, video=None, file=None, context=None):
+    def generate(self, seed, prompt="", model="Gemini 3 Flash Preview Free", media_resolution="Default", thinking_level="High", System_prompt="", Web_search=True, format=False, image_input=None, video=None, file=None, context=None):
         # 输入非空校验 - 更严格地检查prompt是否为空
         prompt_stripped = prompt.strip() if prompt else ""
-        if not prompt_stripped and not Image and not video and not file:
+        if not prompt_stripped and not image_input and not video and not file:
             return ("错误：至少需要输入文本、图片、视频或文件中的一种",)
 
         if context is not None:
@@ -2594,9 +2598,9 @@ class GeminiLLMNode:
         oneapi_url, oneapi_token = config_manager.get_api_config()
         # 处理图片输入
         input_image_base64 = None
-        if Image is not None:
+        if image_input is not None:
             try:
-                input_image_base64 = ImageConverter.convert_images_to_base64(Image)
+                input_image_base64 = ImageConverter.convert_images_to_base64(image_input)
                 if not input_image_base64:
                     return ("错误：图片转换为base64失败",)
             except Exception as e:
@@ -2630,11 +2634,16 @@ class GeminiLLMNode:
         print(f"处理媒体文件数量: 图片{len(input_image_base64) if input_image_base64 else 0}张, 视频帧{len(video_base64) if video_base64 else 0}帧, 文件{len(file_base64) if file_base64 else 0}个")
         
         def call_api(seed_override):
+            MODEL_MAPPING = {
+                "Gemini 3 Pro Preview": "Gemini-3-Pro-Preview",
+                "Gemini 3 Flash Preview": "Gemini-3-Flash-Preview",
+            }
+            modelr = MODEL_MAPPING.get(model, model)
             print("=== 准备调用API ===")
             # 构建payload，包含所有参数
             nonlocal conversation_history  # 允许在内部函数中修改外部变量
             payload = {
-                "model": "gemini-3-llm",
+                "model": modelr,
                 "prompt": prompt,
                 "seed": int(seed_override),
                 "model_type": model,
@@ -2759,107 +2768,116 @@ class Gemini3NanoNode:
             }
         }
 
-    RETURN_TYPES = ("IMAGE", "ANY")  # 返回图片和对话历史（ANY类型兼容conversation_history数组）
-    RETURN_NAMES = ("output", "context")  # 输出端口名称
+    RETURN_TYPES = ("IMAGE","STRING", "ANY")  # 返回图片和对话历史（ANY类型兼容conversation_history数组）
+    RETURN_NAMES = ("image", "text", "context")  # 输出端口名称
     FUNCTION = "generate"
     CATEGORY = "🎨MJapiparty/LLM"
 
     def generate(self, seed, input_images=None, resolution="1K", aspect_ratio="1:1",  prompt="", safe_level="medium", thinking_level="High", System_prompt="", Web_search=True, model="Gemini 2.5 Flash Image", context=None, media_resolution="Default"):
         # 获取配置
+        from PIL import Image
         oneapi_url, oneapi_token = config_manager.get_api_config()
         # 如果没有提供对话历史，初始化为空列表
         if context is not None:
             conversation_history = context.get("image", [])
         else:
             conversation_history = []
-        def call_api(seed_override):
-            nonlocal conversation_history  # 允许在内部函数中修改外部变量
-            payload = {
-                "model": "Gemini3_Nano",
-                "modelr": model,
-                "resolution": resolution,
-                "media_resolution": media_resolution,
-                "prompt": prompt,
-                "seed": seed_override,
-                "safe_level": safe_level,
-                "System_prompt": System_prompt,
-                "Web_search": Web_search,
-                "aspect_ratio": aspect_ratio,
-                "conversation_history": conversation_history,  # 发送API请求时带上上下文数据
-            }
-            if model != "Gemini 2.5 Flash Image":
-                payload["thinking_level"] = thinking_level 
-            if input_images is not None:
-                # 检查图像长边是否大于1280，如果是则等比压缩
-                compressed_images = []
-                for img in input_images:
-                    # 将张量转换为PIL图像
-                    pil_image = ImageConverter.tensor2pil(img)
-                    if pil_image is not None:
-                        # 检查长边
-                        width, height = pil_image.size
-                        max_size = max(width, height)
-                        
-                        if max_size > 1280:
-                            # 计算缩放比例
-                            scale = 1280 / max_size
-                            new_width = int(width * scale)
-                            new_height = int(height * scale)
-                            # 使用高质量的重采样方法进行缩放
-                            pil_image = pil_image.resize((new_width, new_height), Image.LANCZOS)
-                        
-                        # 将处理后的图像转换回张量
-                        compressed_tensor = ImageConverter.pil2tensor(pil_image)
-                        compressed_images.append(compressed_tensor)
-                
-                input_image_base64 = ImageConverter.convert_images_to_base64(compressed_images)
-                payload["input_image"] = input_image_base64
-            headers = {
-                "Content-Type": "application/json",
-                "Authorization": f"Bearer {oneapi_token}"
-            }
-            response = requests.post(oneapi_url, headers=headers, json=payload, timeout=240)
-
-            response.raise_for_status()
-
-            result = response.json()
-            image_url = result.get("res_url")
-
-            if not image_url:
-                raise ValueError("未找到图片 URL")
-
-            image_urls = image_url.split("|") if image_url else []
-            conversation_history = result.get("conversation_history", [])  # 提取对话历史
-            if conversation_history:
-                # print(f"API返回对话历史: {conversation_history}")
-                ImageConverter.conversation_context["image"] = conversation_history
-                conversation_history = {
-                    "image": conversation_history
-                }
-                # print("ContextNode 保存对话历史:", ImageConverter.conversation_context)
-            print(image_urls)
-            for image_url in image_urls:
-                if not image_url:
-                    continue
-                try:
-                    # 下载图片
-                    response = requests.get(image_url)
-                    response.raise_for_status()
-                    # 将图片数据转换为 PIL 图像对象
-                    img = Image.open(BytesIO(response.content)).convert("RGB")
-                    output_tensors.append(ImageConverter.pil2tensor(img))
-                except Exception as e:
-                    print(f"下载图片 {image_url} 失败: {str(e)}")
-                    error_tensor = ImageConverter.create_error_image("下载图片失败")
-                    output_tensors.append(error_tensor)
-            if not output_tensors:
-                error_tensor = ImageConverter.create_error_image("未获取到有效图片 URL")
-                output_tensors.append(error_tensor)
+        MODEL_MAPPING = {
+            "Gemini 2.5 Flash Image": "Gemini2.5-image-Nanobanana",
+            "Gemini-3-pro-image-preview": "Gemini3-image-Nanobanana-pro",
+        }
+        modelr = MODEL_MAPPING.get(model, model)
         output_tensors = []
+        payload = {
+            "model": modelr,
+            "modelr": model,
+            "resolution": resolution,
+            "media_resolution": media_resolution,
+            "prompt": prompt,
+            "seed": 666,
+            "safe_level": safe_level,
+            "System_prompt": System_prompt,
+            "Web_search": Web_search,
+            "aspect_ratio": aspect_ratio,
+            "conversation_history": conversation_history,  # 发送API请求时带上上下文数据
+        }
+        if model != "Gemini 2.5 Flash Image":
+            payload["thinking_level"] = thinking_level 
+        if input_images is not None:
+            # 检查图像长边是否大于1280，如果是则等比压缩
+            compressed_images = []
+            for img in input_images:
+                # 将张量转换为PIL图像
+                pil_image = ImageConverter.tensor2pil(img)
+                if pil_image is not None:
+                    # 检查长边
+                    width, height = pil_image.size
+                    max_size = max(width, height)
+                    
+                    if max_size > 1280:
+                        # 计算缩放比例
+                        scale = 1280 / max_size
+                        new_width = int(width * scale)
+                        new_height = int(height * scale)
+                        # 使用高质量的重采样方法进行缩放
+                        pil_image = pil_image.resize((new_width, new_height), Image.LANCZOS)
+                    
+                    # 将处理后的图像转换回张量
+                    compressed_tensor = ImageConverter.pil2tensor(pil_image)
+                    compressed_images.append(compressed_tensor)
+            
+            input_image_base64 = ImageConverter.convert_images_to_base64(compressed_images)
+            payload["input_image"] = input_image_base64
+        headers = {
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {oneapi_token}"
+        }
+        response = requests.post(oneapi_url, headers=headers, json=payload, timeout=240)
 
-        # 调用API
-        call_api(seed)
-        return (torch.cat(output_tensors, dim=0),conversation_history)
+        response.raise_for_status()
+
+        result = response.json()
+        image_url = result.get("res_url")
+
+        if not image_url:
+            if result.get("restext"):
+                # 创建一个纯白色的图片
+                from PIL import Image
+                white_image = Image.new("RGB", (512, 512), (255, 255, 255))
+                white_tensor = ImageConverter.pil2tensor(white_image)
+                return (white_tensor, result.get("restext"), conversation_history)
+            else:
+                raise ValueError("模型未回复")
+
+        image_urls = image_url.split("|") if image_url else []
+        conversation_history = result.get("conversation_history", [])  # 提取对话历史
+        if conversation_history:
+            # print(f"API返回对话历史: {conversation_history}")
+            ImageConverter.conversation_context["image"] = conversation_history
+            conversation_history = {
+                "image": conversation_history
+            }
+            # print("ContextNode 保存对话历史:", ImageConverter.conversation_context)
+        print(image_urls)
+        for image_url in image_urls:
+            if not image_url:
+                continue
+            try:
+                # 下载图片
+                response = requests.get(image_url)
+                response.raise_for_status()
+                # 将图片数据转换为 PIL 图像对象
+                from PIL import Image
+                img = Image.open(BytesIO(response.content)).convert("RGB")
+                output_tensors.append(ImageConverter.pil2tensor(img))
+            except Exception as e:
+                print(f"下载图片 {image_url} 失败: {str(e)}")
+                error_tensor = ImageConverter.create_error_image("下载图片失败")
+                output_tensors.append(error_tensor)
+        if not output_tensors:
+            error_tensor = ImageConverter.create_error_image("未获取到有效图片 URL")
+            output_tensors.append(error_tensor)
+        return (torch.cat(output_tensors, dim=0),"",conversation_history)
 
 
 class ContextNode:
