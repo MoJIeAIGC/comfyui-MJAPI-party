@@ -1801,7 +1801,11 @@ class FurniturePhotoNode:
         
         # 创建以parentname为键，typename列表为值的字典
         parentname_dict = {}
+        typename_list = []
         for item in data:
+            typename = item['typename']
+            if typename not in typename_list:
+                typename_list.append(typename)
             parentname = item['parentname']
             typename = item['typename']
             if parentname not in parentname_dict:
@@ -1815,7 +1819,7 @@ class FurniturePhotoNode:
             "required": {
                 "input_image": ("IMAGE",),  # 接收多个图片
                 "furniture_types": (parentname_list, {"default": parentname_list[0]}),
-                "style_type": (parentname_dict.get(parentname_list[0], []), {"default": parentname_dict[parentname_list[0]][0]}),
+                "style_type": (typename_list, {"default": typename_list[0]}),
                 # "resolution": (["1K", "2K", "4K"], {"default": "2K"}),
                 "aspect_ratio": (["16:9","4:3","1:1", "3:4",  "9:16"], {"default": "4:3"}),
                 "num_images": ("INT", {"default": 1, "min": 1, "max": 2}),  # 新增参数，只能是1或2
