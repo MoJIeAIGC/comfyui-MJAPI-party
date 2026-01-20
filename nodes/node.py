@@ -2630,11 +2630,16 @@ class GeminiLLMNode:
         print(f"处理媒体文件数量: 图片{len(input_image_base64) if input_image_base64 else 0}张, 视频帧{len(video_base64) if video_base64 else 0}帧, 文件{len(file_base64) if file_base64 else 0}个")
         
         def call_api(seed_override):
+            MODEL_MAPPING = {
+                "Gemini 3 Pro Preview": "Gemini-3-Pro-Preview",
+                "Gemini 3 Flash Preview": "Gemini-3-Flash-Preview",
+            }
+            modelr = MODEL_MAPPING.get(model, model)
             print("=== 准备调用API ===")
             # 构建payload，包含所有参数
             nonlocal conversation_history  # 允许在内部函数中修改外部变量
             payload = {
-                "model": "gemini-3-llm",
+                "model": modelr,
                 "prompt": prompt,
                 "seed": int(seed_override),
                 "model_type": model,
@@ -2773,9 +2778,14 @@ class Gemini3NanoNode:
             conversation_history = context.get("image", [])
         else:
             conversation_history = []
+        MODEL_MAPPING = {
+            "Gemini 2.5 Flash Image": "Gemini2.5-image-Nanobanana",
+            "Gemini-3-pro-image-preview": "Gemini3-image-Nanobanana-pro",
+        }
+        modelr = MODEL_MAPPING.get(model, model)
         output_tensors = []
         payload = {
-            "model": "Gemini3_Nano",
+            "model": modelr,
             "modelr": model,
             "resolution": resolution,
             "media_resolution": media_resolution,
