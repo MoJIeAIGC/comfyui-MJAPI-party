@@ -1888,7 +1888,7 @@ class FurniturePhotoNode:
                     return
 
             result = response.json()
-            print(result)
+            # print(result)
             image_url = result.get("res_url")
 
             if not image_url:
