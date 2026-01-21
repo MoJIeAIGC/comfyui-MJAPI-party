@@ -17,6 +17,28 @@
 - [Dreamina(即梦参考生图)](#dreamina即梦参考生图)
 
 ***
+#### Gemini3-LLM节点
+这是gemini3的大语言模型节点。支持上下文。接入上下文管理即可直接读取上下文,也可以直接将多个LLM节点短接。更多用法可咨询摩诘AI，或查看我们相关教程.
+支持Gemini3的全量参数
+- 通过model参数选择不同模型
+- mdeia_resolution是输入图像参考程度
+- thinking_level是思考等级
+- System_prompt是系统提示词，如果你学过大语言模型就知道该怎么用。
+- web_search是网络搜索开关。
+- formpt是结构化输出参数，用于指定输出的格式。
+![alt text](assets/Gemini3-LLM.png)
+
+#### Gemini3-Nano节点
+这是gemini-nano的满血节点。支持上下文多轮编辑。接入上下文管理即可直接读取上下文。
+支持Gemini的全量参数
+- mdeia_resolution是输入图像参考程度
+- thinking_level是思考等级
+- safe_level是图片安全等级
+- resolution是输出图片分辨率，2.5不支持2K,4K,Gemini3支持.
+- System_prompt是系统提示词，如果你学过大语言模型就知道该怎么用。
+- web_search是网络搜索开关。
+
+![alt text](assets/gemini-nano.png)
 
 #### Nano-pro节点
 NanoBanana-pro又名Gemini 3 Flash Image Preview,是google旗下的图像生成模型，功能强大，支持中英文输入和中英文文字输出，对图像理解能力非常强。支持1K、2K、4K分辨率

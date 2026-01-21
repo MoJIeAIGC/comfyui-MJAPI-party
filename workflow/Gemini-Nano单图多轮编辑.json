@@ -1,0 +1,348 @@
+{
+  "id": "b62e45e5-cef4-4cfd-9642-a1177050a52a",
+  "revision": 0,
+  "last_node_id": 41,
+  "last_link_id": 44,
+  "nodes": [
+    {
+      "id": 18,
+      "type": "Gemini3NanoNode",
+      "pos": [
+        -2549.838166791885,
+        2.8315552216378963
+      ],
+      "size": [
+        270,
+        338
+      ],
+      "flags": {},
+      "order": 4,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "input_images",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": 44
+        },
+        {
+          "name": "context",
+          "shape": 7,
+          "type": "ANY",
+          "link": 20
+        },
+        {
+          "name": "prompt",
+          "type": "STRING",
+          "widget": {
+            "name": "prompt"
+          },
+          "link": 21
+        }
+      ],
+      "outputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "links": [
+            19
+          ]
+        },
+        {
+          "name": "text",
+          "type": "STRING",
+          "links": [
+            23
+          ]
+        },
+        {
+          "name": "context",
+          "type": "ANY",
+          "links": []
+        }
+      ],
+      "properties": {
+        "cnr_id": "Mojie-API-Party",
+        "ver": "e073aaed898375f2d8df683cb15883f29b681b51",
+        "Node name for S&R": "Gemini3NanoNode"
+      },
+      "widgets_values": [
+        "",
+        "Gemini 2.5 Flash Image",
+        "Default",
+        "high",
+        "medium",
+        "1K",
+        "1:1",
+        "",
+        true,
+        629,
+        "randomize"
+      ]
+    },
+    {
+      "id": 20,
+      "type": "SaveImage",
+      "pos": [
+        -2211.599999999999,
+        -77.20000000000003
+      ],
+      "size": [
+        274.3464492614139,
+        355.68714258216335
+      ],
+      "flags": {},
+      "order": 5,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 19
+        }
+      ],
+      "outputs": [],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.6.0"
+      },
+      "widgets_values": [
+        "ComfyUI"
+      ]
+    },
+    {
+      "id": 22,
+      "type": "PrimitiveStringMultiline",
+      "pos": [
+        -3021.246724950482,
+        435.4118738784611
+      ],
+      "size": [
+        400,
+        200
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "links": [
+            21
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.6.0",
+        "Node name for S&R": "PrimitiveStringMultiline"
+      },
+      "widgets_values": [
+        "给图中女士换一件衣服。"
+      ]
+    },
+    {
+      "id": 29,
+      "type": "LoadImageOutput",
+      "pos": [
+        -2925.973717172734,
+        -139.97021492479692
+      ],
+      "size": [
+        270,
+        362
+      ],
+      "flags": {},
+      "order": 1,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            44
+          ]
+        },
+        {
+          "name": "MASK",
+          "type": "MASK",
+          "links": null
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.6.0",
+        "Node name for S&R": "LoadImageOutput"
+      },
+      "widgets_values": [
+        "ComfyUI_00047_.png [output]",
+        true,
+        "refresh",
+        "image"
+      ]
+    },
+    {
+      "id": 21,
+      "type": "ContextNode",
+      "pos": [
+        -2932.924450988315,
+        290.92543739225476
+      ],
+      "size": [
+        270,
+        82
+      ],
+      "flags": {},
+      "order": 2,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "context",
+          "type": "ANY",
+          "links": [
+            20
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "Mojie-API-Party",
+        "ver": "e073aaed898375f2d8df683cb15883f29b681b51",
+        "Node name for S&R": "ContextNode"
+      },
+      "widgets_values": [
+        962649873609270,
+        "randomize"
+      ]
+    },
+    {
+      "id": 23,
+      "type": "PreviewAny",
+      "pos": [
+        -2199.8829000000005,
+        338.55190000000016
+      ],
+      "size": [
+        210,
+        166
+      ],
+      "flags": {},
+      "order": 6,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "source",
+          "type": "*",
+          "link": 23
+        }
+      ],
+      "outputs": [],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.6.0",
+        "Node name for S&R": "PreviewAny"
+      },
+      "widgets_values": [
+        null,
+        null,
+        null
+      ]
+    },
+    {
+      "id": 41,
+      "type": "MarkdownNote",
+      "pos": [
+        -3451.5097485363376,
+        -177.56739481288844
+      ],
+      "size": [
+        275,
+        293
+      ],
+      "flags": {},
+      "order": 3,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [],
+      "properties": {},
+      "widgets_values": [
+        "这是gemini-nano的满血节点。支持上下文多轮编辑。接入上下文管理即可直接读取上下文。\n支持Gemini的全量参数\n- mdeia_resolution是输入图像参考程度\n- thinking_level是思考等级\n- safe_level是图片安全等级\n- resolution是输出图片分辨率，2.5不支持2K,4K,Gemini3支持.\n- System_prompt是系统提示词，如果你学过大语言模型就知道该怎么用。\n- web_search是网络搜索开关。\n更多用法可咨询摩诘AI，或查看我们相关教程."
+      ],
+      "color": "#432",
+      "bgcolor": "#653"
+    }
+  ],
+  "links": [
+    [
+      19,
+      18,
+      0,
+      20,
+      0,
+      "IMAGE"
+    ],
+    [
+      20,
+      21,
+      0,
+      18,
+      1,
+      "ANY"
+    ],
+    [
+      21,
+      22,
+      0,
+      18,
+      2,
+      "STRING"
+    ],
+    [
+      23,
+      18,
+      1,
+      23,
+      0,
+      "STRING"
+    ],
+    [
+      44,
+      29,
+      0,
+      18,
+      0,
+      "IMAGE"
+    ]
+  ],
+  "groups": [
+    {
+      "id": 1,
+      "title": "Gemini-Nano单图多轮编辑",
+      "bounding": [
+        -3149.612648536338,
+        -213.6358948128881,
+        1296.1000000000001,
+        874.2
+      ],
+      "color": "#3f789e",
+      "font_size": 24,
+      "flags": {}
+    }
+  ],
+  "config": {},
+  "extra": {
+    "ds": {
+      "scale": 0.9090909090909091,
+      "offset": [
+        3819.269084899975,
+        310.63711299470646
+      ]
+    },
+    "workflowRendererVersion": "LG",
+    "frontendVersion": "1.34.9"
+  },
+  "version": 0.4
+}

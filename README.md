@@ -57,6 +57,12 @@
 在comfyui节点列表中找到mjapiparty
 ![alt text](doc/assets/node.png)
 
+- 250121 mojie-api-party-2.2版本更新
+#### Gemini3-LLM节点和满血版的Gemini3-Nano节点
+支持的模型有Gemini 3 Pro Preview,Gemini 3 Flash Preview,Gemini3-image-Nanobanana-pro和gemini-2.5-flash-image，并且支持上下文。极大的扩展了comfyui的可塑性。并且支持全参数可调，支持结构化输出，支持web_search，支持思考等级参数和图像参考参数，支持读取视频和pdf文件。能够最大化发挥Gemini3的性能。
+![alt text](doc/assets/Gemini3-LLM.png)
+![alt text](doc/assets/gemini-nano.png)
+
 - 251217 mojie-api-party-2.0版本更新
 #### Nano-pro节点
 NanoBanana-pro又名Gemini 3 Flash Image Preview,是google旗下的图像生成模型，功能强大，支持中英文输入和中英文文字输出，对图像理解能力非常强。支持1K、2K、4K分辨率
