@@ -31,8 +31,10 @@
 [传送门](https://space.bilibili.com/483532108)
 
 ### 目前已支持的节点
-- [Nano-pro节点](#nano-pro节点)
-- [Flux-2-pro节点](#flux-2-pro节点)
+- [Gemini3-Nano节点](/doc/node_list.md#gemini3-nano节点)
+- [Gemini3-LLM](/doc/node_list.md#gemini3-llm节点)
+- [Nano-pro节点](/doc/node_list.md#nano-pro节点)
+- [Flux-2-pro节点](/doc/node_list.md#flux-2-pro节点)
 - [图片翻译节点](/doc/node_list.md#图片翻译节点)
 - [图片高清放大节点](/doc/node_list.md#图片高清放大节点)
 - [seedance视频生成](/doc/node_list.md#seedance视频生成)
@@ -122,7 +124,6 @@ Gemini 2.5 Flash Image Preview又名NanoBanana是一款强大的图片编辑模�
 ![alt text](doc/assets/NanoBanana.png)
 ![alt text](doc/assets/NanoBanana2.png)
 
-
 - 250820-新增节点
 #### Qwen-image 
 Qwen-image是阿里开源的AI绘画工具，对中文的支持非常友好，能够准确的画出细节的小字和排版，支持中文输入，中文输出。
@@ -135,8 +136,6 @@ prompt_extend是提示词扩写参数，默认开启，仅需简单提示词就�
 - 250714-新增节点：
 seededit3.0
 SeedEdit 3.0 是字节跳动开发的图片编辑工具，能通过文字描述修改图片。比如你说 “把背景换成海边”。支持使用中文提示词，支持输出中文，对比kontext一致性保持更好，支持中文提示词输入和中文文本输出。效果相当不错。
-![alt text](doc/assets/seed.png)
-![alt text](doc/assets/seed2.png)
 
 #### Kontext-pro&max
 ![alt text](doc/assets/kontext.png)
