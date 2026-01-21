@@ -31,8 +31,10 @@
 [传送门](https://space.bilibili.com/483532108)
 
 ### 目前已支持的节点
-- [Nano-pro节点](#nano-pro节点)
-- [Flux-2-pro节点](#flux-2-pro节点)
+- [Gemini3-Nano节点](/doc/node_list.md#gemini3-nano节点)
+- [Gemini3-LLM](/doc/node_list.md#gemini3-llm节点)
+- [Nano-pro节点](/doc/node_list.md#nano-pro节点)
+- [Flux-2-pro节点](/doc/node_list.md#flux-2-pro节点)
 - [图片翻译节点](/doc/node_list.md#图片翻译节点)
 - [图片高清放大节点](/doc/node_list.md#图片高清放大节点)
 - [seedance视频生成](/doc/node_list.md#seedance视频生成)
@@ -56,6 +58,12 @@
 
 在comfyui节点列表中找到mjapiparty
 ![alt text](doc/assets/node.png)
+
+- 250121 mojie-api-party-2.2版本更新
+#### Gemini3-LLM节点和满血版的Gemini3-Nano节点
+支持的模型有Gemini 3 Pro Preview,Gemini 3 Flash Preview,Gemini3-image-Nanobanana-pro和gemini-2.5-flash-image，并且支持上下文。极大的扩展了comfyui的可塑性。并且支持全参数可调，支持结构化输出，支持web_search，支持思考等级参数和图像参考参数，支持读取视频和pdf文件。能够最大化发挥Gemini3的性能。
+![alt text](doc/assets/Gemini3-LLM.png)
+![alt text](doc/assets/gemini-nano.png)
 
 - 251217 mojie-api-party-2.0版本更新
 #### Nano-pro节点
@@ -116,7 +124,6 @@ Gemini 2.5 Flash Image Preview又名NanoBanana是一款强大的图片编辑模�
 ![alt text](doc/assets/NanoBanana.png)
 ![alt text](doc/assets/NanoBanana2.png)
 
-
 - 250820-新增节点
 #### Qwen-image 
 Qwen-image是阿里开源的AI绘画工具，对中文的支持非常友好，能够准确的画出细节的小字和排版，支持中文输入，中文输出。
@@ -129,8 +136,6 @@ prompt_extend是提示词扩写参数，默认开启，仅需简单提示词就�
 - 250714-新增节点：
 seededit3.0
 SeedEdit 3.0 是字节跳动开发的图片编辑工具，能通过文字描述修改图片。比如你说 “把背景换成海边”。支持使用中文提示词，支持输出中文，对比kontext一致性保持更好，支持中文提示词输入和中文文本输出。效果相当不错。
-![alt text](doc/assets/seed.png)
-![alt text](doc/assets/seed2.png)
 
 #### Kontext-pro&max
 ![alt text](doc/assets/kontext.png)

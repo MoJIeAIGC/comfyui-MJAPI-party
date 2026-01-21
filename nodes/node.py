@@ -2838,6 +2838,7 @@ class Gemini3NanoNode:
 
         result = response.json()
         image_url = result.get("res_url")
+        restext = result.get("restext","")
 
         if not image_url:
             if result.get("restext"):
@@ -2877,7 +2878,7 @@ class Gemini3NanoNode:
         if not output_tensors:
             error_tensor = ImageConverter.create_error_image("未获取到有效图片 URL")
             output_tensors.append(error_tensor)
-        return (torch.cat(output_tensors, dim=0),"",conversation_history)
+        return (torch.cat(output_tensors, dim=0),restext,conversation_history)
 
 
 class ContextNode:
