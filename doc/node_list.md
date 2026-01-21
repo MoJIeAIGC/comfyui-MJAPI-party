@@ -1,5 +1,7 @@
 #### 所有API节点列表
 所有的节点示例工作流都可以在workflow目录下找到
+- [Gemini3-Nano节点](#gemini3-nano节点)
+- [Gemini3-LLM](#gemini3-llm节点)
 - [Nano-pro节点](#nano-pro节点)
 - [Flux-2-pro节点](#Flux-2-pro节点)
 - [图片翻译节点](#图片翻译节点)
