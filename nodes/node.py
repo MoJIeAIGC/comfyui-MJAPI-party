@@ -2531,9 +2531,9 @@ class FileLoaderNode:
     def load_file(self, file_path: str) -> tuple:
         if not os.path.exists(file_path):
             raise ValueError(f"文件不存在：{file_path}")
-        allowed_extensions = (".docx", ".pdf", ".doc")
+        allowed_extensions = (".txt", ".pdf", ".py")
         if not file_path.lower().endswith(allowed_extensions):
-            raise ValueError(f"仅支持以下文件类型：{allowed_extensions}")
+            raise ValueError(f"文件类型不支持")
         return (file_path,)
 
 
@@ -2626,7 +2626,7 @@ class GeminiLLMNode:
                 file_list = [file] if not isinstance(file, list) else file
                 file_base64 = ImageConverter.files_to_base64_list(file_list)
                 if not file_base64:
-                    return ("错误：文件转base64失败",)
+                    return ("文件类型不支持",)
             except Exception as e:
                 return (f"错误：文件处理失败：{str(e)}",)
         
