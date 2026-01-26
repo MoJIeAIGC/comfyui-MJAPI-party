@@ -2545,13 +2545,12 @@ class GeminiLLMNode:
         return {
             "required": {
                 "prompt": ("STRING",{ "forceInput": True} ),
-                # "limit_generations": ("BOOLEAN", {"default": False}),  # 是否是翻译模式
                 "model": (["Gemini 3 Pro Preview", "Gemini 3 Flash Preview"], {"default": "Gemini 3 Flash Preview"}),  # 值需和后端 MODEL_MAPPING 的 key 完全一致
                 "media_resolution": (["Default","Low","Medium","High"], {"default": "Default"}),  # 值需和后端 RESOLUTION_MAPPING 的 key 完全一致
                 "thinking_level": (["Minimal","Low","Medium","High"], {"default": "High"}),  # 值需和后端 THINKING_LEVEL_MAPPING 的 key 完全一致
                 "System_prompt": ("STRING", {"default": ""}),
-                "Web_search": ("BOOLEAN", {"default": True}),  # 是否是翻译模式
-                "format": ("BOOLEAN", {"default": False}),  # 是否是翻译模式
+                "Web_search": ("BOOLEAN", {"default": False}), 
+                "format": ("BOOLEAN", {"default": False}), 
                 "seed": ("INT", {"default": -1}),
             },
             "optional": {
@@ -2759,7 +2758,7 @@ class Gemini3NanoNode:
                 "resolution": (["1K", "2K", "4K"], {"default": "1K"}),
                 "aspect_ratio": (["16:9","4:3","2:3","4:5","1:1","3:2","5:4","3:4", "9:16"], {"default": "1:1"}),
                 "System_prompt": ("STRING", {"default": ""}),
-                "Web_search": ("BOOLEAN", {"default": True}),  # 是否是翻译模式
+                "Web_search": ("BOOLEAN", {"default": False}), 
                 "seed": ("INT", {"default": -1}),
             },
             "optional": {
@@ -2936,7 +2935,7 @@ class JSONParserNode:
     RETURN_TYPES = ("STRING",)
     RETURN_NAMES = ("output",)
     FUNCTION = "parse_json"
-    CATEGORY = "🎨MJapiparty/Utility"
+    CATEGORY = "🎨MJapiparty/LLM"
     DESCRIPTION = "解析JSON字符串并提取指定键值"
 
     def parse_json(self, json_string, value_key):
