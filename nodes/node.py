@@ -2734,7 +2734,12 @@ class GeminiLLMNode:
                 except:
                     print(f"错误响应文本: {e.response.text[:500]}...")
             # 返回错误信息作为字符串
-            return (f"API调用失败: {str(e)}",)
+            if e.response.status_code == 429:
+                return ("错误：API调用频率超过限制，请稍后重试",)
+            elif e.response.status_code == 403:
+                return ("错误。请检查令牌余额或权限",)
+            else:
+                return (f"API调用失败: {str(e)}",)
         except Exception as e:
             print(f"=== GeminiLLMNode 执行失败 ===")
             print(f"错误类型: 其他异常")
@@ -2831,9 +2836,33 @@ class Gemini3NanoNode:
             "Content-Type": "application/json",
             "Authorization": f"Bearer {oneapi_token}"
         }
-        response = requests.post(oneapi_url, headers=headers, json=payload, timeout=240)
+        try:
+            response = requests.post(oneapi_url, headers=headers, json=payload, timeout=240)
 
-        response.raise_for_status()
+            response.raise_for_status()
+        except requests.exceptions.RequestException as e:
+            print(f"=== API调用失败 ===")
+            print(f"错误类型: 请求异常")
+            print(f"错误详情: {str(e)}")
+            # 创建一个纯白色的图片
+            from PIL import Image
+            white_image = Image.new("RGB", (512, 512), (255, 255, 255))
+            white_tensor = ImageConverter.pil2tensor(white_image)
+            # return (white_tensor, result.get("restext"), conversation_history)
+            if hasattr(e, 'response') and e.response is not None:
+                print(f"错误状态码: {e.response.status_code}")
+                try:
+                    error_response = e.response.json()
+                    print(f"错误响应内容: {error_response}")
+                except:
+                    print(f"错误响应文本: {e.response.text[:500]}...")
+            # 返回错误信息作为字符串
+            if e.response.status_code == 429:
+                return (white_tensor, "错误：API调用频率超过限制，请稍后重试")
+            elif e.response.status_code == 403:
+                return (white_tensor, "错误。请检查令牌余额或权限" )
+            else:
+                return (white_tensor, f"API调用失败: {str(e)}")
 
         result = response.json()
         image_url = result.get("res_url")
