@@ -585,6 +585,10 @@ class ImageConverter:
                     # 如果无法猜测 MIME 类型，使用默认值
                     mime_type = "application/octet-stream"
                 
+                # 只处理文档类型：PDF或纯文本
+                if mime_type not in ["application/pdf", "text/plain"]:
+                    continue
+                
                 # 读取文件内容
                 with open(file_path, "rb") as f:
                     file_content = f.read()

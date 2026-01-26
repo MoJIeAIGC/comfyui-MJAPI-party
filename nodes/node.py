@@ -2531,9 +2531,9 @@ class FileLoaderNode:
     def load_file(self, file_path: str) -> tuple:
         if not os.path.exists(file_path):
             raise ValueError(f"文件不存在：{file_path}")
-        allowed_extensions = (".docx", ".pdf", ".doc")
+        allowed_extensions = (".txt", ".pdf", ".py")
         if not file_path.lower().endswith(allowed_extensions):
-            raise ValueError(f"仅支持以下文件类型：{allowed_extensions}")
+            raise ValueError(f"文件类型不支持")
         return (file_path,)
 
 
@@ -2544,14 +2544,13 @@ class GeminiLLMNode:
     def INPUT_TYPES(cls):
         return {
             "required": {
-                "prompt": ("STRING", ),
-                # "limit_generations": ("BOOLEAN", {"default": False}),  # 是否是翻译模式
+                "prompt": ("STRING",{ "forceInput": True} ),
                 "model": (["Gemini 3 Pro Preview", "Gemini 3 Flash Preview"], {"default": "Gemini 3 Flash Preview"}),  # 值需和后端 MODEL_MAPPING 的 key 完全一致
                 "media_resolution": (["Default","Low","Medium","High"], {"default": "Default"}),  # 值需和后端 RESOLUTION_MAPPING 的 key 完全一致
                 "thinking_level": (["Minimal","Low","Medium","High"], {"default": "High"}),  # 值需和后端 THINKING_LEVEL_MAPPING 的 key 完全一致
                 "System_prompt": ("STRING", {"default": ""}),
-                "Web_search": ("BOOLEAN", {"default": True}),  # 是否是翻译模式
-                "format": ("BOOLEAN", {"default": False}),  # 是否是翻译模式
+                "Web_search": ("BOOLEAN", {"default": False}), 
+                "format": ("BOOLEAN", {"default": False}), 
                 "seed": ("INT", {"default": -1}),
             },
             "optional": {
@@ -2626,7 +2625,7 @@ class GeminiLLMNode:
                 file_list = [file] if not isinstance(file, list) else file
                 file_base64 = ImageConverter.files_to_base64_list(file_list)
                 if not file_base64:
-                    return ("错误：文件转base64失败",)
+                    return ("文件类型不支持",)
             except Exception as e:
                 return (f"错误：文件处理失败：{str(e)}",)
         
@@ -2735,7 +2734,12 @@ class GeminiLLMNode:
                 except:
                     print(f"错误响应文本: {e.response.text[:500]}...")
             # 返回错误信息作为字符串
-            return (f"API调用失败: {str(e)}",)
+            if e.response.status_code == 429:
+                return ("错误：API调用频率超过限制，请稍后重试",)
+            elif e.response.status_code == 403:
+                return ("错误。请检查令牌余额或权限",)
+            else:
+                return (white_tensor, f"API调用失败，请稍后重试")
         except Exception as e:
             print(f"=== GeminiLLMNode 执行失败 ===")
             print(f"错误类型: 其他异常")
@@ -2751,7 +2755,7 @@ class Gemini3NanoNode:
     def INPUT_TYPES(cls):
         return {
             "required": {
-                "prompt": ("STRING", ),
+                "prompt": ("STRING",{ "forceInput": True} ),
                 "model": (["Gemini 2.5 Flash Image", "Gemini-3-pro-image-preview"], {"default": "Gemini 2.5 Flash Image"}),  # 值需和后端 MODEL_MAPPING 的 key 完全一致
                 "media_resolution": (["Default","Low","Medium","High"], {"default": "Default"}),  # 值需和后端 RESOLUTION_MAPPING 的 key 完全一致
                 "thinking_level": (["minimal","low","medium","high"], {"default": "high"}),  # 值需和后端 THINKING_LEVEL_MAPPING 的 key 完全一致
@@ -2759,7 +2763,7 @@ class Gemini3NanoNode:
                 "resolution": (["1K", "2K", "4K"], {"default": "1K"}),
                 "aspect_ratio": (["16:9","4:3","2:3","4:5","1:1","3:2","5:4","3:4", "9:16"], {"default": "1:1"}),
                 "System_prompt": ("STRING", {"default": ""}),
-                "Web_search": ("BOOLEAN", {"default": True}),  # 是否是翻译模式
+                "Web_search": ("BOOLEAN", {"default": False}), 
                 "seed": ("INT", {"default": -1}),
             },
             "optional": {
@@ -2832,9 +2836,33 @@ class Gemini3NanoNode:
             "Content-Type": "application/json",
             "Authorization": f"Bearer {oneapi_token}"
         }
-        response = requests.post(oneapi_url, headers=headers, json=payload, timeout=240)
+        try:
+            response = requests.post(oneapi_url, headers=headers, json=payload, timeout=240)
 
-        response.raise_for_status()
+            response.raise_for_status()
+        except requests.exceptions.RequestException as e:
+            print(f"=== API调用失败 ===")
+            print(f"错误类型: 请求异常")
+            print(f"错误详情: {str(e)}")
+            # 创建一个纯白色的图片
+            from PIL import Image
+            white_image = Image.new("RGB", (512, 512), (255, 255, 255))
+            white_tensor = ImageConverter.pil2tensor(white_image)
+            # return (white_tensor, result.get("restext"), conversation_history)
+            if hasattr(e, 'response') and e.response is not None:
+                print(f"错误状态码: {e.response.status_code}")
+                try:
+                    error_response = e.response.json()
+                    print(f"错误响应内容: {error_response}")
+                except:
+                    print(f"错误响应文本: {e.response.text[:500]}...")
+            # 返回错误信息作为字符串
+            if e.response.status_code == 429:
+                return (white_tensor, "错误：API调用频率超过限制，请稍后重试")
+            elif e.response.status_code == 403:
+                return (white_tensor, "错误。请检查令牌余额或权限" )
+            else:
+                return (white_tensor, f"API调用失败，请稍后重试")
 
         result = response.json()
         image_url = result.get("res_url")
@@ -2922,6 +2950,74 @@ class ContextNode:
         # 确保返回合法列表
         return (conversation_history,)
 
+
+class JSONParserNode:
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "json_string": ("STRING", { "forceInput": True}),
+                "value_key": ("STRING", {"default": "", "placeholder": "要提取的键名"}),
+            }
+        }
+
+    RETURN_TYPES = ("STRING",)
+    RETURN_NAMES = ("output",)
+    FUNCTION = "parse_json"
+    CATEGORY = "🎨MJapiparty/LLM"
+    DESCRIPTION = "解析JSON字符串并提取指定键值"
+
+    def parse_json(self, json_string, value_key):
+        # 输入非空校验
+        json_string_stripped = json_string.strip() if json_string else ""
+        if not json_string_stripped:
+            return ("错误：JSON字符串不能为空",)
+        
+        # 如果value_key为空，原样输出
+        if not value_key.strip():
+            return (json_string_stripped,)
+        
+        # 尝试解析JSON
+        import json
+        try:
+            json_data = json.loads(json_string_stripped)
+        except json.JSONDecodeError as e:
+            return (f"错误：必须是有效的JSON格式 - {str(e)}",)
+        
+        # 定义递归搜索函数
+        def search_key(data, key):
+            # 如果是字典，检查当前层
+            if isinstance(data, dict):
+                if key in data:
+                    return data[key]
+                # 递归搜索子层
+                for value in data.values():
+                    result = search_key(value, key)
+                    if result is not None:
+                        return result
+            # 如果是数组，递归搜索每个元素
+            elif isinstance(data, list):
+                for item in data:
+                    result = search_key(item, key)
+                    if result is not None:
+                        return result
+            # 其他类型，返回None
+            return None
+        
+        # 开始搜索
+        extracted_value = search_key(json_data, value_key)
+        
+        # 如果找到键，返回对应值
+        if extracted_value is not None:
+            # 将提取的值转换为字符串
+            if isinstance(extracted_value, (dict, list)):
+                return (json.dumps(extracted_value, ensure_ascii=False),)
+            else:
+                return (str(extracted_value),)
+        else:
+            # 未找到键，原样输出
+            return (json_string_stripped,)
+
 NODE_CLASS_MAPPINGS = {
     "GeminiEditNode": GeminiEditNode,
     "NanoProNode": NanoProNode,
@@ -2954,6 +3050,7 @@ NODE_CLASS_MAPPINGS = {
     "GeminiLLMNode": GeminiLLMNode,
     "Gemini3NanoNode": Gemini3NanoNode,
     "FileLoaderNode": FileLoaderNode,
+    "JSONParserNode": JSONParserNode,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
@@ -2988,4 +3085,5 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "Gemini3NanoNode": "Gemini3-image-Nano",
     "ContextNode": "对话上下文管理",
     "FileLoaderNode": "文件加载器",
+    "JSONParserNode": "JSON解析器",
 }
