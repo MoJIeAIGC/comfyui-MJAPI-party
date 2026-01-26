@@ -2739,7 +2739,7 @@ class GeminiLLMNode:
             elif e.response.status_code == 403:
                 return ("错误。请检查令牌余额或权限",)
             else:
-                return (f"API调用失败: {str(e)}",)
+                return (white_tensor, f"API调用失败，请稍后重试")
         except Exception as e:
             print(f"=== GeminiLLMNode 执行失败 ===")
             print(f"错误类型: 其他异常")
@@ -2862,7 +2862,7 @@ class Gemini3NanoNode:
             elif e.response.status_code == 403:
                 return (white_tensor, "错误。请检查令牌余额或权限" )
             else:
-                return (white_tensor, f"API调用失败: {str(e)}")
+                return (white_tensor, f"API调用失败，请稍后重试")
 
         result = response.json()
         image_url = result.get("res_url")
