@@ -2922,6 +2922,74 @@ class ContextNode:
         # 确保返回合法列表
         return (conversation_history,)
 
+
+class JSONParserNode:
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "json_string": ("STRING", { "placeholder": "输入JSON字符串"}),
+                "value_key": ("STRING", {"default": "", "placeholder": "要提取的键名"}),
+            }
+        }
+
+    RETURN_TYPES = ("STRING",)
+    RETURN_NAMES = ("output",)
+    FUNCTION = "parse_json"
+    CATEGORY = "🎨MJapiparty/Utility"
+    DESCRIPTION = "解析JSON字符串并提取指定键值"
+
+    def parse_json(self, json_string, value_key):
+        # 输入非空校验
+        json_string_stripped = json_string.strip() if json_string else ""
+        if not json_string_stripped:
+            return ("错误：JSON字符串不能为空",)
+        
+        # 如果value_key为空，原样输出
+        if not value_key.strip():
+            return (json_string_stripped,)
+        
+        # 尝试解析JSON
+        import json
+        try:
+            json_data = json.loads(json_string_stripped)
+        except json.JSONDecodeError as e:
+            return (f"错误：必须是有效的JSON格式 - {str(e)}",)
+        
+        # 定义递归搜索函数
+        def search_key(data, key):
+            # 如果是字典，检查当前层
+            if isinstance(data, dict):
+                if key in data:
+                    return data[key]
+                # 递归搜索子层
+                for value in data.values():
+                    result = search_key(value, key)
+                    if result is not None:
+                        return result
+            # 如果是数组，递归搜索每个元素
+            elif isinstance(data, list):
+                for item in data:
+                    result = search_key(item, key)
+                    if result is not None:
+                        return result
+            # 其他类型，返回None
+            return None
+        
+        # 开始搜索
+        extracted_value = search_key(json_data, value_key)
+        
+        # 如果找到键，返回对应值
+        if extracted_value is not None:
+            # 将提取的值转换为字符串
+            if isinstance(extracted_value, (dict, list)):
+                return (json.dumps(extracted_value, ensure_ascii=False),)
+            else:
+                return (str(extracted_value),)
+        else:
+            # 未找到键，原样输出
+            return (json_string_stripped,)
+
 NODE_CLASS_MAPPINGS = {
     "GeminiEditNode": GeminiEditNode,
     "NanoProNode": NanoProNode,
@@ -2954,6 +3022,7 @@ NODE_CLASS_MAPPINGS = {
     "GeminiLLMNode": GeminiLLMNode,
     "Gemini3NanoNode": Gemini3NanoNode,
     "FileLoaderNode": FileLoaderNode,
+    "JSONParserNode": JSONParserNode,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
@@ -2988,4 +3057,5 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "Gemini3NanoNode": "Gemini3-image-Nano",
     "ContextNode": "对话上下文管理",
     "FileLoaderNode": "文件加载器",
+    "JSONParserNode": "JSON解析器",
 }
