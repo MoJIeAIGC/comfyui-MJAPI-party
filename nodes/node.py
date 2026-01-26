@@ -2544,7 +2544,7 @@ class GeminiLLMNode:
     def INPUT_TYPES(cls):
         return {
             "required": {
-                "prompt": ("STRING", ),
+                "prompt": ("STRING",{ "forceInput": True} ),
                 # "limit_generations": ("BOOLEAN", {"default": False}),  # 是否是翻译模式
                 "model": (["Gemini 3 Pro Preview", "Gemini 3 Flash Preview"], {"default": "Gemini 3 Flash Preview"}),  # 值需和后端 MODEL_MAPPING 的 key 完全一致
                 "media_resolution": (["Default","Low","Medium","High"], {"default": "Default"}),  # 值需和后端 RESOLUTION_MAPPING 的 key 完全一致
@@ -2751,7 +2751,7 @@ class Gemini3NanoNode:
     def INPUT_TYPES(cls):
         return {
             "required": {
-                "prompt": ("STRING", ),
+                "prompt": ("STRING",{ "forceInput": True} ),
                 "model": (["Gemini 2.5 Flash Image", "Gemini-3-pro-image-preview"], {"default": "Gemini 2.5 Flash Image"}),  # 值需和后端 MODEL_MAPPING 的 key 完全一致
                 "media_resolution": (["Default","Low","Medium","High"], {"default": "Default"}),  # 值需和后端 RESOLUTION_MAPPING 的 key 完全一致
                 "thinking_level": (["minimal","low","medium","high"], {"default": "high"}),  # 值需和后端 THINKING_LEVEL_MAPPING 的 key 完全一致
@@ -2928,7 +2928,7 @@ class JSONParserNode:
     def INPUT_TYPES(cls):
         return {
             "required": {
-                "json_string": ("STRING", { "placeholder": "输入JSON字符串"}),
+                "json_string": ("STRING", { "forceInput": True}),
                 "value_key": ("STRING", {"default": "", "placeholder": "要提取的键名"}),
             }
         }
