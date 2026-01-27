@@ -1824,6 +1824,9 @@ class FurniturePhotoNode:
                 "aspect_ratio": (["16:9","4:3","1:1", "3:4",  "9:16"], {"default": "4:3"}),
                 "num_images": ("INT", {"default": 1, "min": 1, "max": 2}),  # 新增参数，只能是1或2
                 "seed": ("INT", {"default": -1}),
+            },
+            "optional": {
+                "prompt": ("STRING",{ "forceInput": True} ),
             }
         }
 
@@ -1832,7 +1835,7 @@ class FurniturePhotoNode:
     FUNCTION = "generate"
     CATEGORY = "🎨MJapiparty/Product&tool"
 
-    def generate(self, seed, input_image, resolution="1K", aspect_ratio="4:3", num_images=1, furniture_types="", style_type=""):
+    def generate(self, seed, input_image, prompt="", resolution="1K", aspect_ratio="4:3", num_images=1, furniture_types="", style_type=""):
         # 获取配置
         oneapi_url, oneapi_token = config_manager.get_api_config()
         input_image_base64 = ImageConverter.tensor_to_base64(input_image)
@@ -1847,6 +1850,8 @@ class FurniturePhotoNode:
                 "seed": int(seed_override),
                 "input_image": [input_image_base64],
             }
+            if prompt:
+                payload["prompt"] = prompt
             headers = {
                 "Content-Type": "application/json",
                 "Authorization": f"Bearer {oneapi_token}"
