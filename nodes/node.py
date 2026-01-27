@@ -2984,10 +2984,26 @@ class JSONParserNode:
         
         # 尝试解析JSON
         import json
-        try:
-            json_data = json.loads(json_string_stripped)
-        except json.JSONDecodeError as e:
-            return (f"错误：必须是有效的JSON格式 - {str(e)}",)
+        import re
+        
+        # 检查是否为Markdown格式的JSON代码块
+        markdown_json_match = re.search(r'```json\s*(.*?)\s*```', json_string_stripped, re.DOTALL)
+        if markdown_json_match:
+            # 提取代码块中的JSON内容
+            json_content = markdown_json_match.group(1).strip()
+            if not json_content:
+                return ("错误：Markdown代码块中没有JSON内容",)
+            # 使用提取的内容进行解析
+            try:
+                json_data = json.loads(json_content)
+            except json.JSONDecodeError as e:
+                return (f"错误：Markdown代码块中的JSON格式无效 - {str(e)}",)
+        else:
+            # 普通JSON字符串，直接解析
+            try:
+                json_data = json.loads(json_string_stripped)
+            except json.JSONDecodeError as e:
+                return (f"错误：必须是有效的JSON格式 - {str(e)}",)
         
         # 定义递归搜索函数
         def search_key(data, key):
