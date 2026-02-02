@@ -1282,7 +1282,7 @@ class DoubaoSeedreamNode:
                 "prompt": ("STRING", {"default": "A beautiful sunset", "multiline": True}),
                 "seed": ("INT", {"default": -1}),
                 "custom_size": ("BOOLEAN", {"default": False}),  # 自定义尺寸开关
-                "size": (["2048x2048", "2304x1728", "1728x2304", "2560x1440", "1440x2560", "2496x1664", "1664x2496", "3024x1296"], {"default": "2048x2048"}),
+                "size": (["2K:2048x2048", "2K:2304x1728", "2K:1728x2304", "2K:2560x1440", "2K:1440x2560", "2K:2496x1664", "2K:1664x2496", "2K:3024x1296","4k:4096x4096", "4k:3520x4704", "4k:4704x3520", "4k:5504x3040", "4k:3040x5504", "4k:3328x4992", "4k:4992x3328", "4k:6240x2656"], {"default": "2K:2048x2048"}),
                 "width": ("INT", {"default": 1024, "min": 1024, "max": 4096}),  # 生成张数
                 "height": ("INT", {"default": 1024, "min": 1024, "max": 4096}),  # 生成张数
                 "max_SetImage": (["off", 'auto'], {"default": "off"}),  
@@ -1297,12 +1297,12 @@ class DoubaoSeedreamNode:
     FUNCTION = "generate"
     CATEGORY = "🎨MJapiparty/ImageCreat"
 
-    def generate(self, prompt, seed, image_input=None,width=1024,height=1024,custom_size=True,size="1024x1024",max_SetImage="off"):
+    def generate(self, prompt, seed, image_input=None,width=1024,height=1024,custom_size=True,size="2K:1024x1024",max_SetImage="off"):
         # 调用配置管理器获取配置
         oneapi_url, oneapi_token = config_manager.get_api_config()
 
         if custom_size == False:
-            resl_size = size
+            resl_size = size.split(":")[1]
         else:
             resl_size = f"{width}x{height}"
 
