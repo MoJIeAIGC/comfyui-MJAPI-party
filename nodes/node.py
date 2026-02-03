@@ -1226,11 +1226,13 @@ class GeminiEditNode:
             # 判断状态码是否为 200
             print(f"Gemini API 响应状态码: {response.status_code}")
             if response.status_code != 200:
-                raise requests.exceptions.HTTPError(f"Request failed with status code {response.status_code}: {response.text}")
-                # error_msg = ImageConverter.get_status_error_msg(response)
-                # error_tensor = ImageConverter.create_error_image(error_msg, width=512, height=512)
-                # return (torch.cat(error_tensor, dim=0),)
-            response.raise_for_status()
+                # raise requests.exceptions.HTTPError(f"Request failed with status code {response.status_code}: {response.text}")
+                error_msg = ImageConverter.get_status_error_msg(response)
+                print(f"Gemini API 错误消息: {error_msg}")
+                error_tensor = ImageConverter.create_error_image(error_msg, width=512, height=512)
+                error_tensors = [error_tensor for _ in range(1)]
+                return (torch.cat(error_tensors, dim=0),)
+            # response.raise_for_status()
             result = response.json()
 
             # 从返回的结果中提取图片 URL
