@@ -2371,8 +2371,13 @@ class NanoProNode:
                 "Authorization": f"Bearer {oneapi_token}"
             }
             response = requests.post(oneapi_url, headers=headers, json=payload, timeout=240)
-
-            response.raise_for_status()
+            if response.status_code != 200:
+                error_msg = ImageConverter.get_status_error_msg(response)
+                print("错误信息",error_msg)
+                error_tensor = ImageConverter.create_error_image(error_msg)
+                output_tensors.append(error_tensor)
+                return
+            # response.raise_for_status()
 
             result = response.json()
             image_url = result.get("res_url")
