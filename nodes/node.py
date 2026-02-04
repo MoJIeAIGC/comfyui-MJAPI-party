@@ -2880,6 +2880,16 @@ class Gemini3NanoNode:
         image_url = result.get("res_url")
         restext = result.get("restext","")
 
+        conversation_history = result.get("conversation_history", [])  # 提取对话历史
+        if conversation_history:
+            # print(f"API返回对话历史: {conversation_history}")
+            ImageConverter.conversation_context["image"] = conversation_history
+            conversation_history = {
+                "image": conversation_history
+            }
+            # print("ContextNode 保存对话历史:", ImageConverter.conversation_context)
+
+
         if not image_url:
             if result.get("restext"):
                 # 创建一个纯白色的图片
@@ -2891,14 +2901,6 @@ class Gemini3NanoNode:
                 raise ValueError("模型未回复")
 
         image_urls = image_url.split("|") if image_url else []
-        conversation_history = result.get("conversation_history", [])  # 提取对话历史
-        if conversation_history:
-            # print(f"API返回对话历史: {conversation_history}")
-            ImageConverter.conversation_context["image"] = conversation_history
-            conversation_history = {
-                "image": conversation_history
-            }
-            # print("ContextNode 保存对话历史:", ImageConverter.conversation_context)
         print(image_urls)
         for image_url in image_urls:
             if not image_url:
