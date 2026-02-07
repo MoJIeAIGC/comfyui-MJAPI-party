@@ -1226,11 +1226,13 @@ class GeminiEditNode:
             # 判断状态码是否为 200
             print(f"Gemini API 响应状态码: {response.status_code}")
             if response.status_code != 200:
-                raise requests.exceptions.HTTPError(f"Request failed with status code {response.status_code}: {response.text}")
-                # error_msg = ImageConverter.get_status_error_msg(response)
-                # error_tensor = ImageConverter.create_error_image(error_msg, width=512, height=512)
-                # return (torch.cat(error_tensor, dim=0),)
-            response.raise_for_status()
+                # raise requests.exceptions.HTTPError(f"Request failed with status code {response.status_code}: {response.text}")
+                error_msg = ImageConverter.get_status_error_msg(response)
+                print(f"Gemini API 错误消息: {error_msg}")
+                error_tensor = ImageConverter.create_error_image(error_msg, width=512, height=512)
+                error_tensors = [error_tensor for _ in range(1)]
+                return (torch.cat(error_tensors, dim=0),)
+            # response.raise_for_status()
             result = response.json()
 
             # 从返回的结果中提取图片 URL
@@ -2369,8 +2371,13 @@ class NanoProNode:
                 "Authorization": f"Bearer {oneapi_token}"
             }
             response = requests.post(oneapi_url, headers=headers, json=payload, timeout=240)
-
-            response.raise_for_status()
+            if response.status_code != 200:
+                error_msg = ImageConverter.get_status_error_msg(response)
+                print("错误信息",error_msg)
+                error_tensor = ImageConverter.create_error_image(error_msg)
+                output_tensors.append(error_tensor)
+                return
+            # response.raise_for_status()
 
             result = response.json()
             image_url = result.get("res_url")
@@ -2873,6 +2880,16 @@ class Gemini3NanoNode:
         image_url = result.get("res_url")
         restext = result.get("restext","")
 
+        conversation_history = result.get("conversation_history", [])  # 提取对话历史
+        if conversation_history:
+            # print(f"API返回对话历史: {conversation_history}")
+            ImageConverter.conversation_context["image"] = conversation_history
+            conversation_history = {
+                "image": conversation_history
+            }
+            # print("ContextNode 保存对话历史:", ImageConverter.conversation_context)
+
+
         if not image_url:
             if result.get("restext"):
                 # 创建一个纯白色的图片
@@ -2884,14 +2901,6 @@ class Gemini3NanoNode:
                 raise ValueError("模型未回复")
 
         image_urls = image_url.split("|") if image_url else []
-        conversation_history = result.get("conversation_history", [])  # 提取对话历史
-        if conversation_history:
-            # print(f"API返回对话历史: {conversation_history}")
-            ImageConverter.conversation_context["image"] = conversation_history
-            conversation_history = {
-                "image": conversation_history
-            }
-            # print("ContextNode 保存对话历史:", ImageConverter.conversation_context)
         print(image_urls)
         for image_url in image_urls:
             if not image_url:
