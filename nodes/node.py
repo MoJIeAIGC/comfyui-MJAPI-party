@@ -950,9 +950,13 @@ class GetDressing:
         return {
             "required": {
                 "image": ("IMAGE",),  # 输入图像
+                "resolution": (["1K", "2K"], {"default": "1K"}),
                 "extend_prompt": ([ "默认","全身", "上身", "下身","外套"], {"default": "默认"}),
                 "size": ([ "1:1", "3:4", "4:3"], {"default": "1:1"}),
                 "seed": ("INT", {"default": -1}),  # -1表示随机
+            },
+            "optional": {
+                "prompt": ("STRING",{ "forceInput": True} ),
             }
         }
 
@@ -961,7 +965,7 @@ class GetDressing:
     FUNCTION = "generate"
     CATEGORY = "🎨MJapiparty/Product&tool"
 
-    def generate(self,  image, seed,  extend_prompt,size="1:1"):
+    def generate(self,  image, seed,  extend_prompt,size="1:1",prompt="",resolution="1K"):
         # 调用配置管理器获取配置
         oneapi_url, oneapi_token = config_manager.get_api_config()
 
@@ -982,7 +986,9 @@ class GetDressing:
             "aspect_ratio": size,
             "input_image": mig_base64,
             "watermark": False,
-            "extend_prompt": extend_prompt
+            "extend_prompt": extend_prompt,
+            "resolution": resolution,
+            "prompt": prompt,
         }
 
         try:
@@ -1484,9 +1490,14 @@ class MoterPoseNode:
         return {
             "required": {
                 "image_input": ("IMAGE", {"default": None}),  # 可选的图像输入
-                "extent_prompt": ("BOOLEAN", {"default": True}),  # 是否是翻译模式
+                "style": (["basic", "deep", "prompt"], {"default": "basic"}),
+                "resolution": (["1K", "2K"], {"default": "1K"}),
+                # "extent_prompt": ("BOOLEAN", {"default": True}),  # 是否是翻译模式
                 "out_batch": ("INT", {"default": 1, "min": 1, "max": 4}),  # 生成张数
                 "seed": ("INT", {"default": -1}),
+            },
+            "optional": {
+                "prompt": ("STRING",{ "forceInput": True} ),
             }
         }
 
@@ -1495,18 +1506,24 @@ class MoterPoseNode:
     FUNCTION = "generate"
     CATEGORY = "🎨MJapiparty/Product&tool"
 
-    def generate(self,  seed, image_input=None, extent_prompt=False,out_batch=1):
+    def generate(self,  seed, image_input=None, style="basic",out_batch=1,prompt="",resolution="1K"):
         # 调用配置管理器获取配置
         oneapi_url, oneapi_token = config_manager.get_api_config()
+        if style == "prompt":
+            if not prompt:
+                raise ValueError("选择prompt后prompt输入不能为空")
 
         def call_api(seed_override):
             payload = {
                 "model": "moter-pose-change",
-                "extent_prompt": extent_prompt,  # 传递翻译模式参数
+                # "extent_prompt": extent_prompt,  # 传递翻译模式参数
                 "seed": int(seed_override),
                 "watermark": False,
                 "mount": out_batch,
-                "input_image": ImageConverter.tensor_to_base64(image_input)
+                "input_image": ImageConverter.tensor_to_base64(image_input),
+                "style": style,
+                "prompt": prompt,
+                "resolution": resolution,
             }
 
             headers = {
