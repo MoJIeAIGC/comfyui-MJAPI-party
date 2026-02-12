@@ -1518,6 +1518,8 @@ class MoterPoseNode:
         if style == "prompt":
             if not prompt:
                 raise ValueError("选择prompt后prompt输入不能为空")
+        if not prompt:
+            prompt = ","
 
         def call_api(seed_override):
             payload = {
