@@ -1433,9 +1433,10 @@ class ModelGenNode:
                 "aspect_ratio": Size,  # 传递尺寸参数
                 "cloths_image": cloths_image_base64,
                 "resolution": resolution,
-                "prompt": prompt,
                 "image_list": [cloths_image_base64],
             }
+            if prompt:
+                payload["prompt"] = prompt
             if face_image is not None:
                 face_image_base64 = ImageConverter.tensor_to_base64(face_image)
                 payload["face_image"] = face_image_base64
