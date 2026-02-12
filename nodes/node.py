@@ -1973,7 +1973,7 @@ class SinotecdesginNode:
     FUNCTION = "generate"
     CATEGORY = "🎨MJapiparty/Tools_api"
 
-    def generate(self, seed, image_input=[], prompt="", type="单张设定图"):
+    def generate(self, seed, image_input=[], prompt=",", type="单张设定图"):
 
             
         # 调用配置管理器获取配置
