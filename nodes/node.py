@@ -954,9 +954,6 @@ class GetDressing:
                 "style_type": ([ "白底图","灰底图"], {"default": "白底图"}),
                 "size": ([ "1:1", "3:4", "4:3"], {"default": "1:1"}),
                 "seed": ("INT", {"default": -1}),  # -1表示随机
-            },
-            "optional": {
-                "prompt": ("STRING",{ "forceInput": True} ),
             }
         }
 
@@ -965,7 +962,7 @@ class GetDressing:
     FUNCTION = "generate"
     CATEGORY = "🎨MJapiparty/Product&tool"
 
-    def generate(self,  image, seed,  style_type,size="1:1",prompt="",resolution="1K"):
+    def generate(self,  image, seed,  style_type,size="1:1",resolution="1K"):
         # 调用配置管理器获取配置
         oneapi_url, oneapi_token = config_manager.get_api_config()
 
@@ -988,7 +985,6 @@ class GetDressing:
             "watermark": False,
             "style_type": style_type,
             "resolution": resolution,
-            "prompt": prompt,
         }
 
         try:
