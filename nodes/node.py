@@ -1390,6 +1390,7 @@ class ModelGenNode:
             "required": {
                 "cloths_image": ("IMAGE",),  # 输入图像
                 "race_class": (["亚裔", "黑人", "白人"], {"default": "亚裔"}),
+                "resolution": (["1K", "2K"], {"default": "2K"}),
                 "gender_class": (["man", "woman", "little boy","little girl"], {"default": "woman"}),
                 "style_prompt": (style_prompt, {"default": "通用-INS自拍"}),
                 "seed": ("INT", {"default": -1}),
@@ -1397,6 +1398,7 @@ class ModelGenNode:
             },
             "optional": {
                 "face_image": ("IMAGE", {"default": None}),  # 可选的图像输入
+                "prompt": ("STRING",{ "forceInput": True} ),
             }
         }
 
@@ -1405,7 +1407,7 @@ class ModelGenNode:
     FUNCTION = "generate"
     CATEGORY = "🎨MJapiparty/Product&tool"
 
-    def generate(self , seed, face_image=None, cloths_image=None,race_class="Asia",gender_class="woman",style_prompt="INS自拍风",Size="3:4"):
+    def generate(self , seed, face_image=None, cloths_image=None,race_class="Asia",gender_class="woman",style_prompt="INS自拍风",Size="3:4",resolution="2K",prompt=""):
         # 调用配置管理器获取配置
         oneapi_url, oneapi_token = config_manager.get_api_config()
 
@@ -1429,11 +1431,15 @@ class ModelGenNode:
                 "is_face": is_face,
                 "style_prompt": style_prompt,
                 "aspect_ratio": Size,  # 传递尺寸参数
-                "cloths_image": cloths_image_base64
+                "cloths_image": cloths_image_base64,
+                "resolution": resolution,
+                "prompt": prompt,
+                "image_list": [cloths_image_base64],
             }
             if face_image is not None:
                 face_image_base64 = ImageConverter.tensor_to_base64(face_image)
                 payload["face_image"] = face_image_base64
+                payload["image_list"].append(face_image_base64)
 
 
             headers = {
