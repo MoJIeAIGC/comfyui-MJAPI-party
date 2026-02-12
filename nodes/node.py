@@ -950,7 +950,7 @@ class GetDressing:
         return {
             "required": {
                 "image": ("IMAGE",),  # 输入图像
-                "resolution": (["1K", "2K"], {"default": "1K"}),
+                "resolution": (["1K", "2K"], {"default": "2K"}),
                 "extend_prompt": ([ "默认","全身", "上身", "下身","外套"], {"default": "默认"}),
                 "size": ([ "1:1", "3:4", "4:3"], {"default": "1:1"}),
                 "seed": ("INT", {"default": -1}),  # -1表示随机
@@ -1944,6 +1944,82 @@ class FurniturePhotoNode:
         call_api(seed)
 
         return (torch.cat(output_tensors, dim=0),)  # 拼接为 (数量, H, W, 3)
+
+
+
+class SinotecdesginNode:
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "image_input": ("IMAGE", {"default": []}),  # 可选的图像输入
+                "prompt": ("STRING",),
+                "type": (["单张设定图", "多角度视图", "多表情视图"], {"default": "单张设定图"}),
+                "seed": ("INT", {"default": -1}),
+                # "prompt": ("STRING",{ "forceInput": True} ),
+            }
+        }
+
+    RETURN_TYPES = ("IMAGE",)  # 返回一个或多个IMAGE
+    RETURN_NAMES = ("output",)  # 保持为一个返回名
+    FUNCTION = "generate"
+    CATEGORY = "🎨MJapiparty/Tools_api"
+
+    def generate(self, seed, image_input=[], prompt="", type="单张设定图"):
+
+            
+        # 调用配置管理器获取配置
+        oneapi_url, oneapi_token = config_manager.get_api_config()
+        if type == "单张设定图":
+            if len(image_input) > 10:
+                raise ValueError("单张设定图最多只能输入10张图片")
+        else:
+            if len(image_input) > 1:
+                raise ValueError(type,"最多只能输入1张图片")
+
+        binary_data_base64 = ImageConverter.convert_images_to_base64(image_input)
+        api_tensors = []
+
+        payload = {
+            "model": "human_desgin",
+            "seed": int(seed+6),
+            "input_image": binary_data_base64,
+            "prompt": prompt,
+            "type": type,
+        }
+
+        headers = {
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {oneapi_token}"
+        }
+        response = requests.post(oneapi_url, headers=headers, json=payload, timeout=1200)
+        # 判断状态码是否为 200
+        if response.status_code != 200:
+            error_msg = ImageConverter.get_status_error_msg(response)
+            print("错误信息",error_msg)
+            output_tensors = []
+            error_tensor = ImageConverter.create_error_image(error_msg)
+            output_tensors.append(error_tensor)
+            return (torch.cat(output_tensors, dim=0),)
+        response.raise_for_status()
+        result = response.json()
+
+        # 从返回的结果中提取图片 URL
+        res_url = result.get("res_url", "")
+        if not res_url:
+            raise ValueError("未找到图片 URL")
+
+        response = requests.get(res_url)
+        response.raise_for_status()
+        # 将图片数据转换为 PIL 图像对象
+        img = Image.open(BytesIO(response.content)).convert("RGB")
+        api_tensors.append(ImageConverter.pil2tensor(img))
+
+        if not api_tensors:
+            error_tensor = ImageConverter.create_error_image("未获取到有效图片 URL")
+            api_tensors.append(error_tensor)
+
+        return (torch.cat(api_tensors, dim=0),)
 
 
 class DetailPhotoNode:
@@ -3098,6 +3174,7 @@ NODE_CLASS_MAPPINGS = {
     "Gemini3NanoNode": Gemini3NanoNode,
     "FileLoaderNode": FileLoaderNode,
     "JSONParserNode": JSONParserNode,
+    "SinotecdesginNode": SinotecdesginNode,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
@@ -3133,4 +3210,5 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "ContextNode": "对话上下文管理",
     "FileLoaderNode": "文件加载器",
     "JSONParserNode": "JSON解析器",
+    "SinotecdesginNode": "人设设计",
 }
