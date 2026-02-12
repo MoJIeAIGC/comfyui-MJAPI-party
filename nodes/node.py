@@ -3147,6 +3147,86 @@ class JSONParserNode:
             # 未找到键，原样输出
             return (json_string_stripped,)
 
+
+
+
+class ChangeHeadNode:
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "source_head": ("IMAGE",), 
+                "replac_head": ("IMAGE",), 
+                "seed": ("INT", {"default": -1}),
+            }
+        }
+
+    RETURN_TYPES = ("IMAGE",)  # 返回一个或多个IMAGE
+    RETURN_NAMES = ("output",)  # 保持为一个返回名
+    FUNCTION = "generate"
+    CATEGORY = "🎨MJapiparty/Product&tool"
+
+    def generate(self, seed, source_head=None, replac_head=None, num_images=1):
+        # 调用配置管理器获取配置
+        oneapi_url, oneapi_token = config_manager.get_api_config()
+        source_head = ImageConverter.tensor_to_base64(source_head)
+        replac_head = ImageConverter.tensor_to_base64(replac_head)
+        
+        payload = {
+            "model": "change_head",
+            "seed": int(seed+6),
+            "source_head": source_head,
+            "replac_head": replac_head,
+        }
+
+        headers = {
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {oneapi_token}"
+        }
+        response = requests.post(oneapi_url, headers=headers, json=payload, timeout=1200)
+        # 判断状态码是否为 200
+        if response.status_code != 200:
+            error_msg = ImageConverter.get_status_error_msg(response)
+            print("错误信息",error_msg)
+            output_tensors = []
+            error_tensor = ImageConverter.create_error_image(error_msg)
+            output_tensors.append(error_tensor)
+            return (torch.cat(output_tensors, dim=0),)
+        response.raise_for_status()
+        result = response.json()
+
+        # 从返回的结果中提取图片 URL
+        res_url = result.get("res_url", "")
+        if not res_url:
+            raise ValueError("未找到图片 URL")
+        image_urls = res_url.split("|") if res_url else []
+
+        api_tensors = []
+        print(image_urls)
+        for image_url in image_urls:
+            if not image_url:
+                continue
+            try:
+                # 下载图片
+                response = requests.get(image_url)
+                response.raise_for_status()
+                # 将图片数据转换为 PIL 图像对象
+                img = Image.open(BytesIO(response.content)).convert("RGB")
+                api_tensors.append(ImageConverter.pil2tensor(img))
+            except Exception as e:
+                print(f"下载图片 {image_url} 失败: {str(e)}")
+                error_tensor = ImageConverter.create_error_image("下载图片失败")
+                api_tensors.append(error_tensor)
+
+        if not api_tensors:
+            error_tensor = ImageConverter.create_error_image("未获取到有效图片 URL")
+            api_tensors.append(error_tensor)
+
+        return (torch.cat(api_tensors, dim=0),)
+
+
+
+
 NODE_CLASS_MAPPINGS = {
     "GeminiEditNode": GeminiEditNode,
     "NanoProNode": NanoProNode,
@@ -3181,6 +3261,7 @@ NODE_CLASS_MAPPINGS = {
     "FileLoaderNode": FileLoaderNode,
     "JSONParserNode": JSONParserNode,
     "SinotecdesginNode": SinotecdesginNode,
+    "ChangeHeadNode": ChangeHeadNode,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
@@ -3217,4 +3298,5 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "FileLoaderNode": "文件加载器",
     "JSONParserNode": "JSON解析器",
     "SinotecdesginNode": "人设设计",
+    "ChangeHeadNode": "头像替换",
 }
