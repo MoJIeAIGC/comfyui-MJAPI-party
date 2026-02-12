@@ -951,7 +951,7 @@ class GetDressing:
             "required": {
                 "image": ("IMAGE",),  # 输入图像
                 "resolution": (["1K", "2K"], {"default": "2K"}),
-                "extend_prompt": ([ "默认","全身", "上身", "下身","外套"], {"default": "默认"}),
+                "style_type": ([ "白底图","灰底图"], {"default": "白底图"}),
                 "size": ([ "1:1", "3:4", "4:3"], {"default": "1:1"}),
                 "seed": ("INT", {"default": -1}),  # -1表示随机
             },
@@ -965,7 +965,7 @@ class GetDressing:
     FUNCTION = "generate"
     CATEGORY = "🎨MJapiparty/Product&tool"
 
-    def generate(self,  image, seed,  extend_prompt,size="1:1",prompt="",resolution="1K"):
+    def generate(self,  image, seed,  style_type,size="1:1",prompt="",resolution="1K"):
         # 调用配置管理器获取配置
         oneapi_url, oneapi_token = config_manager.get_api_config()
 
@@ -986,7 +986,7 @@ class GetDressing:
             "aspect_ratio": size,
             "input_image": mig_base64,
             "watermark": False,
-            "extend_prompt": extend_prompt,
+            "style_type": style_type,
             "resolution": resolution,
             "prompt": prompt,
         }
