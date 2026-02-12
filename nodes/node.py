@@ -1962,10 +1962,12 @@ class SinotecdesginNode:
         return {
             "required": {
                 "image_input": ("IMAGE", {"default": []}),  # 可选的图像输入
-                "prompt": ("STRING",),
                 "type": (["单张设定图", "多角度视图", "多表情视图"], {"default": "单张设定图"}),
                 "seed": ("INT", {"default": -1}),
                 # "prompt": ("STRING",{ "forceInput": True} ),
+            },
+            "optional": {
+                "prompt": ("STRING",),
             }
         }
 
@@ -1974,7 +1976,7 @@ class SinotecdesginNode:
     FUNCTION = "generate"
     CATEGORY = "🎨MJapiparty/Tools_api"
 
-    def generate(self, seed, image_input=[], prompt=",", type="单张设定图"):
+    def generate(self, seed, image_input=[], prompt="", type="单张设定图"):
 
             
         # 调用配置管理器获取配置
@@ -1993,9 +1995,11 @@ class SinotecdesginNode:
             "model": "human_desgin",
             "seed": int(seed+6),
             "input_image": binary_data_base64,
-            "prompt": prompt,
+            # "prompt": prompt,
             "type": type,
         }
+        if prompt:
+            payload["prompt"] = prompt
 
         headers = {
             "Content-Type": "application/json",
