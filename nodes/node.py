@@ -1991,7 +1991,7 @@ class SinotecdesginNode:
             "model": "human_desgin",
             "seed": int(seed+6),
             "input_image": binary_data_base64,
-            "max_SetImage": count,
+            "max_SetImage": 10,
             # "prompt": prompt,
             "type": type,
         }
