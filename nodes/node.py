@@ -1970,7 +1970,7 @@ class SinotecdesginNode:
     RETURN_TYPES = ("IMAGE",)  # 返回一个或多个IMAGE
     RETURN_NAMES = ("output",)  # 保持为一个返回名
     FUNCTION = "generate"
-    CATEGORY = "🎨MJapiparty/Tools_api"
+    CATEGORY = "🎨MJapiparty/Product&tool"
 
     def generate(self, seed, image_input=[], prompt="", type="单张设定图"):
 
