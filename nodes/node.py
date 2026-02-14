@@ -2018,12 +2018,26 @@ class SinotecdesginNode:
         res_url = result.get("res_url", "")
         if not res_url:
             raise ValueError("未找到图片 URL")
-
-        response = requests.get(res_url)
-        response.raise_for_status()
-        # 将图片数据转换为 PIL 图像对象
-        img = Image.open(BytesIO(response.content)).convert("RGB")
-        api_tensors.append(ImageConverter.pil2tensor(img))
+        res_urls = res_url.split("|")
+        for url in res_urls:
+            url = url.strip()
+            if not url:
+                continue
+            
+            # 为每个下载添加重试机制（2次重试）
+            for attempt in range(3):  # 1次初始尝试 + 2次重试
+                try:
+                    response = requests.get(url)
+                    response.raise_for_status()
+                    # 将图片数据转换为 PIL 图像对象
+                    img = Image.open(BytesIO(response.content)).convert("RGB")
+                    api_tensors.append(ImageConverter.pil2tensor(img))
+                    break  # 下载成功，跳出重试循环
+                except Exception as e:
+                    if attempt == 2:  # 最后一次尝试失败
+                        # 创建错误图片并添加到结果中
+                        error_tensor = ImageConverter.create_error_image(f"下载失败: {str(e)}")
+                        api_tensors.append(error_tensor)
 
         if not api_tensors:
             error_tensor = ImageConverter.create_error_image("未获取到有效图片 URL")
