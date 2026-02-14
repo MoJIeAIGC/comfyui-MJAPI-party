@@ -950,7 +950,8 @@ class GetDressing:
         return {
             "required": {
                 "image": ("IMAGE",),  # 输入图像
-                "extend_prompt": ([ "默认","全身", "上身", "下身","外套"], {"default": "默认"}),
+                "resolution": (["1K", "2K"], {"default": "2K"}),
+                "style_type": ([ "白底图","灰底图"], {"default": "白底图"}),
                 "size": ([ "1:1", "3:4", "4:3"], {"default": "1:1"}),
                 "seed": ("INT", {"default": -1}),  # -1表示随机
             }
@@ -961,7 +962,7 @@ class GetDressing:
     FUNCTION = "generate"
     CATEGORY = "🎨MJapiparty/Product&tool"
 
-    def generate(self,  image, seed,  extend_prompt,size="1:1"):
+    def generate(self,  image, seed,  style_type,size="1:1",resolution="1K"):
         # 调用配置管理器获取配置
         oneapi_url, oneapi_token = config_manager.get_api_config()
 
@@ -982,7 +983,8 @@ class GetDressing:
             "aspect_ratio": size,
             "input_image": mig_base64,
             "watermark": False,
-            "extend_prompt": extend_prompt
+            "style_type": style_type,
+            "resolution": resolution,
         }
 
         try:
@@ -1384,6 +1386,7 @@ class ModelGenNode:
             "required": {
                 "cloths_image": ("IMAGE",),  # 输入图像
                 "race_class": (["亚裔", "黑人", "白人"], {"default": "亚裔"}),
+                "resolution": (["1K", "2K"], {"default": "2K"}),
                 "gender_class": (["man", "woman", "little boy","little girl"], {"default": "woman"}),
                 "style_prompt": (style_prompt, {"default": "通用-INS自拍"}),
                 "seed": ("INT", {"default": -1}),
@@ -1391,6 +1394,7 @@ class ModelGenNode:
             },
             "optional": {
                 "face_image": ("IMAGE", {"default": None}),  # 可选的图像输入
+                "prompt": ("STRING",{ "forceInput": True} ),
             }
         }
 
@@ -1399,7 +1403,7 @@ class ModelGenNode:
     FUNCTION = "generate"
     CATEGORY = "🎨MJapiparty/Product&tool"
 
-    def generate(self , seed, face_image=None, cloths_image=None,race_class="Asia",gender_class="woman",style_prompt="INS自拍风",Size="3:4"):
+    def generate(self , seed, face_image=None, cloths_image=None,race_class="Asia",gender_class="woman",style_prompt="INS自拍风",Size="3:4",resolution="2K",prompt=""):
         # 调用配置管理器获取配置
         oneapi_url, oneapi_token = config_manager.get_api_config()
 
@@ -1423,11 +1427,16 @@ class ModelGenNode:
                 "is_face": is_face,
                 "style_prompt": style_prompt,
                 "aspect_ratio": Size,  # 传递尺寸参数
-                "cloths_image": cloths_image_base64
+                "cloths_image": cloths_image_base64,
+                "resolution": resolution,
+                "image_list": [cloths_image_base64],
             }
+            if prompt:
+                payload["prompt"] = prompt
             if face_image is not None:
                 face_image_base64 = ImageConverter.tensor_to_base64(face_image)
                 payload["face_image"] = face_image_base64
+                payload["image_list"].append(face_image_base64)
 
 
             headers = {
@@ -1484,9 +1493,14 @@ class MoterPoseNode:
         return {
             "required": {
                 "image_input": ("IMAGE", {"default": None}),  # 可选的图像输入
-                "extent_prompt": ("BOOLEAN", {"default": True}),  # 是否是翻译模式
+                "style": (["basic", "deep", "prompt"], {"default": "basic"}),
+                "resolution": (["1K", "2K"], {"default": "1K"}),
+                # "extent_prompt": ("BOOLEAN", {"default": True}),  # 是否是翻译模式
                 "out_batch": ("INT", {"default": 1, "min": 1, "max": 4}),  # 生成张数
                 "seed": ("INT", {"default": -1}),
+            },
+            "optional": {
+                "prompt": ("STRING",{ "forceInput": True} ),
             }
         }
 
@@ -1495,18 +1509,26 @@ class MoterPoseNode:
     FUNCTION = "generate"
     CATEGORY = "🎨MJapiparty/Product&tool"
 
-    def generate(self,  seed, image_input=None, extent_prompt=False,out_batch=1):
+    def generate(self,  seed, image_input=None, style="basic",out_batch=1,prompt="",resolution="1K"):
         # 调用配置管理器获取配置
         oneapi_url, oneapi_token = config_manager.get_api_config()
+        if style == "prompt":
+            if not prompt:
+                raise ValueError("选择prompt后prompt输入不能为空")
+        if not prompt:
+            prompt = ","
 
         def call_api(seed_override):
             payload = {
                 "model": "moter-pose-change",
-                "extent_prompt": extent_prompt,  # 传递翻译模式参数
+                # "extent_prompt": extent_prompt,  # 传递翻译模式参数
                 "seed": int(seed_override),
                 "watermark": False,
                 "mount": out_batch,
-                "input_image": ImageConverter.tensor_to_base64(image_input)
+                "input_image": ImageConverter.tensor_to_base64(image_input),
+                "style": style,
+                "prompt": prompt,
+                "resolution": resolution,
             }
 
             headers = {
@@ -1927,6 +1949,101 @@ class FurniturePhotoNode:
         call_api(seed)
 
         return (torch.cat(output_tensors, dim=0),)  # 拼接为 (数量, H, W, 3)
+
+
+
+class SinotecdesginNode:
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "image_input": ("IMAGE", {"default": []}),  # 可选的图像输入
+                "type": (["单张设定图", "多角度视图", "多表情视图"], {"default": "单张设定图"}),
+                "seed": ("INT", {"default": -1}),
+                # "prompt": ("STRING",{ "forceInput": True} ),
+            },
+            "optional": {
+                "prompt": ("STRING",),
+            }
+        }
+
+    RETURN_TYPES = ("IMAGE",)  # 返回一个或多个IMAGE
+    RETURN_NAMES = ("output",)  # 保持为一个返回名
+    FUNCTION = "generate"
+    CATEGORY = "🎨MJapiparty/Product&tool"
+
+    def generate(self, seed, image_input=[], prompt="", type="单张设定图"):
+
+            
+        # 调用配置管理器获取配置
+        oneapi_url, oneapi_token = config_manager.get_api_config()
+        if type == "单张设定图":
+            if len(image_input) > 10:
+                raise ValueError("单张设定图最多只能输入10张图片")
+        else:
+            if len(image_input) > 1:
+                raise ValueError(type,"最多只能输入1张图片")
+
+        binary_data_base64 = ImageConverter.convert_images_to_base64(image_input)
+        api_tensors = []
+
+        payload = {
+            "model": "human_desgin",
+            "seed": int(seed+6),
+            "input_image": binary_data_base64,
+            "max_SetImage": 10,
+            # "prompt": prompt,
+            "type": type,
+        }
+        if prompt:
+            payload["prompt"] = prompt
+
+        headers = {
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {oneapi_token}"
+        }
+        response = requests.post(oneapi_url, headers=headers, json=payload, timeout=1200)
+        # 判断状态码是否为 200
+        if response.status_code != 200:
+            error_msg = ImageConverter.get_status_error_msg(response)
+            print("错误信息",error_msg)
+            output_tensors = []
+            error_tensor = ImageConverter.create_error_image(error_msg)
+            output_tensors.append(error_tensor)
+            return (torch.cat(output_tensors, dim=0),)
+        response.raise_for_status()
+        result = response.json()
+
+        # 从返回的结果中提取图片 URL
+        res_url = result.get("res_url", "")
+        if not res_url:
+            raise ValueError("未找到图片 URL")
+        res_urls = res_url.split("|")
+        for url in res_urls:
+            url = url.strip()
+            if not url:
+                continue
+            
+            # 为每个下载添加重试机制（2次重试）
+            for attempt in range(3):  # 1次初始尝试 + 2次重试
+                try:
+                    response = requests.get(url)
+                    response.raise_for_status()
+                    # 将图片数据转换为 PIL 图像对象
+                    img = Image.open(BytesIO(response.content)).convert("RGB")
+                    api_tensors.append(ImageConverter.pil2tensor(img))
+                    break  # 下载成功，跳出重试循环
+                except Exception as e:
+                    if attempt == 2:  # 最后一次尝试失败
+                        # 创建错误图片并添加到结果中
+                        error_tensor = ImageConverter.create_error_image(f"下载失败: {str(e)}")
+                        api_tensors.append(error_tensor)
+
+        if not api_tensors:
+            error_tensor = ImageConverter.create_error_image("未获取到有效图片 URL")
+            api_tensors.append(error_tensor)
+
+        return (torch.cat(api_tensors, dim=0),)
 
 
 class DetailPhotoNode:
@@ -3048,6 +3165,86 @@ class JSONParserNode:
             # 未找到键，原样输出
             return (json_string_stripped,)
 
+
+
+
+class ChangeHeadNode:
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "source_head": ("IMAGE",), 
+                "replac_head": ("IMAGE",), 
+                "seed": ("INT", {"default": -1}),
+            }
+        }
+
+    RETURN_TYPES = ("IMAGE",)  # 返回一个或多个IMAGE
+    RETURN_NAMES = ("output",)  # 保持为一个返回名
+    FUNCTION = "generate"
+    CATEGORY = "🎨MJapiparty/Product&tool"
+
+    def generate(self, seed, source_head=None, replac_head=None, num_images=1):
+        # 调用配置管理器获取配置
+        oneapi_url, oneapi_token = config_manager.get_api_config()
+        source_head = ImageConverter.tensor_to_base64(source_head)
+        replac_head = ImageConverter.tensor_to_base64(replac_head)
+        
+        payload = {
+            "model": "change_head",
+            "seed": int(seed+6),
+            "source_head": source_head,
+            "replac_head": replac_head,
+        }
+
+        headers = {
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {oneapi_token}"
+        }
+        response = requests.post(oneapi_url, headers=headers, json=payload, timeout=1200)
+        # 判断状态码是否为 200
+        if response.status_code != 200:
+            error_msg = ImageConverter.get_status_error_msg(response)
+            print("错误信息",error_msg)
+            output_tensors = []
+            error_tensor = ImageConverter.create_error_image(error_msg)
+            output_tensors.append(error_tensor)
+            return (torch.cat(output_tensors, dim=0),)
+        response.raise_for_status()
+        result = response.json()
+
+        # 从返回的结果中提取图片 URL
+        res_url = result.get("res_url", "")
+        if not res_url:
+            raise ValueError("未找到图片 URL")
+        image_urls = res_url.split("|") if res_url else []
+
+        api_tensors = []
+        print(image_urls)
+        for image_url in image_urls:
+            if not image_url:
+                continue
+            try:
+                # 下载图片
+                response = requests.get(image_url)
+                response.raise_for_status()
+                # 将图片数据转换为 PIL 图像对象
+                img = Image.open(BytesIO(response.content)).convert("RGB")
+                api_tensors.append(ImageConverter.pil2tensor(img))
+            except Exception as e:
+                print(f"下载图片 {image_url} 失败: {str(e)}")
+                error_tensor = ImageConverter.create_error_image("下载图片失败")
+                api_tensors.append(error_tensor)
+
+        if not api_tensors:
+            error_tensor = ImageConverter.create_error_image("未获取到有效图片 URL")
+            api_tensors.append(error_tensor)
+
+        return (torch.cat(api_tensors, dim=0),)
+
+
+
+
 NODE_CLASS_MAPPINGS = {
     "GeminiEditNode": GeminiEditNode,
     "NanoProNode": NanoProNode,
@@ -3081,6 +3278,8 @@ NODE_CLASS_MAPPINGS = {
     "Gemini3NanoNode": Gemini3NanoNode,
     "FileLoaderNode": FileLoaderNode,
     "JSONParserNode": JSONParserNode,
+    "SinotecdesginNode": SinotecdesginNode,
+    "ChangeHeadNode": ChangeHeadNode,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
@@ -3116,4 +3315,6 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "ContextNode": "对话上下文管理",
     "FileLoaderNode": "文件加载器",
     "JSONParserNode": "JSON解析器",
+    "SinotecdesginNode": "人设设计",
+    "ChangeHeadNode": "头像替换",
 }
