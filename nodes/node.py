@@ -1977,6 +1977,8 @@ class SinotecdesginNode:
             
         # 调用配置管理器获取配置
         oneapi_url, oneapi_token = config_manager.get_api_config()
+        if type == "多表情视图" and not prompt:
+            raise ValueError("多表情视图需传入提示词")
         if type == "单张设定图":
             if len(image_input) > 10:
                 raise ValueError("单张设定图最多只能输入10张图片")
