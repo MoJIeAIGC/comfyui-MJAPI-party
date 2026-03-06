@@ -1977,6 +1977,8 @@ class SinotecdesginNode:
             
         # 调用配置管理器获取配置
         oneapi_url, oneapi_token = config_manager.get_api_config()
+        if type == "多表情视图" and not prompt:
+            raise ValueError("多表情视图需传入提示词")
         if type == "单张设定图":
             if len(image_input) > 10:
                 raise ValueError("单张设定图最多只能输入10张图片")
@@ -2674,7 +2676,7 @@ class GeminiLLMNode:
         return {
             "required": {
                 "prompt": ("STRING",{ "forceInput": True} ),
-                "model": (["Gemini 3 Pro Preview", "Gemini 3 Flash Preview"], {"default": "Gemini 3 Flash Preview"}),  # 值需和后端 MODEL_MAPPING 的 key 完全一致
+                "model": (["Gemini 3 Pro Preview", "Gemini 3 Flash Preview", "Gemini 3.1 Pro Preview"], {"default": "Gemini 3 Flash Preview"}),  # 值需和后端 MODEL_MAPPING 的 key 完全一致
                 "media_resolution": (["Default","Low","Medium","High"], {"default": "Default"}),  # 值需和后端 RESOLUTION_MAPPING 的 key 完全一致
                 "thinking_level": (["Minimal","Low","Medium","High"], {"default": "High"}),  # 值需和后端 THINKING_LEVEL_MAPPING 的 key 完全一致
                 "System_prompt": ("STRING", {"default": ""}),
@@ -2697,7 +2699,7 @@ class GeminiLLMNode:
     CATEGORY = "🎨MJapiparty/LLM"
 
 
-    def generate(self, seed, prompt="", model="Gemini 3 Flash Preview Free", media_resolution="Default", thinking_level="High", System_prompt="", Web_search=True, format=False, image_input=None, video=None, file=None, context=None):
+    def generate(self, seed, prompt="", model="Gemini 3.1 Pro Preview", media_resolution="Default", thinking_level="High", System_prompt="", Web_search=True, format=False, image_input=None, video=None, file=None, context=None):
         # 输入非空校验 - 更严格地检查prompt是否为空
         prompt_stripped = prompt.strip() if prompt else ""
         if not prompt_stripped and not image_input and not video and not file:
@@ -2709,7 +2711,7 @@ class GeminiLLMNode:
             conversation_history = []
 
         # 参数值校验
-        valid_models = ["Gemini 3 Pro Preview", "Gemini 3 Flash Preview", "Gemini 3 Flash Preview Free"]
+        valid_models = ["Gemini 3 Pro Preview", "Gemini 3 Flash Preview", "Gemini 3.1 Pro Preview"]
         valid_resolutions = ["Default", "Low", "Medium", "High"]
         valid_thinking_levels = ["Minimal", "Low", "Medium", "High"]
         
@@ -2765,6 +2767,7 @@ class GeminiLLMNode:
             MODEL_MAPPING = {
                 "Gemini 3 Pro Preview": "Gemini-3-Pro-Preview",
                 "Gemini 3 Flash Preview": "Gemini-3-Flash-Preview",
+                "Gemini 3.1 Pro Preview": "Gemini-3.1-Pro-Preview",
             }
             modelr = MODEL_MAPPING.get(model, model)
             print("=== 准备调用API ===")
@@ -2885,7 +2888,7 @@ class Gemini3NanoNode:
         return {
             "required": {
                 "prompt": ("STRING",{ "forceInput": True} ),
-                "model": (["Gemini 2.5 Flash Image", "Gemini-3-pro-image-preview"], {"default": "Gemini 2.5 Flash Image"}),  # 值需和后端 MODEL_MAPPING 的 key 完全一致
+                "model": (["Gemini 2.5 Flash Image", "Gemini-3-pro-image-preview", "Gemini-3.1-flash-image-preview"], {"default": "Gemini 2.5 Flash Image"}),  # 值需和后端 MODEL_MAPPING 的 key 完全一致
                 "media_resolution": (["Default","Low","Medium","High"], {"default": "Default"}),  # 值需和后端 RESOLUTION_MAPPING 的 key 完全一致
                 "thinking_level": (["minimal","low","medium","high"], {"default": "high"}),  # 值需和后端 THINKING_LEVEL_MAPPING 的 key 完全一致
                 "safe_level": (["high","medium","low"], {"default": "medium"}),  # 值需和后端 THINKING_LEVEL_MAPPING 的 key 完全一致
@@ -2918,6 +2921,7 @@ class Gemini3NanoNode:
         MODEL_MAPPING = {
             "Gemini 2.5 Flash Image": "Gemini2.5-image-Nanobanana",
             "Gemini-3-pro-image-preview": "Gemini3-image-Nanobanana-pro",
+            "Gemini-3.1-flash-image-preview": "Gemini3.1-flash-image-preview",
         }
         modelr = MODEL_MAPPING.get(model, model)
         output_tensors = []
