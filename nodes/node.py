@@ -1841,7 +1841,7 @@ class FurniturePhotoNode:
         
         return {
             "required": {
-                "input_image": ("IMAGE",),  # 接收多个图片
+                "input_image": ("IMAGE",[]),  # 接收多个图片
                 "furniture_types": (parentname_list, {"default": parentname_list[0]}),
                 "style_type": (typename_list, {"default": typename_list[0]}),
                 # "resolution": (["1K", "2K", "4K"], {"default": "2K"}),
@@ -1862,7 +1862,7 @@ class FurniturePhotoNode:
     def generate(self, seed, input_image, prompt="", resolution="1K", aspect_ratio="4:3", num_images=1, furniture_types="", style_type=""):
         # 获取配置
         oneapi_url, oneapi_token = config_manager.get_api_config()
-        input_image_base64 = ImageConverter.tensor_to_base64(input_image)
+        # input_image_base64 = ImageConverter.tensor_to_base64(input_image)
         def call_api(seed_override):
             payload = {
                 "model": "furniture-photo",
@@ -1872,8 +1872,11 @@ class FurniturePhotoNode:
                 "furniture_types": furniture_types,
                 "style_type": style_type,
                 "seed": int(seed_override),
-                "input_image": [input_image_base64],
+                # "input_image": [input_image_base64],
             }
+            if input_image:
+                binary_data_base64 = ImageConverter.convert_images_to_base64(input_image)
+                payload["input_image"] = binary_data_base64
             if prompt:
                 payload["prompt"] = prompt
             headers = {
