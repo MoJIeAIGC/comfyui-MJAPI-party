@@ -1874,9 +1874,8 @@ class FurniturePhotoNode:
                 "seed": int(seed_override),
                 # "input_image": [input_image_base64],
             }
-            if input_image:
-                binary_data_base64 = ImageConverter.convert_images_to_base64(input_image)
-                payload["input_image"] = binary_data_base64
+            binary_data_base64 = ImageConverter.convert_images_to_base64(input_image)
+            payload["input_image"] = binary_data_base64
             if prompt:
                 payload["prompt"] = prompt
             headers = {
