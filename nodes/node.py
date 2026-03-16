@@ -2491,7 +2491,7 @@ class NanoProNode:
                 "Content-Type": "application/json",
                 "Authorization": f"Bearer {oneapi_token}"
             }
-            response = requests.post(oneapi_url, headers=headers, json=payload, timeout=240)
+            response = requests.post(oneapi_url, headers=headers, json=payload, timeout=300)
             if response.status_code != 200:
                 error_msg = ImageConverter.get_status_error_msg(response)
                 print("错误信息",error_msg)
@@ -2826,7 +2826,7 @@ class GeminiLLMNode:
             }
             print(f"正在调用API: {oneapi_url}")
             print(f"API调用超时设置: 240秒")
-            response = requests.post(oneapi_url, headers=headers, json=payload, timeout=240)
+            response = requests.post(oneapi_url, headers=headers, json=payload, timeout=300)
             print(f"API调用完成，状态码: {response.status_code}")
 
             response.raise_for_status()
@@ -2972,7 +2972,7 @@ class Gemini3NanoNode:
             "Authorization": f"Bearer {oneapi_token}"
         }
         try:
-            response = requests.post(oneapi_url, headers=headers, json=payload, timeout=240)
+            response = requests.post(oneapi_url, headers=headers, json=payload, timeout=300)
 
             response.raise_for_status()
         except requests.exceptions.RequestException as e:
