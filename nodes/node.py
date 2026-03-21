@@ -1820,8 +1820,8 @@ class FurniturePhotoNode:
         data = result.get('data', [])
         
         # 创建去重的parentname列表
-        parentname_list = list(set(item['parentname'] for item in data))
-        parentname_list.sort()  # 排序
+        #parentname_list = list(set(item['parentname'] for item in data))
+        #parentname_list.sort()  # 排序
         
         # 创建以parentname为键，typename列表为值的字典
         parentname_dict = {}
@@ -1842,11 +1842,11 @@ class FurniturePhotoNode:
         return {
             "required": {
                 "input_image": ("IMAGE",[]),  # 接收多个图片
-                "furniture_types": (parentname_list, {"default": parentname_list[0]}),
+                # "furniture_types": (parentname_list, {"default": parentname_list[0]}),
                 "style_type": (typename_list, {"default": typename_list[0]}),
-                # "resolution": (["1K", "2K", "4K"], {"default": "2K"}),
-                "aspect_ratio": (["16:9","4:3","1:1", "3:4",  "9:16"], {"default": "4:3"}),
-                "num_images": ("INT", {"default": 1, "min": 1, "max": 2}),  # 新增参数，只能是1或2
+                #"resolution": (["1K", "2K", "4K"], {"default": "2K"}),
+                "aspect_ratio": (["16:9","4:3","1:1", "3:4",  "9:16"], {"default": "1:1"}),
+                "num_images": ("INT", {"default": 1, "min": 1, "max": 4}),  # 新增参数，只能是1或2
                 "seed": ("INT", {"default": -1}),
             },
             "optional": {
@@ -1859,7 +1859,7 @@ class FurniturePhotoNode:
     FUNCTION = "generate"
     CATEGORY = "🎨MJapiparty/Product&tool"
 
-    def generate(self, seed, input_image, prompt="", resolution="1K", aspect_ratio="4:3", num_images=1, furniture_types="", style_type=""):
+    def generate(self, seed, input_image, prompt="", resolution="2K", aspect_ratio="1:1", num_images=1, style_type=""):
         # 获取配置
         oneapi_url, oneapi_token = config_manager.get_api_config()
         # input_image_base64 = ImageConverter.tensor_to_base64(input_image)
@@ -1869,7 +1869,7 @@ class FurniturePhotoNode:
                 "resolution": "2K",
                 "aspect_ratio": aspect_ratio,
                 "num_images": num_images,
-                "furniture_types": furniture_types,
+                #"furniture_types": furniture_types,
                 "style_type": style_type,
                 "seed": int(seed_override),
                 # "input_image": [input_image_base64],
