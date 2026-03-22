@@ -2895,7 +2895,7 @@ class Gemini3NanoNode:
                 "thinking_level": (["minimal","low","medium","high"], {"default": "high"}),  # 值需和后端 THINKING_LEVEL_MAPPING 的 key 完全一致
                 "safe_level": (["high","medium","low"], {"default": "medium"}),  # 值需和后端 THINKING_LEVEL_MAPPING 的 key 完全一致
                 "resolution": (["1K", "2K", "4K"], {"default": "1K"}),
-                "aspect_ratio": (["16:9","4:3","2:3","4:5","1:1","3:2","5:4","3:4", "9:16"], {"default": "1:1"}),
+                "aspect_ratio": (["16:9","4:3","2:3","4:5","1:1","3:2","5:4","3:4", "9:16","21:9"], {"default": "1:1"}),
                 "System_prompt": ("STRING", {"default": ""}),
                 "Web_search": ("BOOLEAN", {"default": False}), 
                 "seed": ("INT", {"default": -1}),
