@@ -1811,40 +1811,19 @@ class ImageUpscaleNode:
 class FurniturePhotoNode:
     @classmethod
     def INPUT_TYPES(cls):
-        url = "http://admin.qihuaimage.com/items/furniture_style"
+        url = "https://rf.mojieaigc.com/v1/styles"
         response = requests.get(url)
         response.raise_for_status()
         result = response.json()
-        
-        # 处理数据：创建去重的parentname列表和以parentname为键的字典
-        data = result.get('data', [])
-        
-        # 创建去重的parentname列表
-        #parentname_list = list(set(item['parentname'] for item in data))
-        #parentname_list.sort()  # 排序
-        
-        # 创建以parentname为键，typename列表为值的字典
-        parentname_dict = {}
-        typename_list = []
-        for item in data:
-            typename = item['typename']
-            if typename not in typename_list:
-                typename_list.append(typename)
-            parentname = item['parentname']
-            typename = item['typename']
-            if parentname not in parentname_dict:
-                parentname_dict[parentname] = []
-            parentname_dict[parentname].append(typename)
-        
-        # print("去重的parentname列表:", parentname_list)
-        # print("parentname字典:", parentname_dict)
+        style_list = result.get('style', [])
+        # print("style_list:", style_list)
         
         return {
             "required": {
                 "input_image": ("IMAGE",[]),  # 接收多个图片
                 # "furniture_types": (parentname_list, {"default": parentname_list[0]}),
                 # "style_type": (typename_list, {"default": typename_list[0]}),
-                "style_type": (["网红奶白风", "网红原木风", "宋式美学"], {"default": "网红奶白风"}),
+                "style_type": (style_list, {"default": style_list[0]}),
                 "aspect_ratio": (["16:9","4:3","1:1", "3:4",  "9:16"], {"default": "1:1"}),
                 "num_images": ("INT", {"default": 1, "min": 1, "max": 4}),  # 新增参数，只能是1或2
                 "seed": ("INT", {"default": 0}),
