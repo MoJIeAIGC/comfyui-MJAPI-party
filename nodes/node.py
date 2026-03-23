@@ -29,7 +29,7 @@ class DreaminaI2INode:
                 "skin": ("FLOAT", {"default": 0.3}),
                 "skin_unifi": ("FLOAT", {"default": 0.0}),
                 "gen_mode": (["creative", "reference", "reference_char"], {"default": "reference"}),
-                "seed": ("INT", {"default": -1}),  # -1表示随机
+                "seed": ("INT", {"default": 0}),  # -1表示随机
                 "batch_size": ("INT", {"default": 1, "min": 1, "max": 2}),  # 生成张数
             }
         }
@@ -109,7 +109,7 @@ class FluxProNode:
         return {
             "required": {
                 "prompt": ("STRING", {"default": "A beautiful sunset", "multiline": True}),
-                "seed": ("INT", {"default": -1}),
+                "seed": ("INT", {"default": 0}),
                 "is_translation": ("BOOLEAN", {"default": False}),  # 是否是翻译模式
                 "aspect_ratio": (["default", "1:1", "3:4", "4:3", "9:16", "16:9"], {"default": "default"}),
                 "batch_size": ("INT", {"default": 1, "min": 1, "max": 2}),  # 新增参数，只能是1或2
@@ -206,7 +206,7 @@ class FluxMaxNode:
         return {
             "required": {
                 "prompt": ("STRING", {"default": "A beautiful sunset", "multiline": True}),
-                "seed": ("INT", {"default": -1}),
+                "seed": ("INT", {"default": 0}),
                 "is_translation": ("BOOLEAN", {"default": False}),  # 是否是翻译模式
                 "aspect_ratio": (["default", "1:1", "3:4", "4:3", "9:16", "16:9"], {"default": "default"}),
                 "batch_size": ("INT", {"default": 1, "min": 1, "max": 2}),  # 新增参数，只能是1或2
@@ -309,7 +309,7 @@ class ReplaceNode:
                 "Product_image": ("IMAGE",),  # 输入图像
                 "prompt": ("STRING", {"default": "", "multiline": True}),
                 "strong": ("FLOAT", {"default": 0.6}),
-                "seed": ("INT", {"default": -1}),  # -1表示随机
+                "seed": ("INT", {"default": 0}),  # -1表示随机
             },
             "optional": {
                 "Product_mask": ("MASK",),  # 可选的图像输入
@@ -387,7 +387,7 @@ class SeedEdit3:
                 "image": ("IMAGE",),  # 输入图像
                 "prompt": ("STRING", {"default": "", "multiline": True}),
                 "cfg_scale": ("FLOAT", {"default": 0.5}),
-                "seed": ("INT", {"default": -1}),  # -1表示随机
+                "seed": ("INT", {"default": 0}),  # -1表示随机
                 "batch_size": ("INT", {"default": 1, "min": 1, "max": 2}),  # 生成张数
             }
         }
@@ -463,7 +463,7 @@ class KouTuNode:
         return {
             "required": {
                 "image": ("IMAGE",),  # 输入图像
-                "seed": ("INT", {"default": -1}),  # -1表示随机
+                "seed": ("INT", {"default": 0}),  # -1表示随机
             },
             "optional": {
                 "mask": ("MASK",),  # 可选的图像输入
@@ -538,7 +538,7 @@ class ViduT2VNode:
                 "movement_amplitude": (["auto", "small", "medium", "large"], {"default": "auto"}),
                 "Size": (["1:1", "9:16", "16:9"], {"default": "16:9"}),
                 "bgm": ("BOOLEAN", {"default": False}),  # 是否是翻译模式
-                "seed": ("INT", {"default": -1}),
+                "seed": ("INT", {"default": 0}),
             }
         }
 
@@ -600,7 +600,7 @@ class ViduI2VNode:
                 "resolution": (["720p", "1080p"], {"default": "1080p"}),
                 "movement_amplitude": (["auto", "small", "medium", "large"], {"default": "auto"}),
                 "bgm": ("BOOLEAN", {"default": False}),  # 是否是翻译模式
-                "seed": ("INT", {"default": -1}),
+                "seed": ("INT", {"default": 0}),
             },
             "optional": {
                 "last_image": ("IMAGE",),  # 接收多个图片
@@ -671,7 +671,7 @@ class DreaminaT2VNode:
                 "Size": (["1:1", "3:4", "4:3", "9:16", "16:9", "21:9"], {"default": "16:9"}),
                 "duration": ("INT", {"default": 10, "min": 3, "max": 12}),  # 新增参数，只能是1或2
                 "camerafixed": ("BOOLEAN", {"default": False}),  # 是否是翻译模式
-                "seed": ("INT", {"default": -1}),
+                "seed": ("INT", {"default": 0}),
             }
         }
 
@@ -733,7 +733,7 @@ class DreaminaI2VNode:
                 "Size": (["1:1", "3:4", "4:3", "9:16", "16:9", "21:9"], {"default": "16:9"}),
                 "duration": ("INT", {"default": 10, "min": 3, "max": 12}),  # 新增参数，只能是1或2
                 "camerafixed": ("BOOLEAN", {"default": False}),  # 是否是翻译模式
-                "seed": ("INT", {"default": -1}),
+                "seed": ("INT", {"default": 0}),
             },
             "optional": {
                 "last_image": ("IMAGE",),  # 接收多个图片
@@ -798,7 +798,7 @@ class QwenImageNode:
                 "size": (["1328*1328", "1664*928", "1472*1140", "1140*1472", "928*1664"], {"default": "1328*1328"}),
                 "batch_size": ("INT", {"default": 1, "min": 1, "max": 2}),  # 新增参数，只能是1或2
                 "prompt_extend": ("BOOLEAN", {"default": True}),  # 是否开启prompt智能改写
-                "seed": ("INT", {"default": -1}),
+                "seed": ("INT", {"default": 0}),
             }
         }
 
@@ -875,7 +875,7 @@ class QwenImageEditNode:
                 "prompt": ("STRING", {"default": "", "multiline": True}),
                 "image": ("IMAGE",),  # 输入图像
                 "batch_size": ("INT", {"default": 1, "min": 1, "max": 2}),  # 新增参数，只能是1或2
-                "seed": ("INT", {"default": -1}),
+                "seed": ("INT", {"default": 0}),
             }
         }
 
@@ -953,7 +953,7 @@ class GetDressing:
                 "resolution": (["1K", "2K"], {"default": "2K"}),
                 "style_type": ([ "白底图","灰底图"], {"default": "白底图"}),
                 "size": ([ "1:1", "3:4", "4:3"], {"default": "1:1"}),
-                "seed": ("INT", {"default": -1}),  # -1表示随机
+                "seed": ("INT", {"default": 0}),  # -1表示随机
             }
         }
 
@@ -1028,7 +1028,7 @@ class ViduNode:
                 "duration": ("INT", {"default": 5, "min": 1, "max": 8}),
                 "resolution": (["720p", "1080p"], {"default": "1080p"}),
                 "movement_amplitude": (["auto", "small", "medium", "large"], {"default": "auto"}),
-                "seed": ("INT", {"default": -1}),
+                "seed": ("INT", {"default": 0}),
                 "images": ("IMAGE", {"default": []})  # 接收多个图片
             }
         }
@@ -1090,7 +1090,7 @@ class ReplaceClothesNode:
             "required": {
                 "cloths_image": ("IMAGE",),  # 输入图像
                 "model_image": ("IMAGE",),  # 输入图像
-                "seed": ("INT", {"default": -1}),  # -1表示随机
+                "seed": ("INT", {"default": 0}),  # -1表示随机
             }
         }
 
@@ -1190,7 +1190,7 @@ class GeminiEditNode:
                 "is_translation": ("BOOLEAN", {"default": False}),  # 是否是翻译模式
                 "Size": (["1:1", "3:4", "4:3", "9:16", "16:9"], {"default": "3:4"}),
                 "mount": ("INT", {"default": 1, "min": 1, "max": 4}),  # 生成张数
-                "seed": ("INT", {"default": -1}),
+                "seed": ("INT", {"default": 0}),
             },
             "optional": {
                 "image_input": ("IMAGE", {"default": []}),  # 可选的图像输入
@@ -1284,7 +1284,7 @@ class DoubaoSeedreamNode:
         return {
             "required": {
                 "prompt": ("STRING", {"default": "A beautiful sunset", "multiline": True}),
-                "seed": ("INT", {"default": -1}),
+                "seed": ("INT", {"default": 0}),
                 "custom_size": ("BOOLEAN", {"default": False}),  # 自定义尺寸开关
                 "size": (["2K:2048x2048", "2K:2304x1728", "2K:1728x2304", "2K:2560x1440", "2K:1440x2560", "2K:2496x1664", "2K:1664x2496", "2K:3024x1296","4k:4096x4096", "4k:3520x4704", "4k:4704x3520", "4k:5504x3040", "4k:3040x5504", "4k:3328x4992", "4k:4992x3328", "4k:6240x2656"], {"default": "2K:2048x2048"}),
                 "width": ("INT", {"default": 1024, "min": 1024, "max": 4096}),  # 生成张数
@@ -1389,7 +1389,7 @@ class ModelGenNode:
                 "resolution": (["1K", "2K"], {"default": "2K"}),
                 "gender_class": (["man", "woman", "little boy","little girl"], {"default": "woman"}),
                 "style_prompt": (style_prompt, {"default": "通用-INS自拍"}),
-                "seed": ("INT", {"default": -1}),
+                "seed": ("INT", {"default": 0}),
                 "Size": (["1:1", "3:4", "9:16"], {"default": "3:4"}),
             },
             "optional": {
@@ -1497,7 +1497,7 @@ class MoterPoseNode:
                 "resolution": (["1K", "2K"], {"default": "1K"}),
                 # "extent_prompt": ("BOOLEAN", {"default": True}),  # 是否是翻译模式
                 "out_batch": ("INT", {"default": 1, "min": 1, "max": 4}),  # 生成张数
-                "seed": ("INT", {"default": -1}),
+                "seed": ("INT", {"default": 0}),
             },
             "optional": {
                 "prompt": ("STRING",{ "forceInput": True} ),
@@ -1594,7 +1594,7 @@ class ImageTranslateNode:
                 "modelid": (["default", "erase" ], {"default": "default"}),
                 "SourceLang": (["自动","阿拉伯语", "法语", "英语",  "加泰罗尼亚语", "葡萄牙语", "西班牙语", "荷兰语", "德语", "斯洛文尼亚语", "阿塞拜疆语", "孟加拉语", "俄语", "挪威语", "马来语", "中文", "中文 (繁体)", "捷克语", "斯洛伐克语", "波兰语", "匈牙利语", "越南语", "丹麦语", "芬兰语", "瑞典语", "印尼语", "希伯来语", "意大利语", "日语", "韩语", "泰米尔语", "泰语", "土耳其语"], {"default": "自动"}),
                 "TargetLang": (["英语","中文", "中文 (繁体)",   "日语", "韩语", "阿拉伯语", "葡萄牙语", "法语", "德语", "西班牙语", "印尼语", "意大利语", "马来语", "俄语", "泰语", "越南语"], {"default": "英语"}),
-                "seed": ("INT", {"default": -1}),
+                "seed": ("INT", {"default": 0}),
             }
         }
 
@@ -1671,7 +1671,7 @@ class ImageUpscaleNode:
         return {
             "required": {
                 "image_input": ("IMAGE", {"default": []}),  # 可选的图像输入
-                "seed": ("INT", {"default": -1}),
+                "seed": ("INT", {"default": 0}),
                 "multiple": (["x2", "x4", "x6"], {"default": "x2"}),
             }
         }
@@ -1847,7 +1847,7 @@ class FurniturePhotoNode:
                 "style_type": (["网红奶白风", "网红原木风", "宋式美学"], {"default": "网红奶白风"}),
                 "aspect_ratio": (["16:9","4:3","1:1", "3:4",  "9:16"], {"default": "1:1"}),
                 "num_images": ("INT", {"default": 1, "min": 1, "max": 4}),  # 新增参数，只能是1或2
-                "seed": ("INT", {"default": -1}),
+                "seed": ("INT", {"default": 0}),
             },
             "optional": {
                 "prompt": ("STRING",{ "forceInput": True} ),
@@ -1961,7 +1961,7 @@ class SinotecdesginNode:
             "required": {
                 "image_input": ("IMAGE", {"default": []}),  # 可选的图像输入
                 "type": (["单张设定图", "多角度视图", "多表情视图"], {"default": "单张设定图"}),
-                "seed": ("INT", {"default": -1}),
+                "seed": ("INT", {"default": 0}),
                 # "prompt": ("STRING",{ "forceInput": True} ),
             },
             "optional": {
@@ -2057,7 +2057,7 @@ class DetailPhotoNode:
             "required": {
                 "input_image": ("IMAGE",),  # 接收多个图片
                 "mask": ("MASK",),  # 输入遮罩
-                "seed": ("INT", {"default": -1}),
+                "seed": ("INT", {"default": 0}),
             }
         }
 
@@ -2183,7 +2183,7 @@ class DetailJinNode:
                 "input_image": ("IMAGE",),  # 接收多个图片
                 "Polished_type": (Polished_list, {"default": Polished_list[0]}),
                 "num_images": ("INT", {"default": 1, "min": 1, "max": 2}),  # 新增参数，只能是1或2
-                "seed": ("INT", {"default": -1}),
+                "seed": ("INT", {"default": 0}),
             }
         }
 
@@ -2304,7 +2304,7 @@ class FurnitureAngleNode:
             "required": {
                 "input_image": ("IMAGE",),  # 接收多个图片
                 "angle_type": (["4k-俯视45度","4K-正视角","4k-顶视图","4K-对角线拍摄","1k-左侧垂直视图","1k-右侧垂直视图"], {"default": "2k-俯视45度"}),
-                "seed": ("INT", {"default": -1}),
+                "seed": ("INT", {"default": 0}),
             }
         }
 
@@ -2434,7 +2434,7 @@ class NanoProNode:
                 "resolution": (["1K", "2K", "4K"], {"default": "2K"}),
                 "aspect_ratio": (["auto","16:9","4:3","2:3","4:5","1:1","3:2","5:4","3:4", "9:16"], {"default": "auto"}),
                 "num_images": ("INT", {"default": 1, "min": 1, "max": 2}),  # 新增参数，只能是1或2
-                "seed": ("INT", {"default": -1}),
+                "seed": ("INT", {"default": 0}),
             },
             "optional": {
                 "input_images": ("IMAGE",),  # 接收多个图片
@@ -2546,7 +2546,7 @@ class Flux2Node:
                 "custom_size": ("BOOLEAN", {"default": False}),  # 自定义尺寸开关
                 "width": ("INT", {"default": 1024, "min": 1024, "max": 2048}),  # 生成张数
                 "height": ("INT", {"default": 1024, "min": 1024, "max": 2048}),  # 生成张数
-                "seed": ("INT", {"default": -1}),
+                "seed": ("INT", {"default": 0}),
             },
             "optional": {
                 "input_images": ("IMAGE",),  # 接收多个图片
@@ -2677,16 +2677,16 @@ class GeminiLLMNode:
     def INPUT_TYPES(cls):
         return {
             "required": {
-                "prompt": ("STRING",{ "forceInput": True} ),
                 "model": (["Gemini 3 Pro Preview", "Gemini 3 Flash Preview", "Gemini 3.1 Pro Preview"], {"default": "Gemini 3 Flash Preview"}),  # 值需和后端 MODEL_MAPPING 的 key 完全一致
                 "media_resolution": (["Default","Low","Medium","High"], {"default": "Default"}),  # 值需和后端 RESOLUTION_MAPPING 的 key 完全一致
                 "thinking_level": (["Minimal","Low","Medium","High"], {"default": "High"}),  # 值需和后端 THINKING_LEVEL_MAPPING 的 key 完全一致
                 "System_prompt": ("STRING", {"default": ""}),
                 "Web_search": ("BOOLEAN", {"default": False}), 
                 "format": ("BOOLEAN", {"default": False}), 
-                "seed": ("INT", {"default": -1}),
+                "seed": ("INT", {"default": 0}),
             },
             "optional": {
+                "prompt": ("STRING",{ "forceInput": True} ),
                 "image_input": ("IMAGE",),  # 支持多输入，传递时会转为 base64 列表
                 "video": ("VIDEO",),  # 支持多输入，传递时会转为 base64 列表（拆帧后）
                 "file": ("FILE",),  # 支持多输入，传递时会转为 base64 列表
@@ -2888,8 +2888,7 @@ class Gemini3NanoNode:
     @classmethod
     def INPUT_TYPES(cls):
         return {
-            "required": {
-                "prompt": ("STRING",{ "forceInput": True} ),
+            "required": {                
                 "model": (["Gemini 2.5 Flash Image", "Gemini-3-pro-image-preview", "Gemini-3.1-flash-image-preview"], {"default": "Gemini 2.5 Flash Image"}),  # 值需和后端 MODEL_MAPPING 的 key 完全一致
                 "media_resolution": (["Default","Low","Medium","High"], {"default": "Default"}),  # 值需和后端 RESOLUTION_MAPPING 的 key 完全一致
                 "thinking_level": (["minimal","low","medium","high"], {"default": "high"}),  # 值需和后端 THINKING_LEVEL_MAPPING 的 key 完全一致
@@ -2898,9 +2897,10 @@ class Gemini3NanoNode:
                 "aspect_ratio": (["16:9","4:3","2:3","4:5","1:1","3:2","5:4","3:4", "9:16","21:9"], {"default": "1:1"}),
                 "System_prompt": ("STRING", {"default": ""}),
                 "Web_search": ("BOOLEAN", {"default": False}), 
-                "seed": ("INT", {"default": -1}),
+                "seed": ("INT", {"default": 0}),
             },
             "optional": {
+                "prompt": ("STRING",{ "forceInput": True} ),
                 "input_images": ("IMAGE",),  # 接收多个图片
                 "context": ("ANY",),  # 接收对话历史上下文数据
             }
@@ -3181,7 +3181,7 @@ class ChangeHeadNode:
             "required": {
                 "source_head": ("IMAGE",), 
                 "replac_head": ("IMAGE",), 
-                "seed": ("INT", {"default": -1}),
+                "seed": ("INT", {"default": 0}),
             }
         }
 
