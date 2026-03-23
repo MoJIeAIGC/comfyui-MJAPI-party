@@ -59,6 +59,10 @@
 在comfyui节点列表中找到mjapiparty
 ![alt text](doc/assets/node.png)
 
+- 260323 mojie-api-party-2.4.0版本更新
+修复了一些bug，现在换了新服务器了，google-nano系列出图稳定且快速。
+修复了在高comfyui版本下，gemini3-LLM和gemini3-Nano节点加载错误的bug
+
 - 260306 mojie-api-party-2.3版本更新
 Gemini3-LLM节点新增Gemini-3.1-pro-preview模型选项
 Gemini3-image-Nano节点新增gemini-3.1-flash-image-preview模型选项，也就是Nano-2,功能和nano-pro差不多价格更低。
