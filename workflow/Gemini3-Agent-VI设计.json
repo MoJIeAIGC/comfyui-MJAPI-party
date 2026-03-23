@@ -2,7 +2,7 @@
   "id": "9bb53a52-4136-4bfb-8dc5-249581439303",
   "revision": 0,
   "last_node_id": 61,
-  "last_link_id": 91,
+  "last_link_id": 96,
   "nodes": [
     {
       "id": 8,
@@ -21,6 +21,7 @@
       "inputs": [
         {
           "name": "prompt",
+          "shape": 7,
           "type": "STRING",
           "link": 7
         },
@@ -46,7 +47,7 @@
           "name": "context",
           "shape": 7,
           "type": "ANY",
-          "link": null
+          "link": 93
         },
         {
           "name": "System_prompt",
@@ -84,91 +85,7 @@
         "",
         true,
         false,
-        1291,
-        "randomize"
-      ]
-    },
-    {
-      "id": 12,
-      "type": "GeminiLLMNode",
-      "pos": [
-        2910,
-        2620
-      ],
-      "size": [
-        290.4438069652174,
-        319.660269107301
-      ],
-      "flags": {},
-      "order": 27,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "prompt",
-          "type": "STRING",
-          "link": 15
-        },
-        {
-          "name": "image_input",
-          "shape": 7,
-          "type": "IMAGE",
-          "link": 89
-        },
-        {
-          "name": "video",
-          "shape": 7,
-          "type": "VIDEO",
-          "link": null
-        },
-        {
-          "name": "file",
-          "shape": 7,
-          "type": "FILE",
-          "link": null
-        },
-        {
-          "name": "context",
-          "shape": 7,
-          "type": "ANY",
-          "link": null
-        },
-        {
-          "name": "System_prompt",
-          "type": "STRING",
-          "widget": {
-            "name": "System_prompt"
-          },
-          "link": 16
-        }
-      ],
-      "outputs": [
-        {
-          "name": "output",
-          "type": "STRING",
-          "links": [
-            23,
-            34
-          ]
-        },
-        {
-          "name": "context",
-          "type": "ANY",
-          "links": null
-        }
-      ],
-      "properties": {
-        "cnr_id": "Mojie-API-Party",
-        "ver": "3466c0246bf441d635d795408b25bf543e915863",
-        "Node name for S&R": "GeminiLLMNode"
-      },
-      "widgets_values": [
-        "Gemini 3 Pro Preview",
-        "Default",
-        "High",
-        "",
-        true,
-        false,
-        441,
+        1884,
         "randomize"
       ]
     },
@@ -214,7 +131,7 @@
       ],
       "size": [
         290.4438069652174,
-        319.660269107301
+        518
       ],
       "flags": {},
       "order": 26,
@@ -222,6 +139,7 @@
       "inputs": [
         {
           "name": "prompt",
+          "shape": 7,
           "type": "STRING",
           "link": 21
         },
@@ -247,7 +165,7 @@
           "name": "context",
           "shape": 7,
           "type": "ANY",
-          "link": null
+          "link": 95
         },
         {
           "name": "System_prompt",
@@ -285,7 +203,7 @@
         "",
         true,
         false,
-        647,
+        149,
         "randomize"
       ]
     },
@@ -301,7 +219,7 @@
         457.12714433739166
       ],
       "flags": {},
-      "order": 34,
+      "order": 37,
       "mode": 0,
       "inputs": [
         {
@@ -334,7 +252,7 @@
         150
       ],
       "flags": {},
-      "order": 39,
+      "order": 50,
       "mode": 0,
       "inputs": [
         {
@@ -411,15 +329,7 @@
       "widgets_values": [
         "",
         "将输入的图片策略中第六张图的效果与输入的图片结合形成Nanobanan提示词输出，输出只需要提示词本身。",
-        "",
-        [
-          false,
-          true
-        ],
-        [
-          false,
-          true
-        ]
+        ""
       ]
     },
     {
@@ -434,7 +344,7 @@
         203.23931446431664
       ],
       "flags": {},
-      "order": 37,
+      "order": 41,
       "mode": 0,
       "inputs": [
         {
@@ -472,6 +382,7 @@
       "inputs": [
         {
           "name": "prompt",
+          "shape": 7,
           "type": "STRING",
           "link": 50
         },
@@ -497,7 +408,7 @@
           "name": "context",
           "shape": 7,
           "type": "ANY",
-          "link": null
+          "link": 92
         },
         {
           "name": "System_prompt",
@@ -535,7 +446,7 @@
         "",
         true,
         false,
-        580,
+        98,
         "randomize"
       ]
     },
@@ -556,6 +467,7 @@
       "inputs": [
         {
           "name": "prompt",
+          "shape": 7,
           "type": "STRING",
           "link": 69
         },
@@ -581,7 +493,7 @@
           "name": "context",
           "shape": 7,
           "type": "ANY",
-          "link": null
+          "link": 94
         },
         {
           "name": "System_prompt",
@@ -619,7 +531,7 @@
         "",
         true,
         false,
-        1938,
+        281,
         "randomize"
       ]
     },
@@ -664,15 +576,7 @@
       "widgets_values": [
         "",
         "将输入的图片策略中第五张图的效果与输入的图片结合形成Nanobanan提示词输出，输出只需要提示词本身。",
-        "",
-        [
-          false,
-          true
-        ],
-        [
-          false,
-          true
-        ]
+        ""
       ]
     },
     {
@@ -687,7 +591,7 @@
         150
       ],
       "flags": {},
-      "order": 44,
+      "order": 51,
       "mode": 0,
       "inputs": [
         {
@@ -735,7 +639,7 @@
         150
       ],
       "flags": {},
-      "order": 48,
+      "order": 52,
       "mode": 0,
       "inputs": [
         {
@@ -783,7 +687,7 @@
         150
       ],
       "flags": {},
-      "order": 52,
+      "order": 53,
       "mode": 0,
       "inputs": [
         {
@@ -817,39 +721,6 @@
         true,
         0,
         "white"
-      ]
-    },
-    {
-      "id": 9,
-      "type": "PreviewAny",
-      "pos": [
-        3350,
-        1390
-      ],
-      "size": [
-        460.7085302427936,
-        457.12714433739166
-      ],
-      "flags": {},
-      "order": 32,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "source",
-          "type": "*",
-          "link": 10
-        }
-      ],
-      "outputs": [],
-      "properties": {
-        "cnr_id": "comfy-core",
-        "ver": "0.7.0",
-        "Node name for S&R": "PreviewAny"
-      },
-      "widgets_values": [
-        null,
-        null,
-        null
       ]
     },
     {
@@ -902,6 +773,7 @@
       "inputs": [
         {
           "name": "prompt",
+          "shape": 7,
           "type": "STRING",
           "link": 56
         },
@@ -966,7 +838,7 @@
         "",
         true,
         false,
-        313,
+        15,
         "randomize"
       ]
     },
@@ -1011,15 +883,7 @@
       "widgets_values": [
         "",
         "将输入的图片策略中第三张图的效果与输入的图片结合形成Nanobanan提示词输出，输出只需要提示词本身。",
-        "",
-        [
-          false,
-          true
-        ],
-        [
-          false,
-          true
-        ]
+        ""
       ]
     },
     {
@@ -1063,15 +927,7 @@
       "widgets_values": [
         "",
         "将输入的图片策略中第四张图的效果与输入的图片结合形成Nanobanan提示词输出，输出只需要提示词本身。",
-        "",
-        [
-          false,
-          true
-        ],
-        [
-          false,
-          true
-        ]
+        ""
       ]
     },
     {
@@ -1115,15 +971,7 @@
       "widgets_values": [
         "",
         "提炼上文中第二张图的设计要求，根据输入的图像，给出具体的Nanobanana图片生成提示词，提示词使用中文。输出只需要提示词本身。",
-        "",
-        [
-          false,
-          true
-        ],
-        [
-          false,
-          true
-        ]
+        ""
       ]
     },
     {
@@ -1156,11 +1004,7 @@
         "Node name for S&R": "PrimitiveStringMultiline"
       },
       "widgets_values": [
-        "你是一名熟练使用Nanobanana的图片提示词工程师，你擅长将设计要求转换成具体的AI生图的提示词。\n1-如果输入有图片，那你将使用该图片融入到设计要求中。\n2-需要完美的符合设计要求，同时也要注意细节氛围，还有设计风格，联系上下文的输入输出，保持风格上的一致性。\n3-需要遵循Nanobanana的图片编辑语法与输入的图片结合起来使用。\n4-将画面风格，场景氛围，输入的主体，细节描述，拆分成json格式输出。\n\n例如设计要求是一个带有logo的马克杯，并且输入了一个logo图像。那么你将输出:使用图片图片1中的logo，印在一个马克杯上。以此将输入图片与设计要求结合起来。",
-        [
-          false,
-          true
-        ]
+        "你是一名熟练使用Nanobanana的图片提示词工程师，你擅长将设计要求转换成具体的AI生图的提示词。\n1-如果输入有图片，那你将使用该图片融入到设计要求中。\n2-需要完美的符合设计要求，同时也要注意细节氛围，还有设计风格，联系上下文的输入输出，保持风格上的一致性。\n3-需要遵循Nanobanana的图片编辑语法与输入的图片结合起来使用。\n4-将画面风格，场景氛围，输入的主体，细节描述，拆分成json格式输出。\n\n例如设计要求是一个带有logo的马克杯，并且输入了一个logo图像。那么你将输出:使用图片图片1中的logo，印在一个马克杯上。以此将输入图片与设计要求结合起来。"
       ]
     },
     {
@@ -1193,11 +1037,7 @@
         "Node name for S&R": "PrimitiveStringMultiline"
       },
       "widgets_values": [
-        "你是一名熟练使用Nanobanana的图片提示词工程师，你擅长将设计要求转换成具体的AI生图的提示词。\n1-如果输入有图片，那你将使用该图片融入到设计要求中。\n2-需要完美的符合设计要求，同时也要注意细节氛围，还有设计风格，联系上下文的输入输出，保持风格上的一致性。\n3-需要遵循Nanobanana的图片编辑语法与输入的图片结合起来使用。\n4-将画面风格，场景氛围，输入的主体，细节描述，拆分成json格式输出。\n\n例如设计要求是一个带有logo的马克杯，并且输入了一个logo图像。那么你将输出:使用图片图片1中的logo，印在一个马克杯上。以此将输入图片与设计要求结合起来。",
-        [
-          false,
-          true
-        ]
+        "你是一名熟练使用Nanobanana的图片提示词工程师，你擅长将设计要求转换成具体的AI生图的提示词。\n1-如果输入有图片，那你将使用该图片融入到设计要求中。\n2-需要完美的符合设计要求，同时也要注意细节氛围，还有设计风格，联系上下文的输入输出，保持风格上的一致性。\n3-需要遵循Nanobanana的图片编辑语法与输入的图片结合起来使用。\n4-将画面风格，场景氛围，输入的主体，细节描述，拆分成json格式输出。\n\n例如设计要求是一个带有logo的马克杯，并且输入了一个logo图像。那么你将输出:使用图片图片1中的logo，印在一个马克杯上。以此将输入图片与设计要求结合起来。"
       ]
     },
     {
@@ -1230,11 +1070,7 @@
         "Node name for S&R": "PrimitiveStringMultiline"
       },
       "widgets_values": [
-        "你是一名熟练使用Nanobanana的图片提示词工程师，你擅长将设计要求转换成具体的AI生图的提示词。\n1-如果输入有图片，那你将使用该图片融入到设计要求中。\n2-需要完美的符合设计要求，同时也要注意细节氛围，还有设计风格，联系上下文的输入输出，保持风格上的一致性。\n3-需要遵循Nanobanana的图片编辑语法与输入的图片结合起来使用。\n4-将画面风格，场景氛围，输入的主体，细节描述，拆分成json格式输出。\n\n例如设计要求是一个带有logo的马克杯，并且输入了一个logo图像。那么你将输出:使用图片图片1中的logo，印在一个马克杯上。以此将输入图片与设计要求结合起来。",
-        [
-          false,
-          true
-        ]
+        "你是一名熟练使用Nanobanana的图片提示词工程师，你擅长将设计要求转换成具体的AI生图的提示词。\n1-如果输入有图片，那你将使用该图片融入到设计要求中。\n2-需要完美的符合设计要求，同时也要注意细节氛围，还有设计风格，联系上下文的输入输出，保持风格上的一致性。\n3-需要遵循Nanobanana的图片编辑语法与输入的图片结合起来使用。\n4-将画面风格，场景氛围，输入的主体，细节描述，拆分成json格式输出。\n\n例如设计要求是一个带有logo的马克杯，并且输入了一个logo图像。那么你将输出:使用图片图片1中的logo，印在一个马克杯上。以此将输入图片与设计要求结合起来。"
       ]
     },
     {
@@ -1267,11 +1103,7 @@
         "Node name for S&R": "PrimitiveStringMultiline"
       },
       "widgets_values": [
-        "你是一名熟练使用Nanobanana的图片提示词工程师，你擅长将设计要求转换成具体的AI生图的提示词。\n1-如果输入有图片，那你将使用该图片融入到设计要求中。\n2-需要完美的符合设计要求，同时也要注意细节氛围，还有设计风格，联系上下文的输入输出，保持风格上的一致性。\n3-需要遵循Nanobanana的图片编辑语法与输入的图片结合起来使用。\n4-将画面风格，场景氛围，输入的主体，细节描述，拆分成json格式输出。\n\n例如设计要求是一个带有logo的马克杯，并且输入了一个logo图像。那么你将输出:使用图片图片1中的logo，印在一个马克杯上。以此将输入图片与设计要求结合起来。",
-        [
-          false,
-          true
-        ]
+        "你是一名熟练使用Nanobanana的图片提示词工程师，你擅长将设计要求转换成具体的AI生图的提示词。\n1-如果输入有图片，那你将使用该图片融入到设计要求中。\n2-需要完美的符合设计要求，同时也要注意细节氛围，还有设计风格，联系上下文的输入输出，保持风格上的一致性。\n3-需要遵循Nanobanana的图片编辑语法与输入的图片结合起来使用。\n4-将画面风格，场景氛围，输入的主体，细节描述，拆分成json格式输出。\n\n例如设计要求是一个带有logo的马克杯，并且输入了一个logo图像。那么你将输出:使用图片图片1中的logo，印在一个马克杯上。以此将输入图片与设计要求结合起来。"
       ]
     },
     {
@@ -1317,7 +1149,7 @@
         150
       ],
       "flags": {},
-      "order": 35,
+      "order": 39,
       "mode": 0,
       "inputs": [
         {
@@ -1354,288 +1186,6 @@
       ]
     },
     {
-      "id": 37,
-      "type": "Gemini3NanoNode",
-      "pos": [
-        1013.255022515517,
-        616.6537399341903
-      ],
-      "size": [
-        296.6667044122971,
-        350.5949122697856
-      ],
-      "flags": {},
-      "order": 21,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "prompt",
-          "type": "STRING",
-          "link": 80
-        },
-        {
-          "name": "input_images",
-          "shape": 7,
-          "type": "IMAGE",
-          "link": null
-        },
-        {
-          "name": "context",
-          "shape": 7,
-          "type": "ANY",
-          "link": null
-        }
-      ],
-      "outputs": [
-        {
-          "name": "image",
-          "type": "IMAGE",
-          "links": [
-            61,
-            81,
-            82,
-            83,
-            84,
-            85,
-            86,
-            87,
-            88,
-            89,
-            90,
-            91
-          ]
-        },
-        {
-          "name": "text",
-          "type": "STRING",
-          "links": [
-            24
-          ]
-        },
-        {
-          "name": "context",
-          "type": "ANY",
-          "links": [
-            55
-          ]
-        }
-      ],
-      "properties": {
-        "cnr_id": "Mojie-API-Party",
-        "ver": "3466c0246bf441d635d795408b25bf543e915863",
-        "Node name for S&R": "Gemini3NanoNode"
-      },
-      "widgets_values": [
-        "Gemini-3.1-flash-image-preview",
-        "Default",
-        "high",
-        "low",
-        "2K",
-        "1:1",
-        "",
-        true,
-        1998,
-        "randomize"
-      ]
-    },
-    {
-      "id": 7,
-      "type": "StringConcatenate",
-      "pos": [
-        523.8452911747279,
-        308.7450425718596
-      ],
-      "size": [
-        400,
-        200
-      ],
-      "flags": {},
-      "order": 18,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "string_a",
-          "type": "STRING",
-          "widget": {
-            "name": "string_a"
-          },
-          "link": 78
-        }
-      ],
-      "outputs": [
-        {
-          "name": "STRING",
-          "type": "STRING",
-          "links": [
-            3
-          ]
-        }
-      ],
-      "properties": {
-        "cnr_id": "comfy-core",
-        "ver": "0.7.0",
-        "Node name for S&R": "StringConcatenate"
-      },
-      "widgets_values": [
-        "",
-        "提炼上文中的logo设计要求，给出具体的Nanobanana图片生成提示词，提示词使用中文。输出只需要提示词本身。",
-        "",
-        [
-          false,
-          true
-        ],
-        [
-          false,
-          true
-        ]
-      ]
-    },
-    {
-      "id": 11,
-      "type": "GeminiLLMNode",
-      "pos": [
-        -374.4763274714881,
-        1183.5778642380765
-      ],
-      "size": [
-        210,
-        306
-      ],
-      "flags": {},
-      "order": 11,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "prompt",
-          "type": "STRING",
-          "link": 12
-        },
-        {
-          "name": "image_input",
-          "shape": 7,
-          "type": "IMAGE",
-          "link": null
-        },
-        {
-          "name": "video",
-          "shape": 7,
-          "type": "VIDEO",
-          "link": null
-        },
-        {
-          "name": "file",
-          "shape": 7,
-          "type": "FILE",
-          "link": null
-        },
-        {
-          "name": "context",
-          "shape": 7,
-          "type": "ANY",
-          "link": 14
-        }
-      ],
-      "outputs": [
-        {
-          "name": "output",
-          "type": "STRING",
-          "links": [
-            11,
-            44,
-            45,
-            46,
-            68,
-            71,
-            78
-          ]
-        },
-        {
-          "name": "context",
-          "type": "ANY",
-          "links": null
-        }
-      ],
-      "properties": {
-        "cnr_id": "Mojie-API-Party",
-        "ver": "3466c0246bf441d635d795408b25bf543e915863",
-        "Node name for S&R": "GeminiLLMNode"
-      },
-      "widgets_values": [
-        "Gemini 3 Pro Preview",
-        "Default",
-        "High",
-        "",
-        true,
-        false,
-        844,
-        "randomize"
-      ]
-    },
-    {
-      "id": 14,
-      "type": "PreviewAny",
-      "pos": [
-        505.036478823852,
-        1318.7138233200312
-      ],
-      "size": [
-        460.7085302427936,
-        457.12714433739166
-      ],
-      "flags": {},
-      "order": 20,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "source",
-          "type": "*",
-          "link": 18
-        }
-      ],
-      "outputs": [],
-      "properties": {
-        "cnr_id": "comfy-core",
-        "ver": "0.7.0",
-        "Node name for S&R": "PreviewAny"
-      },
-      "widgets_values": [
-        null,
-        null,
-        null
-      ]
-    },
-    {
-      "id": 45,
-      "type": "SaveImage",
-      "pos": [
-        1407.0676616035487,
-        649.9869559897734
-      ],
-      "size": [
-        432.2894620537552,
-        472.4021782374957
-      ],
-      "flags": {},
-      "order": 22,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "images",
-          "type": "IMAGE",
-          "link": 61
-        }
-      ],
-      "outputs": [],
-      "properties": {
-        "cnr_id": "comfy-core",
-        "ver": "0.7.0",
-        "Node name for S&R": "SaveImage"
-      },
-      "widgets_values": [
-        "ComfyUI"
-      ]
-    },
-    {
       "id": 6,
       "type": "PrimitiveStringMultiline",
       "pos": [
@@ -1665,132 +1215,7 @@
         "Node name for S&R": "PrimitiveStringMultiline"
       },
       "widgets_values": [
-        "请你根据该品牌策略制定一个logo设计方案和logo的应用场景方案，算上logo一起，一共出6张图，组成一个全套的VI设计方案,必须要详细的说明每一张图的具体设计效果。",
-        [
-          false,
-          true
-        ]
-      ]
-    },
-    {
-      "id": 34,
-      "type": "PrimitiveStringMultiline",
-      "pos": [
-        504.3433417188149,
-        1058.6507632152056
-      ],
-      "size": [
-        400,
-        200
-      ],
-      "flags": {},
-      "order": 5,
-      "mode": 0,
-      "inputs": [],
-      "outputs": [
-        {
-          "name": "STRING",
-          "type": "STRING",
-          "links": [
-            5
-          ]
-        }
-      ],
-      "properties": {
-        "cnr_id": "comfy-core",
-        "ver": "0.7.0",
-        "Node name for S&R": "PrimitiveStringMultiline"
-      },
-      "widgets_values": [
-        "你是一名熟练使用Nanobanana的图片提示词工程师，你擅长将设计要求转换成具体的AI生图的提示词。例如设计要求是一个手绘的女性品牌形象并配有文字。而你将对该形象和文字做具体详尽的规划。",
-        [
-          false,
-          true
-        ]
-      ]
-    },
-    {
-      "id": 5,
-      "type": "GeminiLLMNode",
-      "pos": [
-        604.6610047820784,
-        638.9503697017897
-      ],
-      "size": [
-        290.4438069652174,
-        319.660269107301
-      ],
-      "flags": {},
-      "order": 19,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "prompt",
-          "type": "STRING",
-          "link": 3
-        },
-        {
-          "name": "image_input",
-          "shape": 7,
-          "type": "IMAGE",
-          "link": null
-        },
-        {
-          "name": "video",
-          "shape": 7,
-          "type": "VIDEO",
-          "link": null
-        },
-        {
-          "name": "file",
-          "shape": 7,
-          "type": "FILE",
-          "link": null
-        },
-        {
-          "name": "context",
-          "shape": 7,
-          "type": "ANY",
-          "link": null
-        },
-        {
-          "name": "System_prompt",
-          "type": "STRING",
-          "widget": {
-            "name": "System_prompt"
-          },
-          "link": 5
-        }
-      ],
-      "outputs": [
-        {
-          "name": "output",
-          "type": "STRING",
-          "links": [
-            18,
-            80
-          ]
-        },
-        {
-          "name": "context",
-          "type": "ANY",
-          "links": null
-        }
-      ],
-      "properties": {
-        "cnr_id": "Mojie-API-Party",
-        "ver": "3466c0246bf441d635d795408b25bf543e915863",
-        "Node name for S&R": "GeminiLLMNode"
-      },
-      "widgets_values": [
-        "Gemini 3.1 Pro Preview",
-        "Default",
-        "High",
-        "",
-        true,
-        false,
-        1649,
-        "randomize"
+        "请你根据该品牌策略制定一个logo设计方案和logo的应用场景方案，算上logo一起，一共出6张图，组成一个全套的VI设计方案,必须要详细的说明每一张图的具体设计效果。"
       ]
     },
     {
@@ -1838,7 +1263,7 @@
         456.59045046272354
       ],
       "flags": {},
-      "order": 40,
+      "order": 42,
       "mode": 0,
       "inputs": [
         {
@@ -1869,7 +1294,7 @@
         203.23931446431664
       ],
       "flags": {},
-      "order": 41,
+      "order": 43,
       "mode": 0,
       "inputs": [
         {
@@ -1904,7 +1329,7 @@
       "flags": {
         "collapsed": false
       },
-      "order": 6,
+      "order": 5,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -1922,11 +1347,7 @@
         "Node name for S&R": "PrimitiveStringMultiline"
       },
       "widgets_values": [
-        "你是一名高级设计师，尤其擅长对品牌的深度理解以及和视觉表现相结合。能够很好的理解品牌的意图，并且能够将文字和视觉很好的融合。当用户给你一个任意命题的时候，你都能够准确的说出应该如何对该品牌进行设计。\n",
-        [
-          false,
-          true
-        ]
+        "你是一名高级设计师，尤其擅长对品牌的深度理解以及和视觉表现相结合。能够很好的理解品牌的意图，并且能够将文字和视觉很好的融合。当用户给你一个任意命题的时候，你都能够准确的说出应该如何对该品牌进行设计。\n"
       ]
     },
     {
@@ -1974,7 +1395,7 @@
         458.1082581413127
       ],
       "flags": {},
-      "order": 51,
+      "order": 48,
       "mode": 0,
       "inputs": [
         {
@@ -2005,7 +1426,7 @@
         203.23931446431664
       ],
       "flags": {},
-      "order": 53,
+      "order": 49,
       "mode": 0,
       "inputs": [
         {
@@ -2038,7 +1459,7 @@
         457.12714433739166
       ],
       "flags": {},
-      "order": 33,
+      "order": 35,
       "mode": 0,
       "inputs": [
         {
@@ -2071,7 +1492,7 @@
         203.23931446431664
       ],
       "flags": {},
-      "order": 49,
+      "order": 47,
       "mode": 0,
       "inputs": [
         {
@@ -2104,7 +1525,7 @@
         200
       ],
       "flags": {},
-      "order": 7,
+      "order": 6,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -2122,309 +1543,7 @@
         "Node name for S&R": "PrimitiveStringMultiline"
       },
       "widgets_values": [
-        "你是一名熟练使用Nanobanana的图片提示词工程师，你擅长将设计要求转换成具体的AI生图的提示词。\n1-如果输入有图片，那你将使用该图片融入到设计要求中。\n2-需要完美的符合设计要求，同时也要注意细节氛围，还有设计风格，联系上下文的输入输出，保持风格上的一致性。\n3-需要遵循Nanobanana的图片编辑语法与输入的图片结合起来使用。\n4-将画面风格，场景氛围，输入的主体，细节描述，拆分成json格式输出。\n\n例如设计要求是一个带有logo的马克杯，并且输入了一个logo图像。那么你将输出:使用图片图片1中的logo，印在一个马克杯上。以此将输入图片与设计要求结合起来。",
-        [
-          false,
-          true
-        ]
-      ]
-    },
-    {
-      "id": 23,
-      "type": "Gemini3NanoNode",
-      "pos": [
-        3901.270658652642,
-        2563.239999999998
-      ],
-      "size": [
-        239.6491357199966,
-        340.2280815984583
-      ],
-      "flags": {},
-      "order": 50,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "prompt",
-          "type": "STRING",
-          "link": 34
-        },
-        {
-          "name": "input_images",
-          "shape": 7,
-          "type": "IMAGE",
-          "link": 90
-        },
-        {
-          "name": "context",
-          "shape": 7,
-          "type": "ANY",
-          "link": 36
-        }
-      ],
-      "outputs": [
-        {
-          "name": "image",
-          "type": "IMAGE",
-          "links": [
-            66,
-            77
-          ]
-        },
-        {
-          "name": "text",
-          "type": "STRING",
-          "links": [
-            43
-          ]
-        },
-        {
-          "name": "context",
-          "type": "ANY",
-          "links": null
-        }
-      ],
-      "properties": {
-        "cnr_id": "Mojie-API-Party",
-        "ver": "3466c0246bf441d635d795408b25bf543e915863",
-        "Node name for S&R": "Gemini3NanoNode"
-      },
-      "widgets_values": [
-        "Gemini-3.1-flash-image-preview",
-        "Default",
-        "high",
-        "low",
-        "1K",
-        "4:3",
-        "",
-        true,
-        134,
-        "randomize"
-      ]
-    },
-    {
-      "id": 21,
-      "type": "Gemini3NanoNode",
-      "pos": [
-        3882.121212121211,
-        1364.5454545454522
-      ],
-      "size": [
-        239.6491357199966,
-        340.2280815984583
-      ],
-      "flags": {},
-      "order": 42,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "prompt",
-          "type": "STRING",
-          "link": 28
-        },
-        {
-          "name": "input_images",
-          "shape": 7,
-          "type": "IMAGE",
-          "link": 85
-        },
-        {
-          "name": "context",
-          "shape": 7,
-          "type": "ANY",
-          "link": 30
-        }
-      ],
-      "outputs": [
-        {
-          "name": "image",
-          "type": "IMAGE",
-          "links": [
-            64,
-            73
-          ]
-        },
-        {
-          "name": "text",
-          "type": "STRING",
-          "links": [
-            59
-          ]
-        },
-        {
-          "name": "context",
-          "type": "ANY",
-          "links": [
-            33
-          ]
-        }
-      ],
-      "properties": {
-        "cnr_id": "Mojie-API-Party",
-        "ver": "3466c0246bf441d635d795408b25bf543e915863",
-        "Node name for S&R": "Gemini3NanoNode"
-      },
-      "widgets_values": [
-        "Gemini-3.1-flash-image-preview",
-        "Default",
-        "high",
-        "low",
-        "1K",
-        "4:3",
-        "",
-        true,
-        274,
-        "randomize"
-      ]
-    },
-    {
-      "id": 20,
-      "type": "Gemini3NanoNode",
-      "pos": [
-        3880,
-        750
-      ],
-      "size": [
-        239.6491357199966,
-        340.2280815984583
-      ],
-      "flags": {},
-      "order": 38,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "prompt",
-          "type": "STRING",
-          "link": 25
-        },
-        {
-          "name": "input_images",
-          "shape": 7,
-          "type": "IMAGE",
-          "link": 84
-        },
-        {
-          "name": "context",
-          "shape": 7,
-          "type": "ANY",
-          "link": 27
-        }
-      ],
-      "outputs": [
-        {
-          "name": "image",
-          "type": "IMAGE",
-          "links": [
-            40,
-            63
-          ]
-        },
-        {
-          "name": "text",
-          "type": "STRING",
-          "links": [
-            60
-          ]
-        },
-        {
-          "name": "context",
-          "type": "ANY",
-          "links": [
-            30
-          ]
-        }
-      ],
-      "properties": {
-        "cnr_id": "Mojie-API-Party",
-        "ver": "3466c0246bf441d635d795408b25bf543e915863",
-        "Node name for S&R": "Gemini3NanoNode"
-      },
-      "widgets_values": [
-        "Gemini-3.1-flash-image-preview",
-        "Default",
-        "high",
-        "low",
-        "1K",
-        "4:3",
-        "",
-        true,
-        715,
-        "randomize"
-      ]
-    },
-    {
-      "id": 39,
-      "type": "Gemini3NanoNode",
-      "pos": [
-        3859.754529666079,
-        81.79910335641068
-      ],
-      "size": [
-        268.4874816131885,
-        344.78150463422537
-      ],
-      "flags": {},
-      "order": 30,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "prompt",
-          "type": "STRING",
-          "link": 53
-        },
-        {
-          "name": "input_images",
-          "shape": 7,
-          "type": "IMAGE",
-          "link": 83
-        },
-        {
-          "name": "context",
-          "shape": 7,
-          "type": "ANY",
-          "link": 55
-        }
-      ],
-      "outputs": [
-        {
-          "name": "image",
-          "type": "IMAGE",
-          "links": [
-            38,
-            62
-          ]
-        },
-        {
-          "name": "text",
-          "type": "STRING",
-          "links": [
-            47
-          ]
-        },
-        {
-          "name": "context",
-          "type": "ANY",
-          "links": [
-            27
-          ]
-        }
-      ],
-      "properties": {
-        "cnr_id": "Mojie-API-Party",
-        "ver": "3466c0246bf441d635d795408b25bf543e915863",
-        "Node name for S&R": "Gemini3NanoNode"
-      },
-      "widgets_values": [
-        "Gemini-3.1-flash-image-preview",
-        "High",
-        "high",
-        "low",
-        "1K",
-        "4:3",
-        "",
-        true,
-        131,
-        "randomize"
+        "你是一名熟练使用Nanobanana的图片提示词工程师，你擅长将设计要求转换成具体的AI生图的提示词。\n1-如果输入有图片，那你将使用该图片融入到设计要求中。\n2-需要完美的符合设计要求，同时也要注意细节氛围，还有设计风格，联系上下文的输入输出，保持风格上的一致性。\n3-需要遵循Nanobanana的图片编辑语法与输入的图片结合起来使用。\n4-将画面风格，场景氛围，输入的主体，细节描述，拆分成json格式输出。\n\n例如设计要求是一个带有logo的马克杯，并且输入了一个logo图像。那么你将输出:使用图片图片1中的logo，印在一个马克杯上。以此将输入图片与设计要求结合起来。"
       ]
     },
     {
@@ -2439,7 +1558,7 @@
         409.8739249563213
       ],
       "flags": {},
-      "order": 43,
+      "order": 44,
       "mode": 0,
       "inputs": [
         {
@@ -2459,81 +1578,6 @@
       ]
     },
     {
-      "id": 22,
-      "type": "Gemini3NanoNode",
-      "pos": [
-        3873.402925936429,
-        2003.719031660513
-      ],
-      "size": [
-        239.6491357199966,
-        340.2280815984583
-      ],
-      "flags": {},
-      "order": 46,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "prompt",
-          "type": "STRING",
-          "link": 31
-        },
-        {
-          "name": "input_images",
-          "shape": 7,
-          "type": "IMAGE",
-          "link": 88
-        },
-        {
-          "name": "context",
-          "shape": 7,
-          "type": "ANY",
-          "link": 33
-        }
-      ],
-      "outputs": [
-        {
-          "name": "image",
-          "type": "IMAGE",
-          "links": [
-            65,
-            75
-          ]
-        },
-        {
-          "name": "text",
-          "type": "STRING",
-          "links": [
-            41
-          ]
-        },
-        {
-          "name": "context",
-          "type": "ANY",
-          "links": [
-            36
-          ]
-        }
-      ],
-      "properties": {
-        "cnr_id": "Mojie-API-Party",
-        "ver": "3466c0246bf441d635d795408b25bf543e915863",
-        "Node name for S&R": "Gemini3NanoNode"
-      },
-      "widgets_values": [
-        "Gemini-3.1-flash-image-preview",
-        "Default",
-        "high",
-        "low",
-        "1K",
-        "4:3",
-        "",
-        true,
-        1740,
-        "randomize"
-      ]
-    },
-    {
       "id": 49,
       "type": "SaveImage",
       "pos": [
@@ -2545,7 +1589,7 @@
         458.1082581413127
       ],
       "flags": {},
-      "order": 47,
+      "order": 46,
       "mode": 0,
       "inputs": [
         {
@@ -2609,7 +1653,7 @@
         494.661282851097
       ],
       "flags": {},
-      "order": 36,
+      "order": 40,
       "mode": 0,
       "inputs": [
         {
@@ -2629,11 +1673,782 @@
       ]
     },
     {
+      "id": 57,
+      "type": "PrimitiveStringMultiline",
+      "pos": [
+        -1575.1286293341675,
+        721.6348372629791
+      ],
+      "size": [
+        400,
+        200
+      ],
+      "flags": {},
+      "order": 7,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "links": [
+            56
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.7.0",
+        "Node name for S&R": "PrimitiveStringMultiline"
+      },
+      "widgets_values": [
+        "帮我设计一个名字叫做“摩诘AI | Mojie-AI”的科技公司的VI系统，要求logo简洁抽象有趣,并且将中文和英文做很好的融合，记忆点清晰，带有现代科技气息。"
+      ]
+    },
+    {
+      "id": 7,
+      "type": "StringConcatenate",
+      "pos": [
+        504.11379135307027,
+        276.8710813214897
+      ],
+      "size": [
+        400,
+        200
+      ],
+      "flags": {},
+      "order": 18,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "string_a",
+          "type": "STRING",
+          "widget": {
+            "name": "string_a"
+          },
+          "link": 78
+        }
+      ],
+      "outputs": [
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "links": [
+            3
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.7.0",
+        "Node name for S&R": "StringConcatenate"
+      },
+      "widgets_values": [
+        "",
+        "提炼上文中的logo设计要求，给出具体的Nanobanana图片生成提示词，提示词使用中文。输出只需要提示词本身。",
+        ""
+      ]
+    },
+    {
+      "id": 37,
+      "type": "Gemini3NanoNode",
+      "pos": [
+        982.8988689437365,
+        467.63262239999284
+      ],
+      "size": [
+        296.6667044122971,
+        350.5949122697856
+      ],
+      "flags": {},
+      "order": 21,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "prompt",
+          "shape": 7,
+          "type": "STRING",
+          "link": 80
+        },
+        {
+          "name": "input_images",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": null
+        },
+        {
+          "name": "context",
+          "shape": 7,
+          "type": "ANY",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "links": [
+            61,
+            81,
+            82,
+            83,
+            84,
+            85,
+            86,
+            87,
+            88,
+            89,
+            90,
+            91
+          ]
+        },
+        {
+          "name": "text",
+          "type": "STRING",
+          "links": [
+            24
+          ]
+        },
+        {
+          "name": "context",
+          "type": "ANY",
+          "links": []
+        }
+      ],
+      "properties": {
+        "cnr_id": "Mojie-API-Party",
+        "ver": "3466c0246bf441d635d795408b25bf543e915863",
+        "Node name for S&R": "Gemini3NanoNode"
+      },
+      "widgets_values": [
+        "Gemini-3.1-flash-image-preview",
+        "Default",
+        "high",
+        "low",
+        "2K",
+        "1:1",
+        "",
+        true,
+        911,
+        "randomize"
+      ]
+    },
+    {
+      "id": 39,
+      "type": "Gemini3NanoNode",
+      "pos": [
+        3859.754529666079,
+        81.79910335641068
+      ],
+      "size": [
+        268.4874816131885,
+        344.78150463422537
+      ],
+      "flags": {},
+      "order": 30,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "prompt",
+          "shape": 7,
+          "type": "STRING",
+          "link": 53
+        },
+        {
+          "name": "input_images",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": 83
+        },
+        {
+          "name": "context",
+          "shape": 7,
+          "type": "ANY",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "links": [
+            38,
+            62
+          ]
+        },
+        {
+          "name": "text",
+          "type": "STRING",
+          "links": [
+            47
+          ]
+        },
+        {
+          "name": "context",
+          "type": "ANY",
+          "links": []
+        }
+      ],
+      "properties": {
+        "cnr_id": "Mojie-API-Party",
+        "ver": "3466c0246bf441d635d795408b25bf543e915863",
+        "Node name for S&R": "Gemini3NanoNode"
+      },
+      "widgets_values": [
+        "Gemini-3.1-flash-image-preview",
+        "High",
+        "high",
+        "low",
+        "1K",
+        "4:3",
+        "",
+        true,
+        1708,
+        "randomize"
+      ]
+    },
+    {
+      "id": 20,
+      "type": "Gemini3NanoNode",
+      "pos": [
+        3880,
+        750
+      ],
+      "size": [
+        239.6491357199966,
+        340.2280815984583
+      ],
+      "flags": {},
+      "order": 32,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "prompt",
+          "shape": 7,
+          "type": "STRING",
+          "link": 25
+        },
+        {
+          "name": "input_images",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": 84
+        },
+        {
+          "name": "context",
+          "shape": 7,
+          "type": "ANY",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "links": [
+            40,
+            63
+          ]
+        },
+        {
+          "name": "text",
+          "type": "STRING",
+          "links": [
+            60
+          ]
+        },
+        {
+          "name": "context",
+          "type": "ANY",
+          "links": []
+        }
+      ],
+      "properties": {
+        "cnr_id": "Mojie-API-Party",
+        "ver": "3466c0246bf441d635d795408b25bf543e915863",
+        "Node name for S&R": "Gemini3NanoNode"
+      },
+      "widgets_values": [
+        "Gemini-3.1-flash-image-preview",
+        "Default",
+        "high",
+        "low",
+        "1K",
+        "4:3",
+        "",
+        true,
+        1250,
+        "randomize"
+      ]
+    },
+    {
+      "id": 21,
+      "type": "Gemini3NanoNode",
+      "pos": [
+        3882.121212121211,
+        1364.5454545454522
+      ],
+      "size": [
+        239.6491357199966,
+        340.2280815984583
+      ],
+      "flags": {},
+      "order": 34,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "prompt",
+          "shape": 7,
+          "type": "STRING",
+          "link": 28
+        },
+        {
+          "name": "input_images",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": 85
+        },
+        {
+          "name": "context",
+          "shape": 7,
+          "type": "ANY",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "links": [
+            64,
+            73
+          ]
+        },
+        {
+          "name": "text",
+          "type": "STRING",
+          "links": [
+            59
+          ]
+        },
+        {
+          "name": "context",
+          "type": "ANY",
+          "links": []
+        }
+      ],
+      "properties": {
+        "cnr_id": "Mojie-API-Party",
+        "ver": "3466c0246bf441d635d795408b25bf543e915863",
+        "Node name for S&R": "Gemini3NanoNode"
+      },
+      "widgets_values": [
+        "Gemini-3.1-flash-image-preview",
+        "Default",
+        "high",
+        "low",
+        "1K",
+        "4:3",
+        "",
+        true,
+        1851,
+        "randomize"
+      ]
+    },
+    {
+      "id": 22,
+      "type": "Gemini3NanoNode",
+      "pos": [
+        3873.402925936429,
+        2003.719031660513
+      ],
+      "size": [
+        239.6491357199966,
+        340.2280815984583
+      ],
+      "flags": {},
+      "order": 36,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "prompt",
+          "shape": 7,
+          "type": "STRING",
+          "link": 31
+        },
+        {
+          "name": "input_images",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": 88
+        },
+        {
+          "name": "context",
+          "shape": 7,
+          "type": "ANY",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "links": [
+            65,
+            75
+          ]
+        },
+        {
+          "name": "text",
+          "type": "STRING",
+          "links": [
+            41
+          ]
+        },
+        {
+          "name": "context",
+          "type": "ANY",
+          "links": []
+        }
+      ],
+      "properties": {
+        "cnr_id": "Mojie-API-Party",
+        "ver": "3466c0246bf441d635d795408b25bf543e915863",
+        "Node name for S&R": "Gemini3NanoNode"
+      },
+      "widgets_values": [
+        "Gemini-3.1-flash-image-preview",
+        "Default",
+        "high",
+        "low",
+        "1K",
+        "4:3",
+        "",
+        true,
+        1568,
+        "randomize"
+      ]
+    },
+    {
+      "id": 12,
+      "type": "GeminiLLMNode",
+      "pos": [
+        2981.7509084423914,
+        2673.8131813317937
+      ],
+      "size": [
+        290.4438069652174,
+        319.660269107301
+      ],
+      "flags": {},
+      "order": 27,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "prompt",
+          "shape": 7,
+          "type": "STRING",
+          "link": 15
+        },
+        {
+          "name": "image_input",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": 89
+        },
+        {
+          "name": "video",
+          "shape": 7,
+          "type": "VIDEO",
+          "link": null
+        },
+        {
+          "name": "file",
+          "shape": 7,
+          "type": "FILE",
+          "link": null
+        },
+        {
+          "name": "context",
+          "shape": 7,
+          "type": "ANY",
+          "link": 96
+        },
+        {
+          "name": "System_prompt",
+          "type": "STRING",
+          "widget": {
+            "name": "System_prompt"
+          },
+          "link": 16
+        }
+      ],
+      "outputs": [
+        {
+          "name": "output",
+          "type": "STRING",
+          "links": [
+            23,
+            34
+          ]
+        },
+        {
+          "name": "context",
+          "type": "ANY",
+          "links": null
+        }
+      ],
+      "properties": {
+        "cnr_id": "Mojie-API-Party",
+        "ver": "3466c0246bf441d635d795408b25bf543e915863",
+        "Node name for S&R": "GeminiLLMNode"
+      },
+      "widgets_values": [
+        "Gemini 3 Pro Preview",
+        "Default",
+        "High",
+        "",
+        true,
+        false,
+        1486,
+        "randomize"
+      ]
+    },
+    {
+      "id": 23,
+      "type": "Gemini3NanoNode",
+      "pos": [
+        3871.885901995158,
+        2557.7303581267197
+      ],
+      "size": [
+        239.6491357199966,
+        340.2280815984583
+      ],
+      "flags": {},
+      "order": 38,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "prompt",
+          "shape": 7,
+          "type": "STRING",
+          "link": 34
+        },
+        {
+          "name": "input_images",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": 90
+        },
+        {
+          "name": "context",
+          "shape": 7,
+          "type": "ANY",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "links": [
+            66,
+            77
+          ]
+        },
+        {
+          "name": "text",
+          "type": "STRING",
+          "links": [
+            43
+          ]
+        },
+        {
+          "name": "context",
+          "type": "ANY",
+          "links": null
+        }
+      ],
+      "properties": {
+        "cnr_id": "Mojie-API-Party",
+        "ver": "3466c0246bf441d635d795408b25bf543e915863",
+        "Node name for S&R": "Gemini3NanoNode"
+      },
+      "widgets_values": [
+        "Gemini-3.1-flash-image-preview",
+        "Default",
+        "high",
+        "low",
+        "1K",
+        "4:3",
+        "",
+        true,
+        1700,
+        "randomize"
+      ]
+    },
+    {
+      "id": 45,
+      "type": "SaveImage",
+      "pos": [
+        1431.9480552147347,
+        572.2357259548181
+      ],
+      "size": [
+        432.2894620537552,
+        472.4021782374957
+      ],
+      "flags": {},
+      "order": 22,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 61
+        }
+      ],
+      "outputs": [],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.7.0",
+        "Node name for S&R": "SaveImage"
+      },
+      "widgets_values": [
+        "ComfyUI"
+      ]
+    },
+    {
+      "id": 5,
+      "type": "GeminiLLMNode",
+      "pos": [
+        578.1622151709845,
+        564.2394728649842
+      ],
+      "size": [
+        290.4438069652174,
+        319.660269107301
+      ],
+      "flags": {},
+      "order": 19,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "prompt",
+          "shape": 7,
+          "type": "STRING",
+          "link": 3
+        },
+        {
+          "name": "image_input",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": null
+        },
+        {
+          "name": "video",
+          "shape": 7,
+          "type": "VIDEO",
+          "link": null
+        },
+        {
+          "name": "file",
+          "shape": 7,
+          "type": "FILE",
+          "link": null
+        },
+        {
+          "name": "context",
+          "shape": 7,
+          "type": "ANY",
+          "link": null
+        },
+        {
+          "name": "System_prompt",
+          "type": "STRING",
+          "widget": {
+            "name": "System_prompt"
+          },
+          "link": 5
+        }
+      ],
+      "outputs": [
+        {
+          "name": "output",
+          "type": "STRING",
+          "links": [
+            18,
+            80
+          ]
+        },
+        {
+          "name": "context",
+          "type": "ANY",
+          "links": [
+            92,
+            93,
+            94,
+            95,
+            96
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "Mojie-API-Party",
+        "ver": "3466c0246bf441d635d795408b25bf543e915863",
+        "Node name for S&R": "GeminiLLMNode"
+      },
+      "widgets_values": [
+        "Gemini 3.1 Pro Preview",
+        "Default",
+        "High",
+        "",
+        true,
+        false,
+        574,
+        "randomize"
+      ]
+    },
+    {
+      "id": 34,
+      "type": "PrimitiveStringMultiline",
+      "pos": [
+        484.16902658046445,
+        948.3812785442358
+      ],
+      "size": [
+        400,
+        200
+      ],
+      "flags": {},
+      "order": 8,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "links": [
+            5
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.7.0",
+        "Node name for S&R": "PrimitiveStringMultiline"
+      },
+      "widgets_values": [
+        "你是一名熟练使用Nanobanana的图片提示词工程师，你擅长将设计要求转换成具体的AI生图的提示词。例如设计要求是一个手绘的女性品牌形象并配有文字。而你将对该形象和文字做具体详尽的规划。"
+      ]
+    },
+    {
       "id": 19,
       "type": "PreviewAny",
       "pos": [
-        1014.9247144756649,
-        1056.4449637204966
+        1002.0732714946805,
+        934.7846368338448
       ],
       "size": [
         351.70234241685375,
@@ -2658,44 +2473,155 @@
       "widgets_values": [
         null,
         null,
+        true
+      ]
+    },
+    {
+      "id": 14,
+      "type": "PreviewAny",
+      "pos": [
+        423.43238618319833,
+        1218.7801459370335
+      ],
+      "size": [
+        460.7085302427936,
+        457.12714433739166
+      ],
+      "flags": {},
+      "order": 20,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "source",
+          "type": "*",
+          "link": 18
+        }
+      ],
+      "outputs": [],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.7.0",
+        "Node name for S&R": "PreviewAny"
+      },
+      "widgets_values": [
+        null,
+        null,
         null
       ]
     },
     {
-      "id": 57,
-      "type": "PrimitiveStringMultiline",
+      "id": 11,
+      "type": "GeminiLLMNode",
       "pos": [
-        -1575.1286293341675,
-        721.6348372629791
+        -364.81755133501247,
+        1140.803284205113
       ],
       "size": [
-        400,
-        200
+        210,
+        306
       ],
       "flags": {},
-      "order": 8,
+      "order": 11,
       "mode": 0,
-      "inputs": [],
+      "inputs": [
+        {
+          "name": "prompt",
+          "shape": 7,
+          "type": "STRING",
+          "link": 12
+        },
+        {
+          "name": "image_input",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": null
+        },
+        {
+          "name": "video",
+          "shape": 7,
+          "type": "VIDEO",
+          "link": null
+        },
+        {
+          "name": "file",
+          "shape": 7,
+          "type": "FILE",
+          "link": null
+        },
+        {
+          "name": "context",
+          "shape": 7,
+          "type": "ANY",
+          "link": 14
+        }
+      ],
       "outputs": [
         {
-          "name": "STRING",
+          "name": "output",
           "type": "STRING",
           "links": [
-            56
+            11,
+            44,
+            45,
+            46,
+            68,
+            71,
+            78
           ]
+        },
+        {
+          "name": "context",
+          "type": "ANY",
+          "links": null
         }
       ],
       "properties": {
-        "cnr_id": "comfy-core",
-        "ver": "0.7.0",
-        "Node name for S&R": "PrimitiveStringMultiline"
+        "cnr_id": "Mojie-API-Party",
+        "ver": "3466c0246bf441d635d795408b25bf543e915863",
+        "Node name for S&R": "GeminiLLMNode"
       },
       "widgets_values": [
-        "帮我设计一个名字叫做“摩诘AI | Mojie-AI”的科技公司的VI系统，要求logo简洁抽象有趣,并且将中文和英文做很好的融合，记忆点清晰，带有现代科技气息。",
-        [
-          false,
-          true
-        ]
+        "Gemini 3 Pro Preview",
+        "Default",
+        "High",
+        "",
+        true,
+        false,
+        1958,
+        "randomize"
+      ]
+    },
+    {
+      "id": 9,
+      "type": "PreviewAny",
+      "pos": [
+        3342.666666666667,
+        1377.7777777777778
+      ],
+      "size": [
+        460.7085302427936,
+        457.12714433739166
+      ],
+      "flags": {},
+      "order": 33,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "source",
+          "type": "*",
+          "link": 10
+        }
+      ],
+      "outputs": [],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.7.0",
+        "Node name for S&R": "PreviewAny"
+      },
+      "widgets_values": [
+        null,
+        null,
+        null
       ]
     }
   ],
@@ -2853,28 +2779,12 @@
       "STRING"
     ],
     [
-      27,
-      39,
-      2,
-      20,
-      2,
-      "ANY"
-    ],
-    [
       28,
       54,
       0,
       21,
       0,
       "STRING"
-    ],
-    [
-      30,
-      20,
-      2,
-      21,
-      2,
-      "ANY"
     ],
     [
       31,
@@ -2885,28 +2795,12 @@
       "STRING"
     ],
     [
-      33,
-      21,
-      2,
-      22,
-      2,
-      "ANY"
-    ],
-    [
       34,
       12,
       0,
       23,
       0,
       "STRING"
-    ],
-    [
-      36,
-      22,
-      2,
-      23,
-      2,
-      "ANY"
     ],
     [
       38,
@@ -3011,14 +2905,6 @@
       39,
       0,
       "STRING"
-    ],
-    [
-      55,
-      37,
-      2,
-      39,
-      2,
-      "ANY"
     ],
     [
       56,
@@ -3291,21 +3177,61 @@
       24,
       0,
       "IMAGE"
+    ],
+    [
+      92,
+      5,
+      1,
+      38,
+      4,
+      "ANY"
+    ],
+    [
+      93,
+      5,
+      1,
+      8,
+      4,
+      "ANY"
+    ],
+    [
+      94,
+      5,
+      1,
+      54,
+      4,
+      "ANY"
+    ],
+    [
+      95,
+      5,
+      1,
+      17,
+      4,
+      "ANY"
+    ],
+    [
+      96,
+      5,
+      1,
+      12,
+      4,
+      "ANY"
     ]
   ],
   "groups": [],
   "config": {},
   "extra": {
     "ds": {
-      "scale": 0.23092115320381812,
+      "scale": 0.40909090909091006,
       "offset": [
-        910.4212832186122,
-        567.2607703607987
+        142.24090506187008,
+        120.06209713336514
       ]
     },
     "workflowRendererVersion": "LG",
     "ue_links": [],
-    "frontendVersion": "1.35.9",
+    "frontendVersion": "1.41.21",
     "VHS_latentpreview": false,
     "VHS_latentpreviewrate": 0,
     "VHS_MetadataImage": true,
