@@ -1376,12 +1376,12 @@ class ModelGenNode:
     @classmethod
     def INPUT_TYPES(cls):
         # 发送请求
-        url = "https://qihuaimage.com/api/mjapi/styles/"
-        response = requests.get(url)
-        response.raise_for_status()
-        result = response.json()
-        styles = result.get("data", [])
-        style_prompt = [item["name"] for item in styles]
+        # url = "https://qihuaimage.com/api/mjapi/styles/"
+        # response = requests.get(url)
+        # response.raise_for_status()
+        # result = response.json()
+        # styles = result.get("data", [])
+        style_prompt = ["通用-INS自拍","女装-涉谷街拍","通用-简约风","女装-清新室内","通用-靠墙特写","通用-露营风","通用-荒草秋景","通用-小资情调"]
         return {
             "required": {
                 "cloths_image": ("IMAGE",),  # 输入图像
