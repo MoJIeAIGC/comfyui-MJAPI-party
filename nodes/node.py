@@ -1376,12 +1376,12 @@ class ModelGenNode:
     @classmethod
     def INPUT_TYPES(cls):
         # 发送请求
-        url = "https://qihuaimage.com/api/mjapi/styles/"
-        response = requests.get(url)
-        response.raise_for_status()
-        result = response.json()
-        styles = result.get("data", [])
-        style_prompt = [item["name"] for item in styles]
+        # url = "https://qihuaimage.com/api/mjapi/styles/"
+        # response = requests.get(url)
+        # response.raise_for_status()
+        # result = response.json()
+        # styles = result.get("data", [])
+        style_prompt = ["通用-INS自拍","女装-涉谷街拍","通用-简约风","女装-清新室内","通用-靠墙特写","通用-露营风","通用-荒草秋景","通用-小资情调"]
         return {
             "required": {
                 "cloths_image": ("IMAGE",),  # 输入图像
@@ -1861,7 +1861,7 @@ class FurniturePhotoNode:
                 "Content-Type": "application/json",
                 "Authorization": f"Bearer {oneapi_token}"
             }
-            response = requests.post(oneapi_url, headers=headers, json=payload, timeout=240)
+            response = requests.post(oneapi_url, headers=headers, json=payload, timeout=340)
             try:
                 response.raise_for_status()
             except requests.exceptions.HTTPError as e:
@@ -2151,12 +2151,13 @@ class DetailPhotoNode:
 class DetailJinNode:
     @classmethod
     def INPUT_TYPES(cls):
-        url = "http://admin.qihuaimage.com/items/furn_cai"
-        response = requests.get(url)
-        response.raise_for_status()
-        result = response.json()
-        data = result.get('data', [])
-        Polished_list = list(set(item['name'] for item in data))
+        # url = "http://admin.qihuaimage.com/items/furn_cai"
+        # response = requests.get(url)
+        # response.raise_for_status()
+        # result = response.json()
+        # data = result.get('data', [])
+        # Polished_list = list(set(item['name'] for item in data))
+        Polished_list = ["金属&木纹","木纹","金属"]
         return {
             "required": {
                 "input_image": ("IMAGE",),  # 接收多个图片
@@ -2282,7 +2283,7 @@ class FurnitureAngleNode:
         return {
             "required": {
                 "input_image": ("IMAGE",),  # 接收多个图片
-                "angle_type": (["4k-俯视45度","4K-正视角","4k-顶视图","4K-对角线拍摄","1k-左侧垂直视图","1k-右侧垂直视图"], {"default": "2k-俯视45度"}),
+                "angle_type": (["俯视45度","正视图","对角线视图","左45度视图","左90度视图","右45度视图","右90度视图"], {"default": "俯视45度"}),
                 "seed": ("INT", {"default": 0}),
             }
         }
@@ -2292,43 +2293,7 @@ class FurnitureAngleNode:
     FUNCTION = "generate"
     CATEGORY = "🎨MJapiparty/Product&tool"
 
-    def generate(self, seed, input_image=None,angle_type="2k-俯视45度",num_images=1):
-        # 初始化默认宽高
-        width = 1024
-        height = 1024
-        
-        # 从input_image中获取宽高
-        if input_image is not None:
-            # 将张量转换为PIL图像
-            pil_image = ImageConverter.tensor2pil(input_image)
-            if pil_image is not None:
-                width = pil_image.width
-                height = pil_image.height
-        
-        min_pixels = 3986400  # 2560x1440
-        max_pixels = 16777216  # 4096x4096
-        
-        # 计算当前总像素数
-        current_pixels = width * height
-        
-        # 1. 首先处理总像素数不满足的情况
-        if current_pixels < min_pixels:
-            scale_ratio = (min_pixels / current_pixels) ** 0.5
-            width = int(width * scale_ratio)
-            height = int(height * scale_ratio)
-            current_pixels = width * height  # 更新当前像素数
-
-        if current_pixels > max_pixels:
-            # 需要缩小，计算缩小比例
-            scale_ratio = (max_pixels / current_pixels) ** 0.5
-            width = int(width * scale_ratio)
-            height = int(height * scale_ratio)
-            current_pixels = width * height  # 更新当前像素数
-        
-        # print("处理后的图片宽高",f"{width}x{height}")
-            
-
-                
+    def generate(self, seed, input_image=None,angle_type="俯视45度",num_images=1):
         # 调用配置管理器获取配置
         oneapi_url, oneapi_token = config_manager.get_api_config()
         # 合并图像和遮罩
@@ -2341,17 +2306,8 @@ class FurnitureAngleNode:
                 "angle_type": angle_type,
                 "seed": int(seed+num),
                 "watermark": False,
-                "max_SetImage": num_images,
-                "pro": True,
-                "size": f"{width}x{height}",
+                "resolution": "2K",
             }
-
-            if "1k" in angle_type:
-                payload["model"] = "multiple-angles"
-                payload["input_image"] = [merged_image]
-                payload["rotate_right_left"] = float(-90) if "右侧" in angle_type else float(90)
-                payload["num_images"] = num_images
-
             headers = {
                 "Content-Type": "application/json",
                 "Authorization": f"Bearer {oneapi_token}"
@@ -2391,8 +2347,6 @@ class FurnitureAngleNode:
                     api_tensors.append(error_tensor)
         api_tensors = []
         cell(1)
-        if "2k" in angle_type and num_images == 2:
-            cell(2)
         if not api_tensors:
             error_tensor = ImageConverter.create_error_image("未获取到有效图片 URL")
             api_tensors.append(error_tensor)
