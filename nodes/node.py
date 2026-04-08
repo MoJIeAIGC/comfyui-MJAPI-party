@@ -1823,6 +1823,7 @@ class FurniturePhotoNode:
                 "input_image": ("IMAGE",[]),  # 接收多个图片
                 # "furniture_types": (parentname_list, {"default": parentname_list[0]}),
                 # "style_type": (typename_list, {"default": typename_list[0]}),
+                "resolution": (["2K", "4K"], {"default": "2K"}),
                 "style_type": (style_list, {"default": style_list[0]}),
                 "aspect_ratio": (["16:9","4:3","1:1", "3:4",  "9:16"], {"default": "1:1"}),
                 "num_images": ("INT", {"default": 1, "min": 1, "max": 4}),  # 新增参数，只能是1或2
@@ -1845,7 +1846,7 @@ class FurniturePhotoNode:
         def call_api(seed_override):
             payload = {
                 "model": "furniture-photo",
-                "resolution": "2K",
+                "resolution": resolution,
                 "aspect_ratio": aspect_ratio,
                 "num_images": num_images,
                 #"furniture_types": furniture_types,
