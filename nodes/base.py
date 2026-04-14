@@ -570,22 +570,27 @@ class ImageConverter:
             raise
 
     @staticmethod
-    def resize_image(img, target_size, mode):
+    def resize_image(img, target_size, mode="keep_ratio_pad"):
         w, h = img.size
         if mode == "stretch":
             return img.resize((target_size, target_size), Image.LANCZOS)
         elif mode == "crop":
             return ImageOps.fit(img, (target_size, target_size), Image.LANCZOS)
         else:  # keep_ratio_pad
+            # 计算缩放比例，使长边达到 target_size（若原图长边小于 target_size 则放大）
+            max_dim = max(w, h)
+            scale = target_size / max_dim
+            new_w = int(w * scale)
+            new_h = int(h * scale)
             # 等比缩放
-            img.thumbnail((target_size, target_size), Image.LANCZOS)
-            new_w, new_h = img.size
-            # 创建白色背景画布 (RGB: 255,255,255)
+            resized_img = img.resize((new_w, new_h), Image.LANCZOS)
+            # 创建白色背景画布
             canvas = Image.new("RGB", (target_size, target_size), (255, 255, 255))
             # 居中粘贴
             offset = ((target_size - new_w) // 2, (target_size - new_h) // 2)
-            canvas.paste(img, offset)
+            canvas.paste(resized_img, offset)
             return canvas
+
 
 
     @staticmethod

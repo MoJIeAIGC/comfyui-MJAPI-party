@@ -3206,16 +3206,7 @@ class MultiImageUpload:
         input_dir = folder_paths.get_input_directory()
         pil_images = []
 
-        # 1. 处理上传的文件名列表
-        if filenames:
-            image_names = [name.strip() for name in filenames.split(",") if name.strip()]
-            for name in image_names:
-                img_path = os.path.join(input_dir, name)
-                if not os.path.exists(img_path):
-                    raise FileNotFoundError(f"Image not found: {img_path}")
-                pil_images.append(Image.open(img_path).convert("RGB"))
-
-        # 2. 处理可选的外部图片输入 (image1, image2)
+        # 1. 处理可选的外部图片输入 (image1, image2) - 确保image1排在第一位
         external_images = []
         if image1 is not None:
             external_images.append(image1)
@@ -3229,6 +3220,15 @@ class MultiImageUpload:
                 # 转换为 PIL 图像
                 pil_img = ImageConverter.tensor2pil(single_tensor)
                 pil_images.append(pil_img)
+
+        # 2. 处理上传的图片文件
+        if filenames:
+            image_names = [name.strip() for name in filenames.split(",") if name.strip()]
+            for name in image_names:
+                img_path = os.path.join(input_dir, name)
+                if not os.path.exists(img_path):
+                    raise FileNotFoundError(f"Image not found: {img_path}")
+                pil_images.append(Image.open(img_path).convert("RGB"))
 
         if not pil_images:
             raise ValueError("No images provided (neither upload nor external inputs).")
