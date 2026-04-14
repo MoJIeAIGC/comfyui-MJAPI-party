@@ -5,6 +5,7 @@ import base64
 from io import BytesIO
 import os
 import requests
+from typing import List, Tuple
 import logging
 from comfy_api.input_impl.video_types import VideoFromFile
 class ImageConverter:
@@ -12,6 +13,34 @@ class ImageConverter:
         "llm": [],
         "image": [],
     }
+    @staticmethod
+    def pil_to_comfy_tensor(img: "Image.Image"):
+        """
+        ComfyUI IMAGE convention is float32 in [0,1], shape (1, H, W, 3)
+        """
+        import numpy as np
+        import torch
+        from PIL import Image
+
+        if not isinstance(img, Image.Image):
+            raise TypeError(f"Expected PIL.Image.Image, got {type(img)}")
+        img = img.convert("RGB")
+        arr = np.array(img).astype(np.float32) / 255.0
+        t = torch.from_numpy(arr)  # (H, W, 3)
+        return t.unsqueeze(0)      # (1, H, W, 3)
+
+    @staticmethod
+    def resize_pil(img: "Image.Image", size_wh: Tuple[int, int], mode: str):
+        from PIL import Image
+
+        resampling = getattr(Image, "Resampling", Image)
+        resample = {
+            "nearest": resampling.NEAREST,
+            "bilinear": resampling.BILINEAR,
+            "bicubic": resampling.BICUBIC,
+            "lanczos": resampling.LANCZOS,
+        }.get(mode, resampling.LANCZOS)
+        return img.resize(size_wh, resample=resample)
     @staticmethod
     def pil2tensor(image):
         img_array = np.array(image).astype(np.float32) / 255.0  # (H, W, 3)

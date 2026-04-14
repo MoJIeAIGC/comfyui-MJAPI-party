@@ -3185,55 +3185,60 @@ class ChangeHeadNode:
 import folder_paths
 class MultiImageUpload:
     @classmethod
-    def INPUT_TYPES(s):
+    def INPUT_TYPES(cls):
         return {
             "required": {
                 "filenames": ("STRING", {"default": "", "multiline": False}),
-                "target_size": ("INT", {"default": 1024, "min": 64, "max": 4096, "step": 64}),
-                "resize_mode": (["keep_ratio_pad", "stretch", "crop"], {"default": "keep_ratio_pad"}),
-            },
-            "optional": {
-                "image_batch_in": ("IMAGE",),
+                "resize_to_first": ("BOOLEAN", {"default": True}),
+                "resize_mode": (["nearest", "bilinear", "bicubic", "lanczos"], {"default": "lanczos"}),
             }
         }
 
-    CATEGORY = "image"
     RETURN_TYPES = ("IMAGE", "IMAGE", "STRING")
-    RETURN_NAMES = ("image_batch", "first_image", "uploaded_paths")
-    FUNCTION = "upload_images"
+    RETURN_NAMES = ("image_batch", "image_list", "image_names")
+    OUTPUT_IS_LIST = (False, True, True)
+    FUNCTION = "load"
+    CATEGORY = "image"
 
-    def upload_images(self, filenames="", target_size=1024, resize_mode="keep_ratio_pad", image_batch_in=None):
+    def load(self, filenames, resize_to_first=True, resize_mode="lanczos"):
+        import json
+        import torch
+        from PIL import Image
+
+        if not filenames:
+            raise ValueError("No filenames provided")
+
+        # 解析逗号分隔的文件名列表（与前端保持一致）
+        image_names = [name.strip() for name in filenames.split(",") if name.strip()]
         input_dir = folder_paths.get_input_directory()
-        image_paths = []
-        if filenames:
-            image_paths = [
-                os.path.join(input_dir, name.strip())
-                for name in filenames.split(",") if name.strip()
-            ]
+        
+        pil_images = []
+        for name in image_names:
+            img_path = os.path.join(input_dir, name)
+            if not os.path.exists(img_path):
+                raise FileNotFoundError(f"Image not found: {img_path}")
+            pil_images.append(Image.open(img_path).convert("RGB"))
 
-        image_list = []
-        if not image_paths and image_batch_in is None:
-            raise ValueError("No images uploaded and no input batch provided.")
+        # 生成独立张量列表（原始尺寸）
+        image_list = [ImageConverter.pil_to_comfy_tensor(img) for img in pil_images]
 
-        # 处理上传的图片
-        for img_path in image_paths:
-            img = Image.open(img_path).convert("RGB")
-            img = ImageConverter.resize_image(img, target_size, resize_mode)
-            image_list.append(ImageConverter.pil2tensor(img))
-
-        # 合并外部输入批次
-        if image_batch_in is not None:
-            for i in range(image_batch_in.shape[0]):
-                image_list.append(image_batch_in[i])
-
-        if image_list:
-            batch_tensor = torch.cat([img.unsqueeze(0) for img in image_list], dim=0)
-            first_img = image_list[0]
+        # 生成统一尺寸的批次
+        if len(pil_images) == 1:
+            image_batch = image_list[0]
         else:
-            batch_tensor = torch.empty(0)
-            first_img = torch.empty(0)
+            if resize_to_first:
+                w0, h0 = pil_images[0].size
+                resized = [ImageConverter.resize_pil(img, (w0, h0), resize_mode) for img in pil_images]
+                batch_tensors = [ImageConverter.pil_to_comfy_tensor(img) for img in resized]
+                image_batch = torch.cat(batch_tensors, dim=0)
+            else:
+                # 检查尺寸是否一致
+                shapes = [(t.shape[1], t.shape[2]) for t in image_list]
+                if len(set(shapes)) != 1:
+                    raise ValueError("Images have different sizes; enable resize_to_first=True")
+                image_batch = torch.cat(image_list, dim=0)
 
-        return (batch_tensor, first_img, image_paths)
+        return (image_batch, image_list, image_names)
 
 
 
