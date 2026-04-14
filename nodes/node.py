@@ -2638,7 +2638,7 @@ class GeminiLLMNode:
     def generate(self, seed, prompt="", model="Gemini 3.1 Pro Preview", media_resolution="Default", thinking_level="High", System_prompt="", Web_search=True, format=False, image_input=None, video=None, file=None, context=None):
         # 输入非空校验 - 更严格地检查prompt是否为空
         prompt_stripped = prompt.strip() if prompt else ""
-        if not prompt_stripped and not image_input and not video and not file:
+        if not prompt_stripped and image_input is None and not video and not file:
             return ("错误：至少需要输入文本、图片、视频或文件中的一种",)
 
         if context is not None:
@@ -3182,6 +3182,72 @@ class ChangeHeadNode:
 
         return (torch.cat(api_tensors, dim=0),)
 
+import folder_paths
+class MultiImageUpload:
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "filenames": ("STRING", {"default": "", "multiline": False}),
+                "max_size": ("INT", {"default": 1024, "min": 64, "max": 4096, "step": 64}),
+            },
+            "optional": {
+                "image1": ("IMAGE",),
+                "image2": ("IMAGE",),
+            }
+        }
+
+    RETURN_TYPES = ("IMAGE",)
+    RETURN_NAMES = ("image_batch",)
+    FUNCTION = "load"
+    CATEGORY = "🎨MJapiparty/Product&tool"
+
+    def load(self, filenames, max_size=1024, image1=None, image2=None):
+        input_dir = folder_paths.get_input_directory()
+        pil_images = []
+
+        # 1. 处理可选的外部图片输入 (image1, image2) - 确保image1排在第一位
+        external_images = []
+        if image1 is not None:
+            external_images.append(image1)
+        if image2 is not None:
+            external_images.append(image2)
+
+        for ext_img in external_images:
+            # ext_img 形状为 (B, H, W, C)，需遍历批次中的每一张
+            for i in range(ext_img.shape[0]):
+                single_tensor = ext_img[i]  # (H, W, C)
+                # 转换为 PIL 图像
+                pil_img = ImageConverter.tensor2pil(single_tensor)
+                pil_images.append(pil_img)
+
+        # 2. 处理上传的图片文件
+        if filenames:
+            image_names = [name.strip() for name in filenames.split(",") if name.strip()]
+            for name in image_names:
+                img_path = os.path.join(input_dir, name)
+                if not os.path.exists(img_path):
+                    raise FileNotFoundError(f"Image not found: {img_path}")
+                pil_images.append(Image.open(img_path).convert("RGB"))
+
+        if not pil_images:
+            raise ValueError("No images provided (neither upload nor external inputs).")
+
+        # 3. 统一处理所有图片：等比缩放 + 白边填充至 max_size × max_size
+        processed_tensors = []
+        for img in pil_images:
+            resized_img = ImageConverter.resize_image(img, max_size, "keep_ratio_pad")
+            tensor = ImageConverter.pil2tensor(resized_img)  # (1, max_size, max_size, 3)
+            processed_tensors.append(tensor)
+
+        # 4. 合并为批次
+        if processed_tensors:
+            batch_tensor = torch.cat(processed_tensors, dim=0)
+        else:
+            batch_tensor = torch.empty(0)
+
+        return (batch_tensor,)
+
 
 
 
@@ -3220,6 +3286,7 @@ NODE_CLASS_MAPPINGS = {
     "JSONParserNode": JSONParserNode,
     "SinotecdesginNode": SinotecdesginNode,
     "ChangeHeadNode": ChangeHeadNode,
+    "MultiImageUpload": MultiImageUpload,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
@@ -3257,4 +3324,5 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "JSONParserNode": "JSON解析器",
     "SinotecdesginNode": "人设设计",
     "ChangeHeadNode": "头像替换",
+    "MultiImageUpload": "多图上传",
 }

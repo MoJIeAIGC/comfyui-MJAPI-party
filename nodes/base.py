@@ -5,6 +5,7 @@ import base64
 from io import BytesIO
 import os
 import requests
+from typing import List, Tuple
 import logging
 from comfy_api.input_impl.video_types import VideoFromFile
 class ImageConverter:
@@ -12,6 +13,34 @@ class ImageConverter:
         "llm": [],
         "image": [],
     }
+    @staticmethod
+    def pil_to_comfy_tensor(img: "Image.Image"):
+        """
+        ComfyUI IMAGE convention is float32 in [0,1], shape (1, H, W, 3)
+        """
+        import numpy as np
+        import torch
+        from PIL import Image
+
+        if not isinstance(img, Image.Image):
+            raise TypeError(f"Expected PIL.Image.Image, got {type(img)}")
+        img = img.convert("RGB")
+        arr = np.array(img).astype(np.float32) / 255.0
+        t = torch.from_numpy(arr)  # (H, W, 3)
+        return t.unsqueeze(0)      # (1, H, W, 3)
+
+    @staticmethod
+    def resize_pil(img: "Image.Image", size_wh: Tuple[int, int], mode: str):
+        from PIL import Image
+
+        resampling = getattr(Image, "Resampling", Image)
+        resample = {
+            "nearest": resampling.NEAREST,
+            "bilinear": resampling.BILINEAR,
+            "bicubic": resampling.BICUBIC,
+            "lanczos": resampling.LANCZOS,
+        }.get(mode, resampling.LANCZOS)
+        return img.resize(size_wh, resample=resample)
     @staticmethod
     def pil2tensor(image):
         img_array = np.array(image).astype(np.float32) / 255.0  # (H, W, 3)
@@ -539,6 +568,30 @@ class ImageConverter:
         except Exception as e:
             logging.error(f"视频下载出错: {str(e)}")
             raise
+
+    @staticmethod
+    def resize_image(img, target_size, mode="keep_ratio_pad"):
+        w, h = img.size
+        if mode == "stretch":
+            return img.resize((target_size, target_size), Image.LANCZOS)
+        elif mode == "crop":
+            return ImageOps.fit(img, (target_size, target_size), Image.LANCZOS)
+        else:  # keep_ratio_pad
+            # 计算缩放比例，使长边达到 target_size（若原图长边小于 target_size 则放大）
+            max_dim = max(w, h)
+            scale = target_size / max_dim
+            new_w = int(w * scale)
+            new_h = int(h * scale)
+            # 等比缩放
+            resized_img = img.resize((new_w, new_h), Image.LANCZOS)
+            # 创建白色背景画布
+            canvas = Image.new("RGB", (target_size, target_size), (255, 255, 255))
+            # 居中粘贴
+            offset = ((target_size - new_w) // 2, (target_size - new_h) // 2)
+            canvas.paste(resized_img, offset)
+            return canvas
+
+
 
     @staticmethod
     def convert_images_to_base64(image_list):

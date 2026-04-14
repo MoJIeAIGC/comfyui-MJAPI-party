@@ -569,3 +569,123 @@ app.registerExtension({
 
     }
 });
+
+app.registerExtension({
+    name: "my.custom.nodes.multi.image.upload",
+    async beforeRegisterNodeDef(nodeType, nodeData, app) {
+        if (nodeData.name === "MultiImageUpload") {
+            const onNodeCreated = nodeType.prototype.onNodeCreated;
+            nodeType.prototype.onNodeCreated = function () {
+                const result = onNodeCreated ? onNodeCreated.apply(this, arguments) : undefined;
+                
+                // 隐藏的文件选择 input
+                const fileInput = document.createElement("input");
+                fileInput.type = "file";
+                fileInput.multiple = true;
+                fileInput.accept = "image/png, image/jpeg, image/webp";
+                fileInput.style.display = "none";
+                
+                // 上传按钮
+                const uploadButton = document.createElement("button");
+                uploadButton.textContent = "选择多张图片";
+                uploadButton.style.marginTop = "5px";
+                uploadButton.style.width = "100%";
+                uploadButton.onclick = () => fileInput.click();
+                
+                // 图片预览容器
+                const previewContainer = document.createElement("div");
+                previewContainer.style.display = "flex";
+                previewContainer.style.flexWrap = "wrap";
+                previewContainer.style.gap = "4px";
+                previewContainer.style.marginTop = "8px";
+                previewContainer.style.maxHeight = "200px";
+                previewContainer.style.overflowY = "auto";
+                previewContainer.style.padding = "2px";
+                previewContainer.style.border = "1px dashed #444";
+                previewContainer.style.borderRadius = "4px";
+                previewContainer.style.backgroundColor = "#1e1e1e";
+                
+                // 将 UI 元素添加到节点
+                this.addDOMWidget("upload_button", "button", uploadButton);
+                this.addDOMWidget("preview_container", "custom", previewContainer);
+                                
+                fileInput.onchange = async () => {
+                    const files = Array.from(fileInput.files);
+                    if (files.length === 0) return;
+
+                    // 清空预览区域并显示上传进度
+                    previewContainer.innerHTML = `<div style="width:100%; text-align:center; padding:8px; color:#aaa;">正在上传 ${files.length} 个文件...</div>`;
+
+                    const uploadPromises = files.map(async (file) => {
+                        const formData = new FormData();
+                        formData.append("image", file);
+                        try {
+                            const resp = await api.fetchApi("/upload/image", {
+                                method: "POST",
+                                body: formData
+                            });
+                            if (resp.status === 200) {
+                                const data = await resp.json();
+                                return data.name; // 返回单个文件名
+                            } else {
+                                console.error(`上传 ${file.name} 失败，状态码：${resp.status}`);
+                                return null;
+                            }
+                        } catch (error) {
+                            console.error(`上传 ${file.name} 出错:`, error);
+                            return null;
+                        }
+                    });
+
+                    try {
+                        const uploadedNames = (await Promise.all(uploadPromises)).filter(name => name !== null);
+
+                        if (uploadedNames.length === 0) {
+                            previewContainer.innerHTML = `<div style="width:100%; text-align:center; padding:8px; color:#f66;">所有文件上传失败</div>`;
+                            return;
+                        }
+
+                        // 渲染预览图
+                        previewContainer.innerHTML = "";
+                        uploadedNames.forEach(filename => {
+                            const imgWrapper = document.createElement("div");
+                            imgWrapper.style.width = "60px";
+                            imgWrapper.style.height = "60px";
+                            imgWrapper.style.borderRadius = "4px";
+                            imgWrapper.style.overflow = "hidden";
+                            imgWrapper.style.border = "1px solid #555";
+                            imgWrapper.style.backgroundColor = "#2a2a2a";
+
+                            const img = document.createElement("img");
+                            img.src = `/view?filename=${encodeURIComponent(filename)}&type=input`;
+                            img.style.width = "100%";
+                            img.style.height = "100%";
+                            img.style.objectFit = "cover";
+                            img.alt = filename;
+                            img.title = filename;
+
+                            imgWrapper.appendChild(img);
+                            previewContainer.appendChild(imgWrapper);
+                        });
+
+                        // 保存文件名列表到隐藏 widget
+                        let filenamesWidget = this.widgets.find(w => w.name === "filenames");
+                        if (!filenamesWidget) {
+                            filenamesWidget = this.addWidget("string", "filenames", "", () => { });
+                        }
+                        filenamesWidget.value = uploadedNames.join(",");
+
+                        // 刷新节点尺寸
+                        this.onResize?.(this.size);
+
+                    } catch (error) {
+                        console.error("批量上传出错:", error);
+                        previewContainer.innerHTML = `<div style="width:100%; text-align:center; padding:8px; color:#f66;">上传过程发生异常</div>`;
+                    }
+                };
+                                
+                return result;
+            };
+        }
+    },
+});
