@@ -3239,11 +3239,8 @@ class MultiImageUpload:
                 image_batch = torch.cat(image_list, dim=0)
 
         return (image_batch, image_list, image_names)
-
-
-
-
-
+        
+    CATEGORY = "🎨MJapiparty/Product&tool"
 
 NODE_CLASS_MAPPINGS = {
     "GeminiEditNode": GeminiEditNode,
