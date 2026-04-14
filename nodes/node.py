@@ -2638,7 +2638,7 @@ class GeminiLLMNode:
     def generate(self, seed, prompt="", model="Gemini 3.1 Pro Preview", media_resolution="Default", thinking_level="High", System_prompt="", Web_search=True, format=False, image_input=None, video=None, file=None, context=None):
         # 输入非空校验 - 更严格地检查prompt是否为空
         prompt_stripped = prompt.strip() if prompt else ""
-        if not prompt_stripped and not image_input and not video and not file:
+        if not prompt_stripped and image_input is None and not video and not file:
             return ("错误：至少需要输入文本、图片、视频或文件中的一种",)
 
         if context is not None:
@@ -3182,93 +3182,61 @@ class ChangeHeadNode:
 
         return (torch.cat(api_tensors, dim=0),)
 
-
+import folder_paths
 class MultiImageUpload:
-    """
-    一个多图上传节点。它会将上传的多张图片统一调整为相同的尺寸，
-    然后打包成一个批次（IMAGE Tensor）或列表输出。
-    """
     @classmethod
     def INPUT_TYPES(s):
         return {
             "required": {
-                # 这里可以添加图片以外的参数，比如统一的输出尺寸
-                "max_size": ("INT", {"default": 768, "min": 64, "max": 2048, "step": 64}),
-                "resize_method": (["keep_ratio", "stretch", "crop"], {"default": "keep_ratio"}),
+                "filenames": ("STRING", {"default": "", "multiline": False}),
+                "target_size": ("INT", {"default": 1024, "min": 64, "max": 4096, "step": 64}),
+                "resize_mode": (["keep_ratio_pad", "stretch", "crop"], {"default": "keep_ratio_pad"}),
             },
-            # 这里可以定义可选输入，比如接收一个已有的image batch
             "optional": {
                 "image_batch_in": ("IMAGE",),
             }
         }
-    
-    # 节点在右键菜单中的分类
+
     CATEGORY = "image"
-
-    # 定义输出类型：一个IMAGE批次，一个包含所有图片的列表，以及上传成功的文件路径列表
-    RETURN_TYPES = ("IMAGE", "IMAGE_LIST", "STRING")
-    RETURN_NAMES = ("image_batch", "image_list", "uploaded_paths")
-
-    # 节点的主处理函数
+    RETURN_TYPES = ("IMAGE", "IMAGE", "STRING")
+    RETURN_NAMES = ("image_batch", "first_image", "uploaded_paths")
     FUNCTION = "upload_images"
 
-    def upload_images(self, max_size=768, resize_method="keep_ratio", image_batch_in=None):
-        # 1. 获取上传的图片路径
-        # ComfyUI上传的文件会临时存在 input 目录，格式为 "input/upload_xxxxx.png"
-        image_paths = []
+    def upload_images(self, filenames="", target_size=1024, resize_mode="keep_ratio_pad", image_batch_in=None):
         input_dir = folder_paths.get_input_directory()
-        
-        # 这里我们假设前端会把上传的文件名通过一个特殊参数传过来
-        # 或者你可以遍历 input 目录下所有 "upload_" 开头的文件。
-        # 为了演示，这里简化处理，你需要根据前端实现调整。
-        # 实际开发中，一个常见做法是在前端调用后端API将文件保存到input目录，
-        # 然后通过一个隐藏参数（如"filenames"）把文件名列表传给后端。
-        
-        # 2. 加载、处理和打包图片
+        image_paths = []
+        if filenames:
+            image_paths = [
+                os.path.join(input_dir, name.strip())
+                for name in filenames.split(",") if name.strip()
+            ]
+
         image_list = []
-        # 如果没有上传图片，且没有输入batch，则报错
         if not image_paths and image_batch_in is None:
             raise ValueError("No images uploaded and no input batch provided.")
-        
-        # 处理新上传的图片
+
+        # 处理上传的图片
         for img_path in image_paths:
             img = Image.open(img_path).convert("RGB")
-            # 根据选择的方法调整尺寸
-            img = self.resize_image(img, max_size, resize_method)
-            # 转为Tensor并添加到列表
-            image_list.append(self.pil2tensor(img))
-        
-        # 如果传入了image_batch_in，也将其中的图片加入列表
+            img = ImageConverter.resize_image(img, target_size, resize_mode)
+            image_list.append(ImageConverter.pil2tensor(img))
+
+        # 合并外部输入批次
         if image_batch_in is not None:
-            # image_batch_in 的形状是 (B, H, W, C)，需要遍历批次
             for i in range(image_batch_in.shape[0]):
                 image_list.append(image_batch_in[i])
-        
-        # 3. 将所有图片打包成一个批次 (Batch)
-        # 这需要所有图片尺寸一致。我们假设resize步骤已经保证了这一点。
+
         if image_list:
             batch_tensor = torch.cat([img.unsqueeze(0) for img in image_list], dim=0)
+            first_img = image_list[0]
         else:
             batch_tensor = torch.empty(0)
-            
-        return (batch_tensor, image_list, image_paths)
+            first_img = torch.empty(0)
 
-    def resize_image(self, img, max_size, method):
-        """根据max_size和method调整图片尺寸"""
-        w, h = img.size
-        if method == "stretch":
-            return img.resize((max_size, max_size), Image.LANCZOS)
-        elif method == "crop":
-            return ImageOps.fit(img, (max_size, max_size), Image.LANCZOS)
-        else: # keep_ratio
-            scale = max_size / max(w, h)
-            new_w, new_h = int(w * scale), int(h * scale)
-            return img.resize((new_w, new_h), Image.LANCZOS)
+        return (batch_tensor, first_img, image_paths)
 
-    def pil2tensor(self, img):
-        """将PIL Image转换为ComfyUI所需的IMAGE Tensor (1, H, W, 3)"""
-        np_img = np.array(img).astype(np.float32) / 255.0
-        return torch.from_numpy(np_img)
+
+
 
 
 

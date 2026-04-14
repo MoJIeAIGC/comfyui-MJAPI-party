@@ -541,6 +541,25 @@ class ImageConverter:
             raise
 
     @staticmethod
+    def resize_image(img, target_size, mode):
+        w, h = img.size
+        if mode == "stretch":
+            return img.resize((target_size, target_size), Image.LANCZOS)
+        elif mode == "crop":
+            return ImageOps.fit(img, (target_size, target_size), Image.LANCZOS)
+        else:  # keep_ratio_pad
+            # 等比缩放
+            img.thumbnail((target_size, target_size), Image.LANCZOS)
+            new_w, new_h = img.size
+            # 创建白色背景画布 (RGB: 255,255,255)
+            canvas = Image.new("RGB", (target_size, target_size), (255, 255, 255))
+            # 居中粘贴
+            offset = ((target_size - new_w) // 2, (target_size - new_h) // 2)
+            canvas.paste(img, offset)
+            return canvas
+
+
+    @staticmethod
     def convert_images_to_base64(image_list):
         # 转换图像为Base64编码的字符串数组
         base64_images = []
