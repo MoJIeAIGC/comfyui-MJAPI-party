@@ -3200,7 +3200,7 @@ class MultiImageUpload:
     RETURN_TYPES = ("IMAGE",)
     RETURN_NAMES = ("image_batch",)
     FUNCTION = "load"
-    CATEGORY = "image"
+    CATEGORY = "🎨MJapiparty/Product&tool"
 
     def load(self, filenames, max_size=1024, image1=None, image2=None):
         input_dir = folder_paths.get_input_directory()
