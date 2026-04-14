@@ -3189,58 +3189,64 @@ class MultiImageUpload:
         return {
             "required": {
                 "filenames": ("STRING", {"default": "", "multiline": False}),
-                "resize_to_first": ("BOOLEAN", {"default": True}),
-                "resize_mode": (["nearest", "bilinear", "bicubic", "lanczos"], {"default": "lanczos"}),
+                "max_size": ("INT", {"default": 1024, "min": 64, "max": 4096, "step": 64}),
+            },
+            "optional": {
+                "image1": ("IMAGE",),
+                "image2": ("IMAGE",),
             }
         }
 
-    RETURN_TYPES = ("IMAGE", "IMAGE", "STRING")
-    RETURN_NAMES = ("image_batch", "image_list", "image_names")
-    OUTPUT_IS_LIST = (False, True, True)
+    RETURN_TYPES = ("IMAGE",)
+    RETURN_NAMES = ("image_batch",)
     FUNCTION = "load"
     CATEGORY = "image"
 
-    def load(self, filenames, resize_to_first=True, resize_mode="lanczos"):
-        import json
-        import torch
-        from PIL import Image
-
-        if not filenames:
-            raise ValueError("No filenames provided")
-
-        # 解析逗号分隔的文件名列表（与前端保持一致）
-        image_names = [name.strip() for name in filenames.split(",") if name.strip()]
+    def load(self, filenames, max_size=1024, image1=None, image2=None):
         input_dir = folder_paths.get_input_directory()
-        
         pil_images = []
-        for name in image_names:
-            img_path = os.path.join(input_dir, name)
-            if not os.path.exists(img_path):
-                raise FileNotFoundError(f"Image not found: {img_path}")
-            pil_images.append(Image.open(img_path).convert("RGB"))
 
-        # 生成独立张量列表（原始尺寸）
-        image_list = [ImageConverter.pil_to_comfy_tensor(img) for img in pil_images]
+        # 1. 处理上传的文件名列表
+        if filenames:
+            image_names = [name.strip() for name in filenames.split(",") if name.strip()]
+            for name in image_names:
+                img_path = os.path.join(input_dir, name)
+                if not os.path.exists(img_path):
+                    raise FileNotFoundError(f"Image not found: {img_path}")
+                pil_images.append(Image.open(img_path).convert("RGB"))
 
-        # 生成统一尺寸的批次
-        if len(pil_images) == 1:
-            image_batch = image_list[0]
+        # 2. 处理可选的外部图片输入 (image1, image2)
+        external_images = []
+        if image1 is not None:
+            external_images.append(image1)
+        if image2 is not None:
+            external_images.append(image2)
+
+        for ext_img in external_images:
+            # ext_img 形状为 (B, H, W, C)，需遍历批次中的每一张
+            for i in range(ext_img.shape[0]):
+                single_tensor = ext_img[i]  # (H, W, C)
+                # 转换为 PIL 图像
+                pil_img = ImageConverter.tensor2pil(single_tensor)
+                pil_images.append(pil_img)
+
+        if not pil_images:
+            raise ValueError("No images provided (neither upload nor external inputs).")
+
+        # 3. 统一处理所有图片：等比缩放 + 白边填充至 max_size × max_size
+        processed_tensors = []
+        for img in pil_images:
+            resized_img = ImageConverter.resize_image(img, max_size, "keep_ratio_pad")
+            tensor = ImageConverter.pil2tensor(resized_img)  # (1, max_size, max_size, 3)
+            processed_tensors.append(tensor)
+
+        # 4. 合并为批次
+        if processed_tensors:
+            batch_tensor = torch.cat(processed_tensors, dim=0)
         else:
-            if resize_to_first:
-                w0, h0 = pil_images[0].size
-                resized = [ImageConverter.resize_pil(img, (w0, h0), resize_mode) for img in pil_images]
-                batch_tensors = [ImageConverter.pil_to_comfy_tensor(img) for img in resized]
-                image_batch = torch.cat(batch_tensors, dim=0)
-            else:
-                # 检查尺寸是否一致
-                shapes = [(t.shape[1], t.shape[2]) for t in image_list]
-                if len(set(shapes)) != 1:
-                    raise ValueError("Images have different sizes; enable resize_to_first=True")
-                image_batch = torch.cat(image_list, dim=0)
+            batch_tensor = torch.empty(0)
 
-        return (image_batch, image_list, image_names)
-
-
+        return (batch_tensor,)
 
 
 
