@@ -1,0 +1,3364 @@
+{
+  "id": "769b69b3-4ba7-49df-900a-d37b05d89840",
+  "revision": 0,
+  "last_node_id": 85,
+  "last_link_id": 198,
+  "nodes": [
+    {
+      "id": 24,
+      "type": "PreviewAny",
+      "pos": [
+        1217.031348812339,
+        -1708.5413903559654
+      ],
+      "size": [
+        351.70234241685375,
+        203.23931446431664
+      ],
+      "flags": {},
+      "order": 41,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "source",
+          "type": "*",
+          "link": 136
+        }
+      ],
+      "outputs": [],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.7.0",
+        "Node name for S&R": "PreviewAny"
+      },
+      "widgets_values": [
+        null,
+        null,
+        null
+      ]
+    },
+    {
+      "id": 62,
+      "type": "ImageStitch",
+      "pos": [
+        1643.2218646744561,
+        -1498.098661789297
+      ],
+      "size": [
+        210,
+        150
+      ],
+      "flags": {},
+      "order": 53,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "image1",
+          "type": "IMAGE",
+          "link": 81
+        },
+        {
+          "name": "image2",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": 149
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            83
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.7.0",
+        "Node name for S&R": "ImageStitch"
+      },
+      "widgets_values": [
+        "down",
+        true,
+        0,
+        "white"
+      ]
+    },
+    {
+      "id": 66,
+      "type": "SaveImage",
+      "pos": [
+        2034.4226039207028,
+        -2046.5464195540242
+      ],
+      "size": [
+        541.4015093333273,
+        3690.585067266598
+      ],
+      "flags": {},
+      "order": 57,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 89
+        }
+      ],
+      "outputs": [],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.7.0",
+        "Node name for S&R": "SaveImage"
+      },
+      "widgets_values": [
+        "ComfyUI"
+      ]
+    },
+    {
+      "id": 31,
+      "type": "PreviewAny",
+      "pos": [
+        1216.6477990108133,
+        1050.6263334278533
+      ],
+      "size": [
+        351.70234241685375,
+        203.23931446431664
+      ],
+      "flags": {},
+      "order": 52,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "source",
+          "type": "*",
+          "link": 171
+        }
+      ],
+      "outputs": [],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.7.0",
+        "Node name for S&R": "PreviewAny"
+      },
+      "widgets_values": [
+        null,
+        null,
+        null
+      ]
+    },
+    {
+      "id": 58,
+      "type": "StringConcatenate",
+      "pos": [
+        -990,
+        1160
+      ],
+      "size": [
+        400,
+        200
+      ],
+      "flags": {},
+      "order": 21,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "string_a",
+          "type": "STRING",
+          "widget": {
+            "name": "string_a"
+          },
+          "link": 104
+        }
+      ],
+      "outputs": [
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "links": [
+            128
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.7.0",
+        "Node name for S&R": "StringConcatenate"
+      },
+      "widgets_values": [
+        "",
+        "将输入的图片策略中第六张图的效果与输入的图片结合形成Nanobanan提示词输出，输出只需要提示词本身。",
+        ""
+      ]
+    },
+    {
+      "id": 25,
+      "type": "PreviewAny",
+      "pos": [
+        1220.404040404042,
+        -1143.6363636363626
+      ],
+      "size": [
+        351.70234241685375,
+        203.23931446431664
+      ],
+      "flags": {},
+      "order": 44,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "source",
+          "type": "*",
+          "link": 182
+        }
+      ],
+      "outputs": [],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.7.0",
+        "Node name for S&R": "PreviewAny"
+      },
+      "widgets_values": [
+        null,
+        null,
+        null
+      ]
+    },
+    {
+      "id": 27,
+      "type": "PreviewAny",
+      "pos": [
+        1211.0525928400114,
+        -67.71929725230797
+      ],
+      "size": [
+        351.70234241685375,
+        203.23931446431664
+      ],
+      "flags": {},
+      "order": 48,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "source",
+          "type": "*",
+          "link": 157
+        }
+      ],
+      "outputs": [],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.7.0",
+        "Node name for S&R": "PreviewAny"
+      },
+      "widgets_values": [
+        null,
+        null,
+        null
+      ]
+    },
+    {
+      "id": 22,
+      "type": "SaveImage",
+      "pos": [
+        796.532281191492,
+        -126.85587296288831
+      ],
+      "size": [
+        331.0230652512312,
+        495.6358877827539
+      ],
+      "flags": {},
+      "order": 47,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 155
+        }
+      ],
+      "outputs": [],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.7.0",
+        "Node name for S&R": "SaveImage"
+      },
+      "widgets_values": [
+        "ComfyUI"
+      ]
+    },
+    {
+      "id": 63,
+      "type": "ImageStitch",
+      "pos": [
+        1637.3221013834634,
+        -1278.0195322658033
+      ],
+      "size": [
+        210,
+        150
+      ],
+      "flags": {},
+      "order": 54,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "image1",
+          "type": "IMAGE",
+          "link": 83
+        },
+        {
+          "name": "image2",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": 156
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            85
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.7.0",
+        "Node name for S&R": "ImageStitch"
+      },
+      "widgets_values": [
+        "down",
+        true,
+        0,
+        "white"
+      ]
+    },
+    {
+      "id": 64,
+      "type": "ImageStitch",
+      "pos": [
+        1643.2615139504965,
+        -1051.7413174284095
+      ],
+      "size": [
+        210,
+        150
+      ],
+      "flags": {},
+      "order": 55,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "image1",
+          "type": "IMAGE",
+          "link": 85
+        },
+        {
+          "name": "image2",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": 163
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            87
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.7.0",
+        "Node name for S&R": "ImageStitch"
+      },
+      "widgets_values": [
+        "down",
+        true,
+        0,
+        "white"
+      ]
+    },
+    {
+      "id": 65,
+      "type": "ImageStitch",
+      "pos": [
+        1646.2561588490416,
+        -813.913483043308
+      ],
+      "size": [
+        210,
+        150
+      ],
+      "flags": {},
+      "order": 56,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "image1",
+          "type": "IMAGE",
+          "link": 87
+        },
+        {
+          "name": "image2",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": 170
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            89
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.7.0",
+        "Node name for S&R": "ImageStitch"
+      },
+      "widgets_values": [
+        "down",
+        true,
+        0,
+        "white"
+      ]
+    },
+    {
+      "id": 61,
+      "type": "ImageStitch",
+      "pos": [
+        1638.0544504875086,
+        -1712.3965998475605
+      ],
+      "size": [
+        210,
+        150
+      ],
+      "flags": {},
+      "order": 43,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "image1",
+          "type": "IMAGE",
+          "link": 135
+        },
+        {
+          "name": "image2",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": 179
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            81
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.7.0",
+        "Node name for S&R": "ImageStitch"
+      },
+      "widgets_values": [
+        "down",
+        true,
+        0,
+        "white"
+      ]
+    },
+    {
+      "id": 39,
+      "type": "StringConcatenate",
+      "pos": [
+        -1035.2878042403063,
+        -1895.4458571023483
+      ],
+      "size": [
+        400,
+        200
+      ],
+      "flags": {},
+      "order": 16,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "string_a",
+          "type": "STRING",
+          "widget": {
+            "name": "string_a"
+          },
+          "link": 99
+        }
+      ],
+      "outputs": [
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "links": [
+            105
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.7.0",
+        "Node name for S&R": "StringConcatenate"
+      },
+      "widgets_values": [
+        "",
+        "将输入的图片策略中第一张图的效果与输入的图片结合形成Nanobanan提示词输出，输出只需要提示词本身。",
+        ""
+      ]
+    },
+    {
+      "id": 51,
+      "type": "StringConcatenate",
+      "pos": [
+        -1001.3245706909202,
+        -37.56141115722839
+      ],
+      "size": [
+        400,
+        200
+      ],
+      "flags": {},
+      "order": 19,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "string_a",
+          "type": "STRING",
+          "widget": {
+            "name": "string_a"
+          },
+          "link": 102
+        }
+      ],
+      "outputs": [
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "links": [
+            120
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.7.0",
+        "Node name for S&R": "StringConcatenate"
+      },
+      "widgets_values": [
+        "",
+        "将输入的图片策略中第四张图的效果与输入的图片结合形成Nanobanan提示词输出，输出只需要提示词本身。",
+        ""
+      ]
+    },
+    {
+      "id": 42,
+      "type": "StringConcatenate",
+      "pos": [
+        -1017.9824596169219,
+        -1220
+      ],
+      "size": [
+        400,
+        200
+      ],
+      "flags": {},
+      "order": 17,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "string_a",
+          "type": "STRING",
+          "widget": {
+            "name": "string_a"
+          },
+          "link": 100
+        }
+      ],
+      "outputs": [
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "links": [
+            110
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.7.0",
+        "Node name for S&R": "StringConcatenate"
+      },
+      "widgets_values": [
+        "",
+        "将输入的图片策略中第二张图的效果与输入的图片结合形成Nanobanan提示词输出，输出只需要提示词本身。",
+        ""
+      ]
+    },
+    {
+      "id": 26,
+      "type": "PreviewAny",
+      "pos": [
+        1206.6959329864312,
+        -576.0292657837981
+      ],
+      "size": [
+        351.70234241685375,
+        203.23931446431664
+      ],
+      "flags": {},
+      "order": 46,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "source",
+          "type": "*",
+          "link": 150
+        }
+      ],
+      "outputs": [],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.7.0",
+        "Node name for S&R": "PreviewAny"
+      },
+      "widgets_values": [
+        null,
+        null,
+        null
+      ]
+    },
+    {
+      "id": 46,
+      "type": "PreviewAny",
+      "pos": [
+        -140.26316236461395,
+        -627.9824596169228
+      ],
+      "size": [
+        460.7085302427936,
+        457.12714433739166
+      ],
+      "flags": {},
+      "order": 32,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "source",
+          "type": "*",
+          "link": 118
+        }
+      ],
+      "outputs": [],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.7.0",
+        "Node name for S&R": "PreviewAny"
+      },
+      "widgets_values": [
+        null,
+        null,
+        null
+      ]
+    },
+    {
+      "id": 47,
+      "type": "StringConcatenate",
+      "pos": [
+        -1005.1834153356635,
+        -668.9633169328673
+      ],
+      "size": [
+        400,
+        200
+      ],
+      "flags": {},
+      "order": 18,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "string_a",
+          "type": "STRING",
+          "widget": {
+            "name": "string_a"
+          },
+          "link": 101
+        }
+      ],
+      "outputs": [
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "links": [
+            115
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.7.0",
+        "Node name for S&R": "StringConcatenate"
+      },
+      "widgets_values": [
+        "",
+        "将输入的图片策略中第三张图的效果与输入的图片结合形成Nanobanan提示词输出，输出只需要提示词本身。",
+        ""
+      ]
+    },
+    {
+      "id": 67,
+      "type": "GeminiLLMNode",
+      "pos": [
+        -2638.727679004162,
+        -279.9224534759299
+      ],
+      "size": [
+        270,
+        306
+      ],
+      "flags": {},
+      "order": 11,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "prompt",
+          "shape": 7,
+          "type": "STRING",
+          "link": 90
+        },
+        {
+          "name": "image_input",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": 184
+        },
+        {
+          "name": "video",
+          "shape": 7,
+          "type": "VIDEO",
+          "link": null
+        },
+        {
+          "name": "file",
+          "shape": 7,
+          "type": "FILE",
+          "link": null
+        },
+        {
+          "name": "context",
+          "shape": 7,
+          "type": "ANY",
+          "link": null
+        },
+        {
+          "name": "System_prompt",
+          "type": "STRING",
+          "widget": {
+            "name": "System_prompt"
+          },
+          "link": 92
+        }
+      ],
+      "outputs": [
+        {
+          "name": "output",
+          "type": "STRING",
+          "links": [
+            93,
+            198
+          ]
+        },
+        {
+          "name": "context",
+          "type": "ANY",
+          "links": [
+            97
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "Mojie-API-Party",
+        "ver": "d4f36ca7531c26e5b2f5f84191b85f3068c07c82",
+        "Node name for S&R": "GeminiLLMNode"
+      },
+      "widgets_values": [
+        "Gemini 3 Pro Preview",
+        "Default",
+        "High",
+        "",
+        true,
+        false,
+        1127,
+        "randomize"
+      ]
+    },
+    {
+      "id": 7,
+      "type": "PrimitiveStringMultiline",
+      "pos": [
+        -3100.630866849501,
+        -9.999090312022322
+      ],
+      "size": [
+        400,
+        296
+      ],
+      "flags": {
+        "collapsed": false
+      },
+      "order": 0,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "links": [
+            92,
+            174
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.7.0",
+        "Node name for S&R": "PrimitiveStringMultiline"
+      },
+      "widgets_values": [
+        "你是一名电商专家，对亚马逊，天猫，tumn等各大电商平台的规则和数据了如指掌。能够迅速的分析输入图片或输入的文字的产品该制定怎样的策略销售和商品视觉策略。\n"
+      ]
+    },
+    {
+      "id": 6,
+      "type": "PreviewAny",
+      "pos": [
+        -2365.123684412083,
+        -1026.800646032651
+      ],
+      "size": [
+        500.44749491857965,
+        695.0090023271656
+      ],
+      "flags": {},
+      "order": 12,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "source",
+          "type": "*",
+          "link": 93
+        }
+      ],
+      "outputs": [],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.7.0",
+        "Node name for S&R": "PreviewAny"
+      },
+      "widgets_values": [
+        null,
+        null,
+        null
+      ]
+    },
+    {
+      "id": 10,
+      "type": "PreviewAny",
+      "pos": [
+        -1732.6984922801287,
+        -1057.3157684772768
+      ],
+      "size": [
+        528.2010556503208,
+        748.7542809180603
+      ],
+      "flags": {},
+      "order": 15,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "source",
+          "type": "*",
+          "link": 98
+        }
+      ],
+      "outputs": [],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.7.0",
+        "Node name for S&R": "PreviewAny"
+      },
+      "widgets_values": [
+        null,
+        null,
+        null
+      ]
+    },
+    {
+      "id": 75,
+      "type": "Gemini3NanoNode",
+      "pos": [
+        373.2690541781458,
+        -1825.1840721262197
+      ],
+      "size": [
+        270,
+        314
+      ],
+      "flags": {},
+      "order": 29,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "prompt",
+          "shape": 7,
+          "type": "STRING",
+          "link": 132
+        },
+        {
+          "name": "input_images",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": 196
+        },
+        {
+          "name": "context",
+          "shape": 7,
+          "type": "ANY",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "links": [
+            134,
+            135
+          ]
+        },
+        {
+          "name": "text",
+          "type": "STRING",
+          "links": [
+            136
+          ]
+        },
+        {
+          "name": "context",
+          "type": "ANY",
+          "links": []
+        }
+      ],
+      "properties": {
+        "cnr_id": "Mojie-API-Party",
+        "ver": "d4f36ca7531c26e5b2f5f84191b85f3068c07c82",
+        "Node name for S&R": "Gemini3NanoNode"
+      },
+      "widgets_values": [
+        "Gemini-3.1-flash-image-preview",
+        "Default",
+        "high",
+        "medium",
+        "1K",
+        "1:1",
+        "",
+        false,
+        487,
+        "randomize"
+      ]
+    },
+    {
+      "id": 44,
+      "type": "PreviewAny",
+      "pos": [
+        -166.37142052444167,
+        -1250.5722600999493
+      ],
+      "size": [
+        460.7085302427936,
+        457.12714433739166
+      ],
+      "flags": {},
+      "order": 30,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "source",
+          "type": "*",
+          "link": 113
+        }
+      ],
+      "outputs": [],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.7.0",
+        "Node name for S&R": "PreviewAny"
+      },
+      "widgets_values": [
+        null,
+        null,
+        null
+      ]
+    },
+    {
+      "id": 80,
+      "type": "Gemini3NanoNode",
+      "pos": [
+        445.3362216837146,
+        1149.9471313717092
+      ],
+      "size": [
+        270,
+        314
+      ],
+      "flags": {},
+      "order": 39,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "prompt",
+          "shape": 7,
+          "type": "STRING",
+          "link": 166
+        },
+        {
+          "name": "input_images",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": 191
+        },
+        {
+          "name": "context",
+          "shape": 7,
+          "type": "ANY",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "links": [
+            169,
+            170
+          ]
+        },
+        {
+          "name": "text",
+          "type": "STRING",
+          "links": [
+            171
+          ]
+        },
+        {
+          "name": "context",
+          "type": "ANY",
+          "links": null
+        }
+      ],
+      "properties": {
+        "cnr_id": "Mojie-API-Party",
+        "ver": "d4f36ca7531c26e5b2f5f84191b85f3068c07c82",
+        "Node name for S&R": "Gemini3NanoNode"
+      },
+      "widgets_values": [
+        "Gemini-3.1-flash-image-preview",
+        "Default",
+        "high",
+        "medium",
+        "1K",
+        "3:4",
+        "",
+        false,
+        909,
+        "randomize"
+      ]
+    },
+    {
+      "id": 52,
+      "type": "PreviewAny",
+      "pos": [
+        -120.07012271475003,
+        -66.71341514316647
+      ],
+      "size": [
+        460.7085302427936,
+        457.12714433739166
+      ],
+      "flags": {},
+      "order": 34,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "source",
+          "type": "*",
+          "link": 122
+        }
+      ],
+      "outputs": [],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.7.0",
+        "Node name for S&R": "PreviewAny"
+      },
+      "widgets_values": [
+        null,
+        null,
+        null
+      ]
+    },
+    {
+      "id": 78,
+      "type": "Gemini3NanoNode",
+      "pos": [
+        418.281082804,
+        -107.68177644210655
+      ],
+      "size": [
+        270,
+        314
+      ],
+      "flags": {},
+      "order": 35,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "prompt",
+          "shape": 7,
+          "type": "STRING",
+          "link": 152
+        },
+        {
+          "name": "input_images",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": 193
+        },
+        {
+          "name": "context",
+          "shape": 7,
+          "type": "ANY",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "links": [
+            155,
+            156
+          ]
+        },
+        {
+          "name": "text",
+          "type": "STRING",
+          "links": [
+            157
+          ]
+        },
+        {
+          "name": "context",
+          "type": "ANY",
+          "links": []
+        }
+      ],
+      "properties": {
+        "cnr_id": "Mojie-API-Party",
+        "ver": "d4f36ca7531c26e5b2f5f84191b85f3068c07c82",
+        "Node name for S&R": "Gemini3NanoNode"
+      },
+      "widgets_values": [
+        "Gemini-3.1-flash-image-preview",
+        "Default",
+        "high",
+        "medium",
+        "1K",
+        "3:4",
+        "",
+        false,
+        467,
+        "randomize"
+      ]
+    },
+    {
+      "id": 77,
+      "type": "Gemini3NanoNode",
+      "pos": [
+        398.60612086175735,
+        -627.5395132155109
+      ],
+      "size": [
+        270,
+        314
+      ],
+      "flags": {},
+      "order": 33,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "prompt",
+          "shape": 7,
+          "type": "STRING",
+          "link": 145
+        },
+        {
+          "name": "input_images",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": 194
+        },
+        {
+          "name": "context",
+          "shape": 7,
+          "type": "ANY",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "links": [
+            148,
+            149
+          ]
+        },
+        {
+          "name": "text",
+          "type": "STRING",
+          "links": [
+            150
+          ]
+        },
+        {
+          "name": "context",
+          "type": "ANY",
+          "links": []
+        }
+      ],
+      "properties": {
+        "cnr_id": "Mojie-API-Party",
+        "ver": "d4f36ca7531c26e5b2f5f84191b85f3068c07c82",
+        "Node name for S&R": "Gemini3NanoNode"
+      },
+      "widgets_values": [
+        "Gemini-3.1-flash-image-preview",
+        "Default",
+        "high",
+        "medium",
+        "1K",
+        "3:4",
+        "",
+        false,
+        689,
+        "randomize"
+      ]
+    },
+    {
+      "id": 79,
+      "type": "Gemini3NanoNode",
+      "pos": [
+        434.23119936472966,
+        524.7555329264233
+      ],
+      "size": [
+        270,
+        314
+      ],
+      "flags": {},
+      "order": 37,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "prompt",
+          "shape": 7,
+          "type": "STRING",
+          "link": 159
+        },
+        {
+          "name": "input_images",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": 192
+        },
+        {
+          "name": "context",
+          "shape": 7,
+          "type": "ANY",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "links": [
+            162,
+            163
+          ]
+        },
+        {
+          "name": "text",
+          "type": "STRING",
+          "links": [
+            164
+          ]
+        },
+        {
+          "name": "context",
+          "type": "ANY",
+          "links": []
+        }
+      ],
+      "properties": {
+        "cnr_id": "Mojie-API-Party",
+        "ver": "d4f36ca7531c26e5b2f5f84191b85f3068c07c82",
+        "Node name for S&R": "Gemini3NanoNode"
+      },
+      "widgets_values": [
+        "Gemini-3.1-flash-image-preview",
+        "Default",
+        "high",
+        "medium",
+        "1K",
+        "3:4",
+        "",
+        false,
+        170,
+        "randomize"
+      ]
+    },
+    {
+      "id": 20,
+      "type": "SaveImage",
+      "pos": [
+        764.3802773281653,
+        -648.572711453657
+      ],
+      "size": [
+        411.5649164343258,
+        456.59045046272354
+      ],
+      "flags": {},
+      "order": 45,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 148
+        }
+      ],
+      "outputs": [],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.7.0",
+        "Node name for S&R": "SaveImage"
+      },
+      "widgets_values": [
+        "ComfyUI"
+      ]
+    },
+    {
+      "id": 82,
+      "type": "Gemini3NanoNode",
+      "pos": [
+        381.81652609070693,
+        -1198.4548253081944
+      ],
+      "size": [
+        270,
+        314
+      ],
+      "flags": {},
+      "order": 31,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "prompt",
+          "shape": 7,
+          "type": "STRING",
+          "link": 177
+        },
+        {
+          "name": "input_images",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": 195
+        },
+        {
+          "name": "context",
+          "shape": 7,
+          "type": "ANY",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "links": [
+            178,
+            179
+          ]
+        },
+        {
+          "name": "text",
+          "type": "STRING",
+          "links": [
+            182
+          ]
+        },
+        {
+          "name": "context",
+          "type": "ANY",
+          "links": []
+        }
+      ],
+      "properties": {
+        "cnr_id": "Mojie-API-Party",
+        "ver": "d4f36ca7531c26e5b2f5f84191b85f3068c07c82",
+        "Node name for S&R": "Gemini3NanoNode"
+      },
+      "widgets_values": [
+        "Gemini-3.1-flash-image-preview",
+        "Default",
+        "high",
+        "medium",
+        "1K",
+        "3:4",
+        "",
+        false,
+        2047,
+        "randomize"
+      ]
+    },
+    {
+      "id": 40,
+      "type": "PreviewAny",
+      "pos": [
+        -158.73686351566087,
+        -1899.222218898098
+      ],
+      "size": [
+        460.7085302427936,
+        457.12714433739166
+      ],
+      "flags": {},
+      "order": 28,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "source",
+          "type": "*",
+          "link": 109
+        }
+      ],
+      "outputs": [],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.7.0",
+        "Node name for S&R": "PreviewAny"
+      },
+      "widgets_values": [
+        null,
+        null,
+        null
+      ]
+    },
+    {
+      "id": 17,
+      "type": "SaveImage",
+      "pos": [
+        742.5450232531624,
+        -1919.7089863776407
+      ],
+      "size": [
+        454.8684192559058,
+        525.0864117091808
+      ],
+      "flags": {},
+      "order": 40,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 134
+        }
+      ],
+      "outputs": [],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.7.0",
+        "Node name for S&R": "SaveImage"
+      },
+      "widgets_values": [
+        "ComfyUI"
+      ]
+    },
+    {
+      "id": 2,
+      "type": "PrimitiveStringMultiline",
+      "pos": [
+        -3095.716804726609,
+        -273.4868947471627
+      ],
+      "size": [
+        400,
+        200
+      ],
+      "flags": {},
+      "order": 1,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "links": [
+            90
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.7.0",
+        "Node name for S&R": "PrimitiveStringMultiline"
+      },
+      "widgets_values": [
+        "这款蓝牙耳机产品在亚马逊商城上面向欧美市场该以何种策略售卖。"
+      ]
+    },
+    {
+      "id": 74,
+      "type": "GeminiLLMNode",
+      "pos": [
+        -471.2758958447613,
+        1177.5598031944069
+      ],
+      "size": [
+        270,
+        306
+      ],
+      "flags": {},
+      "order": 27,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "prompt",
+          "shape": 7,
+          "type": "STRING",
+          "link": 128
+        },
+        {
+          "name": "image_input",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": 190
+        },
+        {
+          "name": "video",
+          "shape": 7,
+          "type": "VIDEO",
+          "link": null
+        },
+        {
+          "name": "file",
+          "shape": 7,
+          "type": "FILE",
+          "link": null
+        },
+        {
+          "name": "context",
+          "shape": 7,
+          "type": "ANY",
+          "link": null
+        },
+        {
+          "name": "System_prompt",
+          "type": "STRING",
+          "widget": {
+            "name": "System_prompt"
+          },
+          "link": 129
+        }
+      ],
+      "outputs": [
+        {
+          "name": "output",
+          "type": "STRING",
+          "links": [
+            130,
+            166
+          ]
+        },
+        {
+          "name": "context",
+          "type": "ANY",
+          "links": null
+        }
+      ],
+      "properties": {
+        "cnr_id": "Mojie-API-Party",
+        "ver": "d4f36ca7531c26e5b2f5f84191b85f3068c07c82",
+        "Node name for S&R": "GeminiLLMNode"
+      },
+      "widgets_values": [
+        "Gemini 3.1 Pro Preview",
+        "Default",
+        "High",
+        "",
+        true,
+        false,
+        1218,
+        "randomize"
+      ]
+    },
+    {
+      "id": 73,
+      "type": "GeminiLLMNode",
+      "pos": [
+        -467.1098320131851,
+        594.8219232141098
+      ],
+      "size": [
+        270,
+        306
+      ],
+      "flags": {},
+      "order": 26,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "prompt",
+          "shape": 7,
+          "type": "STRING",
+          "link": 124
+        },
+        {
+          "name": "image_input",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": 189
+        },
+        {
+          "name": "video",
+          "shape": 7,
+          "type": "VIDEO",
+          "link": null
+        },
+        {
+          "name": "file",
+          "shape": 7,
+          "type": "FILE",
+          "link": null
+        },
+        {
+          "name": "context",
+          "shape": 7,
+          "type": "ANY",
+          "link": null
+        },
+        {
+          "name": "System_prompt",
+          "type": "STRING",
+          "widget": {
+            "name": "System_prompt"
+          },
+          "link": 125
+        }
+      ],
+      "outputs": [
+        {
+          "name": "output",
+          "type": "STRING",
+          "links": [
+            126,
+            159
+          ]
+        },
+        {
+          "name": "context",
+          "type": "ANY",
+          "links": null
+        }
+      ],
+      "properties": {
+        "cnr_id": "Mojie-API-Party",
+        "ver": "d4f36ca7531c26e5b2f5f84191b85f3068c07c82",
+        "Node name for S&R": "GeminiLLMNode"
+      },
+      "widgets_values": [
+        "Gemini 3.1 Pro Preview",
+        "Default",
+        "High",
+        "",
+        true,
+        false,
+        1334,
+        "randomize"
+      ]
+    },
+    {
+      "id": 72,
+      "type": "GeminiLLMNode",
+      "pos": [
+        -495.68601112552994,
+        -52.59780373228897
+      ],
+      "size": [
+        270,
+        306
+      ],
+      "flags": {},
+      "order": 25,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "prompt",
+          "shape": 7,
+          "type": "STRING",
+          "link": 120
+        },
+        {
+          "name": "image_input",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": 188
+        },
+        {
+          "name": "video",
+          "shape": 7,
+          "type": "VIDEO",
+          "link": null
+        },
+        {
+          "name": "file",
+          "shape": 7,
+          "type": "FILE",
+          "link": null
+        },
+        {
+          "name": "context",
+          "shape": 7,
+          "type": "ANY",
+          "link": null
+        },
+        {
+          "name": "System_prompt",
+          "type": "STRING",
+          "widget": {
+            "name": "System_prompt"
+          },
+          "link": 121
+        }
+      ],
+      "outputs": [
+        {
+          "name": "output",
+          "type": "STRING",
+          "links": [
+            122,
+            152
+          ]
+        },
+        {
+          "name": "context",
+          "type": "ANY",
+          "links": null
+        }
+      ],
+      "properties": {
+        "cnr_id": "Mojie-API-Party",
+        "ver": "d4f36ca7531c26e5b2f5f84191b85f3068c07c82",
+        "Node name for S&R": "GeminiLLMNode"
+      },
+      "widgets_values": [
+        "Gemini 3.1 Pro Preview",
+        "Default",
+        "High",
+        "",
+        true,
+        false,
+        1812,
+        "randomize"
+      ]
+    },
+    {
+      "id": 71,
+      "type": "GeminiLLMNode",
+      "pos": [
+        -511.6666761030738,
+        -600
+      ],
+      "size": [
+        270,
+        306
+      ],
+      "flags": {},
+      "order": 24,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "prompt",
+          "shape": 7,
+          "type": "STRING",
+          "link": 115
+        },
+        {
+          "name": "image_input",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": 187
+        },
+        {
+          "name": "video",
+          "shape": 7,
+          "type": "VIDEO",
+          "link": null
+        },
+        {
+          "name": "file",
+          "shape": 7,
+          "type": "FILE",
+          "link": null
+        },
+        {
+          "name": "context",
+          "shape": 7,
+          "type": "ANY",
+          "link": null
+        },
+        {
+          "name": "System_prompt",
+          "type": "STRING",
+          "widget": {
+            "name": "System_prompt"
+          },
+          "link": 117
+        }
+      ],
+      "outputs": [
+        {
+          "name": "output",
+          "type": "STRING",
+          "links": [
+            118,
+            145
+          ]
+        },
+        {
+          "name": "context",
+          "type": "ANY",
+          "links": null
+        }
+      ],
+      "properties": {
+        "cnr_id": "Mojie-API-Party",
+        "ver": "d4f36ca7531c26e5b2f5f84191b85f3068c07c82",
+        "Node name for S&R": "GeminiLLMNode"
+      },
+      "widgets_values": [
+        "Gemini 3.1 Pro Preview",
+        "Default",
+        "High",
+        "",
+        true,
+        false,
+        1878,
+        "randomize"
+      ]
+    },
+    {
+      "id": 70,
+      "type": "GeminiLLMNode",
+      "pos": [
+        -527.672823486453,
+        -1275.7581339025505
+      ],
+      "size": [
+        270,
+        306
+      ],
+      "flags": {},
+      "order": 23,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "prompt",
+          "shape": 7,
+          "type": "STRING",
+          "link": 110
+        },
+        {
+          "name": "image_input",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": 186
+        },
+        {
+          "name": "video",
+          "shape": 7,
+          "type": "VIDEO",
+          "link": null
+        },
+        {
+          "name": "file",
+          "shape": 7,
+          "type": "FILE",
+          "link": null
+        },
+        {
+          "name": "context",
+          "shape": 7,
+          "type": "ANY",
+          "link": null
+        },
+        {
+          "name": "System_prompt",
+          "type": "STRING",
+          "widget": {
+            "name": "System_prompt"
+          },
+          "link": 112
+        }
+      ],
+      "outputs": [
+        {
+          "name": "output",
+          "type": "STRING",
+          "links": [
+            113,
+            177
+          ]
+        },
+        {
+          "name": "context",
+          "type": "ANY",
+          "links": null
+        }
+      ],
+      "properties": {
+        "cnr_id": "Mojie-API-Party",
+        "ver": "d4f36ca7531c26e5b2f5f84191b85f3068c07c82",
+        "Node name for S&R": "GeminiLLMNode"
+      },
+      "widgets_values": [
+        "Gemini 3.1 Pro Preview",
+        "Default",
+        "High",
+        "",
+        true,
+        false,
+        2000,
+        "randomize"
+      ]
+    },
+    {
+      "id": 69,
+      "type": "GeminiLLMNode",
+      "pos": [
+        -540,
+        -1890
+      ],
+      "size": [
+        270,
+        306
+      ],
+      "flags": {},
+      "order": 22,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "prompt",
+          "shape": 7,
+          "type": "STRING",
+          "link": 105
+        },
+        {
+          "name": "image_input",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": 185
+        },
+        {
+          "name": "video",
+          "shape": 7,
+          "type": "VIDEO",
+          "link": null
+        },
+        {
+          "name": "file",
+          "shape": 7,
+          "type": "FILE",
+          "link": null
+        },
+        {
+          "name": "context",
+          "shape": 7,
+          "type": "ANY",
+          "link": null
+        },
+        {
+          "name": "System_prompt",
+          "type": "STRING",
+          "widget": {
+            "name": "System_prompt"
+          },
+          "link": 107
+        }
+      ],
+      "outputs": [
+        {
+          "name": "output",
+          "type": "STRING",
+          "links": [
+            109,
+            132
+          ]
+        },
+        {
+          "name": "context",
+          "type": "ANY",
+          "links": null
+        }
+      ],
+      "properties": {
+        "cnr_id": "Mojie-API-Party",
+        "ver": "d4f36ca7531c26e5b2f5f84191b85f3068c07c82",
+        "Node name for S&R": "GeminiLLMNode"
+      },
+      "widgets_values": [
+        "Gemini 3.1 Pro Preview",
+        "Default",
+        "High",
+        "",
+        true,
+        false,
+        1194,
+        "randomize"
+      ]
+    },
+    {
+      "id": 68,
+      "type": "GeminiLLMNode",
+      "pos": [
+        -1765.3630225171557,
+        -187.06443118320038
+      ],
+      "size": [
+        281.4035137384599,
+        329.94737885076574
+      ],
+      "flags": {},
+      "order": 14,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "prompt",
+          "shape": 7,
+          "type": "STRING",
+          "link": 173
+        },
+        {
+          "name": "image_input",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": 197
+        },
+        {
+          "name": "video",
+          "shape": 7,
+          "type": "VIDEO",
+          "link": null
+        },
+        {
+          "name": "file",
+          "shape": 7,
+          "type": "FILE",
+          "link": null
+        },
+        {
+          "name": "context",
+          "shape": 7,
+          "type": "ANY",
+          "link": 97
+        },
+        {
+          "name": "System_prompt",
+          "type": "STRING",
+          "widget": {
+            "name": "System_prompt"
+          },
+          "link": 174
+        }
+      ],
+      "outputs": [
+        {
+          "name": "output",
+          "type": "STRING",
+          "links": [
+            98,
+            99,
+            100,
+            101,
+            102,
+            103,
+            104
+          ]
+        },
+        {
+          "name": "context",
+          "type": "ANY",
+          "links": null
+        }
+      ],
+      "properties": {
+        "cnr_id": "Mojie-API-Party",
+        "ver": "d4f36ca7531c26e5b2f5f84191b85f3068c07c82",
+        "Node name for S&R": "GeminiLLMNode"
+      },
+      "widgets_values": [
+        "Gemini 3 Pro Preview",
+        "Default",
+        "High",
+        "",
+        true,
+        false,
+        672,
+        "randomize"
+      ]
+    },
+    {
+      "id": 81,
+      "type": "StringConcatenate",
+      "pos": [
+        -2312.0593089747827,
+        -196.0667422994844
+      ],
+      "size": [
+        400,
+        200
+      ],
+      "flags": {},
+      "order": 13,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "string_b",
+          "type": "STRING",
+          "widget": {
+            "name": "string_b"
+          },
+          "link": 198
+        }
+      ],
+      "outputs": [
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "links": [
+            173
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.7.0",
+        "Node name for S&R": "StringConcatenate"
+      },
+      "widgets_values": [
+        "请你根据该策略和输入的图片指定一个完整的具有高转化率的产品详情页方案。该方案一共6张图。请你结合输入的商品描绘出每张图的具体该有怎样的视觉表现和排版以及文字。",
+        "",
+        ""
+      ]
+    },
+    {
+      "id": 55,
+      "type": "PreviewAny",
+      "pos": [
+        -108.97632840942644,
+        554.5485591520713
+      ],
+      "size": [
+        460.7085302427936,
+        457.12714433739166
+      ],
+      "flags": {},
+      "order": 36,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "source",
+          "type": "*",
+          "link": 126
+        }
+      ],
+      "outputs": [],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.7.0",
+        "Node name for S&R": "PreviewAny"
+      },
+      "widgets_values": [
+        null,
+        null,
+        null
+      ]
+    },
+    {
+      "id": 54,
+      "type": "StringConcatenate",
+      "pos": [
+        -998.8354833277386,
+        541.4323713460112
+      ],
+      "size": [
+        400,
+        200
+      ],
+      "flags": {},
+      "order": 20,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "string_a",
+          "type": "STRING",
+          "widget": {
+            "name": "string_a"
+          },
+          "link": 103
+        }
+      ],
+      "outputs": [
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "links": [
+            124
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.7.0",
+        "Node name for S&R": "StringConcatenate"
+      },
+      "widgets_values": [
+        "",
+        "将输入的图片策略中第五张图的效果与输入的图片结合形成Nanobanan提示词输出，输出只需要提示词本身。",
+        ""
+      ]
+    },
+    {
+      "id": 41,
+      "type": "PrimitiveStringMultiline",
+      "pos": [
+        -1014.2982431307701,
+        -946.8421082430759
+      ],
+      "size": [
+        414.1613696760154,
+        234.11602694676435
+      ],
+      "flags": {},
+      "order": 2,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "links": [
+            112
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.7.0",
+        "Node name for S&R": "PrimitiveStringMultiline"
+      },
+      "widgets_values": [
+        "你是一名熟练使用Nanobanana的提示词工程师，你可以将任意提示词转化为json格式的图片生成提示词。你将分析如何将输入的图片与需要达成的效果很好的结合，所有输出的文本以英文输出。\n注意，在提示词中对主体的描述，都需要明确使用输入的哪张图片，并在提示词中使用这张图片，即this image_1 或者 Use image_1,并且避免多余的描述和输入的图片不符，并且引用的图片和达成的效果在拍摄角度,使用场景上最为接近。\n\n以下是一段眼镜产品图片生成的标准化json格式提示词，用于参考使用:  \n{\n  \"main_product\": \"this image_1 Sunglasses\",\n  \"style\": \"Professional product photography, commercial studio shot, high-end fashion e-commerce visual\",\n  \"scene\": \"Minimalist white background, clean softbox lighting, subtle reflection on glossy surface\",\n  \"composition\": \"Front three-quarter view, centered product, medium close-up, sharp focus on frame and lenses\",\n  \"lighting\": \"Soft diffused light, gentle shadows, no glare on lens, bright and clean atmosphere\",\n  \"color_tone\": \"Neutral bright tone, high color accuracy, natural skin-friendly tones\",\n  \"details\": \"Matte black frame, minimalist metal hinges, transparent temples, reflective polarized lens, clean edges, high texture\",\n  \"text_elements\": [\n    \"Small brand logo on upper lens corner: UV400 PROTECTION\",\n    \"Fine print on temple: ULTRA LIGHTWEIGHT DESIGN\",\n    \"Subtle watermark-style text at bottom: FASHION EYEWEAR COLLECTION\"\n  ],\n  \"quality\": \"8K, ultra realistic, high resolution, sharp details, commercial retouching level, no noise\"\n}\n"
+      ]
+    },
+    {
+      "id": 45,
+      "type": "PrimitiveStringMultiline",
+      "pos": [
+        -1015.5502460069907,
+        -400
+      ],
+      "size": [
+        416.97023638861344,
+        238.62191729822382
+      ],
+      "flags": {},
+      "order": 3,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "links": [
+            117
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.7.0",
+        "Node name for S&R": "PrimitiveStringMultiline"
+      },
+      "widgets_values": [
+        "你是一名熟练使用Nanobanana的提示词工程师，你可以将任意提示词转化为json格式的图片生成提示词。你将分析如何将输入的图片与需要达成的效果很好的结合，所有输出的文本以英文输出。\n注意，在提示词中对主体的描述，都需要明确使用输入的哪张图片，并在提示词中使用这张图片，即this image_1 或者 Use image_1,并且避免多余的描述和输入的图片不符，并且引用的图片和达成的效果在拍摄角度,使用场景上最为接近。\n\n以下是一段眼镜产品图片生成的标准化json格式提示词，用于参考使用:  \n{\n  \"main_product\": \"this image_1 Sunglasses\",\n  \"style\": \"Professional product photography, commercial studio shot, high-end fashion e-commerce visual\",\n  \"scene\": \"Minimalist white background, clean softbox lighting, subtle reflection on glossy surface\",\n  \"composition\": \"Front three-quarter view, centered product, medium close-up, sharp focus on frame and lenses\",\n  \"lighting\": \"Soft diffused light, gentle shadows, no glare on lens, bright and clean atmosphere\",\n  \"color_tone\": \"Neutral bright tone, high color accuracy, natural skin-friendly tones\",\n  \"details\": \"Matte black frame, minimalist metal hinges, transparent temples, reflective polarized lens, clean edges, high texture\",\n  \"text_elements\": [\n    \"Small brand logo on upper lens corner: UV400 PROTECTION\",\n    \"Fine print on temple: ULTRA LIGHTWEIGHT DESIGN\",\n    \"Subtle watermark-style text at bottom: FASHION EYEWEAR COLLECTION\"\n  ],\n  \"quality\": \"8K, ultra realistic, high resolution, sharp details, commercial retouching level, no noise\"\n}\n"
+      ]
+    },
+    {
+      "id": 49,
+      "type": "PrimitiveStringMultiline",
+      "pos": [
+        -1011.3596627807651,
+        230
+      ],
+      "size": [
+        400,
+        200
+      ],
+      "flags": {},
+      "order": 4,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "links": [
+            121
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.7.0",
+        "Node name for S&R": "PrimitiveStringMultiline"
+      },
+      "widgets_values": [
+        "你是一名熟练使用Nanobanana的提示词工程师，你可以将任意提示词转化为json格式的图片生成提示词。你将分析如何将输入的图片与需要达成的效果很好的结合，所有输出的文本以英文输出。\n注意，在提示词中对主体的描述，都需要明确使用输入的哪张图片，并在提示词中使用这张图片，即this image_1 或者 Use image_1,并且避免多余的描述和输入的图片不符，并且引用的图片和达成的效果在拍摄角度,使用场景上最为接近。\n\n以下是一段眼镜产品图片生成的标准化json格式提示词，用于参考使用:  \n{\n  \"main_product\": \"this image_1 Sunglasses\",\n  \"style\": \"Professional product photography, commercial studio shot, high-end fashion e-commerce visual\",\n  \"scene\": \"Minimalist white background, clean softbox lighting, subtle reflection on glossy surface\",\n  \"composition\": \"Front three-quarter view, centered product, medium close-up, sharp focus on frame and lenses\",\n  \"lighting\": \"Soft diffused light, gentle shadows, no glare on lens, bright and clean atmosphere\",\n  \"color_tone\": \"Neutral bright tone, high color accuracy, natural skin-friendly tones\",\n  \"details\": \"Matte black frame, minimalist metal hinges, transparent temples, reflective polarized lens, clean edges, high texture\",\n  \"text_elements\": [\n    \"Small brand logo on upper lens corner: UV400 PROTECTION\",\n    \"Fine print on temple: ULTRA LIGHTWEIGHT DESIGN\",\n    \"Subtle watermark-style text at bottom: FASHION EYEWEAR COLLECTION\"\n  ],\n  \"quality\": \"8K, ultra realistic, high resolution, sharp details, commercial retouching level, no noise\"\n}\n"
+      ]
+    },
+    {
+      "id": 53,
+      "type": "PrimitiveStringMultiline",
+      "pos": [
+        -990.9403419000247,
+        814.4508588058591
+      ],
+      "size": [
+        407.0806848380075,
+        246.73251993085046
+      ],
+      "flags": {},
+      "order": 5,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "links": [
+            125
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.7.0",
+        "Node name for S&R": "PrimitiveStringMultiline"
+      },
+      "widgets_values": [
+        "你是一名熟练使用Nanobanana的提示词工程师，你可以将任意提示词转化为json格式的图片生成提示词。你将分析如何将输入的图片与需要达成的效果很好的结合，所有输出的文本以英文输出。\n注意，在提示词中对主体的描述，都需要明确使用输入的哪张图片，并在提示词中使用这张图片，即this image_1 或者 Use image_1,并且避免多余的描述和输入的图片不符，并且引用的图片和达成的效果在拍摄角度,使用场景上最为接近。\n\n以下是一段眼镜产品图片生成的标准化json格式提示词，用于参考使用:  \n{\n  \"main_product\": \"this image_1 Sunglasses\",\n  \"style\": \"Professional product photography, commercial studio shot, high-end fashion e-commerce visual\",\n  \"scene\": \"Minimalist white background, clean softbox lighting, subtle reflection on glossy surface\",\n  \"composition\": \"Front three-quarter view, centered product, medium close-up, sharp focus on frame and lenses\",\n  \"lighting\": \"Soft diffused light, gentle shadows, no glare on lens, bright and clean atmosphere\",\n  \"color_tone\": \"Neutral bright tone, high color accuracy, natural skin-friendly tones\",\n  \"details\": \"Matte black frame, minimalist metal hinges, transparent temples, reflective polarized lens, clean edges, high texture\",\n  \"text_elements\": [\n    \"Small brand logo on upper lens corner: UV400 PROTECTION\",\n    \"Fine print on temple: ULTRA LIGHTWEIGHT DESIGN\",\n    \"Subtle watermark-style text at bottom: FASHION EYEWEAR COLLECTION\"\n  ],\n  \"quality\": \"8K, ultra realistic, high resolution, sharp details, commercial retouching level, no noise\"\n}\n"
+      ]
+    },
+    {
+      "id": 57,
+      "type": "PrimitiveStringMultiline",
+      "pos": [
+        -993.0404589379079,
+        1440.9424391519387
+      ],
+      "size": [
+        400,
+        200
+      ],
+      "flags": {},
+      "order": 6,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "links": [
+            129
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.7.0",
+        "Node name for S&R": "PrimitiveStringMultiline"
+      },
+      "widgets_values": [
+        "你是一名熟练使用Nanobanana的提示词工程师，你可以将任意提示词转化为json格式的图片生成提示词。你将分析如何将输入的图片与需要达成的效果很好的结合，所有输出的文本以英文输出。\n注意，在提示词中对主体的描述，都需要明确使用输入的哪张图片，并在提示词中使用这张图片，即this image_1 或者 Use image_1,并且避免多余的描述和输入的图片不符，并且引用的图片和达成的效果在拍摄角度,使用场景上最为接近。\n\n以下是一段眼镜产品图片生成的标准化json格式提示词，用于参考使用:  \n{\n  \"main_product\": \"this image_1 Sunglasses\",\n  \"style\": \"Professional product photography, commercial studio shot, high-end fashion e-commerce visual\",\n  \"scene\": \"Minimalist white background, clean softbox lighting, subtle reflection on glossy surface\",\n  \"composition\": \"Front three-quarter view, centered product, medium close-up, sharp focus on frame and lenses\",\n  \"lighting\": \"Soft diffused light, gentle shadows, no glare on lens, bright and clean atmosphere\",\n  \"color_tone\": \"Neutral bright tone, high color accuracy, natural skin-friendly tones\",\n  \"details\": \"Matte black frame, minimalist metal hinges, transparent temples, reflective polarized lens, clean edges, high texture\",\n  \"text_elements\": [\n    \"Small brand logo on upper lens corner: UV400 PROTECTION\",\n    \"Fine print on temple: ULTRA LIGHTWEIGHT DESIGN\",\n    \"Subtle watermark-style text at bottom: FASHION EYEWEAR COLLECTION\"\n  ],\n  \"quality\": \"8K, ultra realistic, high resolution, sharp details, commercial retouching level, no noise\"\n}\n"
+      ]
+    },
+    {
+      "id": 59,
+      "type": "PreviewAny",
+      "pos": [
+        -84.9912346606562,
+        1160
+      ],
+      "size": [
+        460.7085302427936,
+        457.12714433739166
+      ],
+      "flags": {},
+      "order": 38,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "source",
+          "type": "*",
+          "link": 130
+        }
+      ],
+      "outputs": [],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.7.0",
+        "Node name for S&R": "PreviewAny"
+      },
+      "widgets_values": [
+        null,
+        null,
+        null
+      ]
+    },
+    {
+      "id": 84,
+      "type": "Note",
+      "pos": [
+        -3655.7930917324006,
+        -712.2633696706838
+      ],
+      "size": [
+        532.5936140640613,
+        156.07174355703205
+      ],
+      "flags": {},
+      "order": 7,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [],
+      "title": "多图要求说明",
+      "properties": {},
+      "widgets_values": [
+        "多图上传最多支持10张\n可以上传多角度，多细节，多款式。也可以上传模特。\nmax_size是图片最大尺寸，默认是不超过2048.\n根据需求填写，也别填太大，图片太大太多传输慢，消耗token。"
+      ],
+      "color": "#432",
+      "bgcolor": "#653"
+    },
+    {
+      "id": 28,
+      "type": "PreviewAny",
+      "pos": [
+        1188.5101268818244,
+        498.5698457148479
+      ],
+      "size": [
+        351.70234241685375,
+        203.23931446431664
+      ],
+      "flags": {},
+      "order": 50,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "source",
+          "type": "*",
+          "link": 164
+        }
+      ],
+      "outputs": [],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.7.0",
+        "Node name for S&R": "PreviewAny"
+      },
+      "widgets_values": [
+        null,
+        null,
+        null
+      ]
+    },
+    {
+      "id": 83,
+      "type": "MultiImageUpload",
+      "pos": [
+        -3078.7685688440547,
+        -830.2889505955064
+      ],
+      "size": [
+        381.0068700930783,
+        400.7594668053957
+      ],
+      "flags": {},
+      "order": 8,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "image1",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": null
+        },
+        {
+          "name": "image2",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "image_batch",
+          "type": "IMAGE",
+          "links": [
+            184,
+            185,
+            186,
+            187,
+            188,
+            189,
+            190,
+            191,
+            192,
+            193,
+            194,
+            195,
+            196,
+            197
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "Mojie-API-Party",
+        "ver": "6cfee1312c9b48a11ba3c8dbb05bdd1da3ea6cb5",
+        "Node name for S&R": "MultiImageUpload"
+      },
+      "widgets_values": [
+        "图层 3.png,图层 4.png,图层 5.png,图层 6.png,图层 7.png,图层 8.png,1x.png",
+        2048,
+        "",
+        ""
+      ]
+    },
+    {
+      "id": 19,
+      "type": "SaveImage",
+      "pos": [
+        774.0294275312395,
+        -1247.5890383929448
+      ],
+      "size": [
+        376.80449280553364,
+        494.661282851097
+      ],
+      "flags": {},
+      "order": 42,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 178
+        }
+      ],
+      "outputs": [],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.7.0",
+        "Node name for S&R": "SaveImage"
+      },
+      "widgets_values": [
+        "ComfyUI"
+      ]
+    },
+    {
+      "id": 23,
+      "type": "SaveImage",
+      "pos": [
+        813.4631888589647,
+        494.8320833865865
+      ],
+      "size": [
+        340.22795554064146,
+        458.1082581413127
+      ],
+      "flags": {},
+      "order": 49,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 162
+        }
+      ],
+      "outputs": [],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.7.0",
+        "Node name for S&R": "SaveImage"
+      },
+      "widgets_values": [
+        "ComfyUI"
+      ]
+    },
+    {
+      "id": 30,
+      "type": "SaveImage",
+      "pos": [
+        822.7928930497114,
+        1142.4248561043316
+      ],
+      "size": [
+        340.22795554064146,
+        458.1082581413127
+      ],
+      "flags": {},
+      "order": 51,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 169
+        }
+      ],
+      "outputs": [],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.7.0",
+        "Node name for S&R": "SaveImage"
+      },
+      "widgets_values": [
+        "ComfyUI"
+      ]
+    },
+    {
+      "id": 85,
+      "type": "Note",
+      "pos": [
+        -3657.931249337736,
+        -252.34900585478968
+      ],
+      "size": [
+        532.5936140640613,
+        156.07174355703205
+      ],
+      "flags": {},
+      "order": 9,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [],
+      "title": "多图要求说明",
+      "properties": {},
+      "widgets_values": [
+        "这里可以写入一些卖点，或者你想要加入的文案。"
+      ],
+      "color": "#432",
+      "bgcolor": "#653"
+    },
+    {
+      "id": 37,
+      "type": "PrimitiveStringMultiline",
+      "pos": [
+        -1021.9036396236619,
+        -1617.8413249002242
+      ],
+      "size": [
+        409.5383940476131,
+        227.9374316381993
+      ],
+      "flags": {},
+      "order": 10,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "links": [
+            107
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.7.0",
+        "Node name for S&R": "PrimitiveStringMultiline"
+      },
+      "widgets_values": [
+        "你是一名熟练使用Nanobanana的提示词工程师，你可以将任意提示词转化为json格式的图片生成提示词。你将分析如何将输入的图片与需要达成的效果很好的结合，所有输出的文本以英文输出。\n注意，在提示词中对主体的描述，都需要明确使用输入的哪张图片，并在提示词中使用这张图片，即this image_1 或者 Use image_1,并且避免多余的描述和输入的图片不符，并且引用的图片和达成的效果在拍摄角度,使用场景上最为接近。\n\n以下是一段眼镜产品图片生成的标准化json格式提示词，用于参考使用:  \n{\n  \"main_product\": \"this image_1 Sunglasses\",\n  \"style\": \"Professional product photography, commercial studio shot, high-end fashion e-commerce visual\",\n  \"scene\": \"Minimalist white background, clean softbox lighting, subtle reflection on glossy surface\",\n  \"composition\": \"Front three-quarter view, centered product, medium close-up, sharp focus on frame and lenses\",\n  \"lighting\": \"Soft diffused light, gentle shadows, no glare on lens, bright and clean atmosphere\",\n  \"color_tone\": \"Neutral bright tone, high color accuracy, natural skin-friendly tones\",\n  \"details\": \"Matte black frame, minimalist metal hinges, transparent temples, reflective polarized lens, clean edges, high texture\",\n  \"text_elements\": [\n    \"Small brand logo on upper lens corner: UV400 PROTECTION\",\n    \"Fine print on temple: ULTRA LIGHTWEIGHT DESIGN\",\n    \"Subtle watermark-style text at bottom: FASHION EYEWEAR COLLECTION\"\n  ],\n  \"quality\": \"8K, ultra realistic, high resolution, sharp details, commercial retouching level, no noise\"\n}\n"
+      ]
+    }
+  ],
+  "links": [
+    [
+      81,
+      61,
+      0,
+      62,
+      0,
+      "IMAGE"
+    ],
+    [
+      83,
+      62,
+      0,
+      63,
+      0,
+      "IMAGE"
+    ],
+    [
+      85,
+      63,
+      0,
+      64,
+      0,
+      "IMAGE"
+    ],
+    [
+      87,
+      64,
+      0,
+      65,
+      0,
+      "IMAGE"
+    ],
+    [
+      89,
+      65,
+      0,
+      66,
+      0,
+      "IMAGE"
+    ],
+    [
+      90,
+      2,
+      0,
+      67,
+      0,
+      "STRING"
+    ],
+    [
+      92,
+      7,
+      0,
+      67,
+      5,
+      "STRING"
+    ],
+    [
+      93,
+      67,
+      0,
+      6,
+      0,
+      "STRING"
+    ],
+    [
+      97,
+      67,
+      1,
+      68,
+      4,
+      "ANY"
+    ],
+    [
+      98,
+      68,
+      0,
+      10,
+      0,
+      "STRING"
+    ],
+    [
+      99,
+      68,
+      0,
+      39,
+      0,
+      "STRING"
+    ],
+    [
+      100,
+      68,
+      0,
+      42,
+      0,
+      "STRING"
+    ],
+    [
+      101,
+      68,
+      0,
+      47,
+      0,
+      "STRING"
+    ],
+    [
+      102,
+      68,
+      0,
+      51,
+      0,
+      "STRING"
+    ],
+    [
+      103,
+      68,
+      0,
+      54,
+      0,
+      "STRING"
+    ],
+    [
+      104,
+      68,
+      0,
+      58,
+      0,
+      "STRING"
+    ],
+    [
+      105,
+      39,
+      0,
+      69,
+      0,
+      "STRING"
+    ],
+    [
+      107,
+      37,
+      0,
+      69,
+      5,
+      "STRING"
+    ],
+    [
+      109,
+      69,
+      0,
+      40,
+      0,
+      "STRING"
+    ],
+    [
+      110,
+      42,
+      0,
+      70,
+      0,
+      "STRING"
+    ],
+    [
+      112,
+      41,
+      0,
+      70,
+      5,
+      "STRING"
+    ],
+    [
+      113,
+      70,
+      0,
+      44,
+      0,
+      "STRING"
+    ],
+    [
+      115,
+      47,
+      0,
+      71,
+      0,
+      "STRING"
+    ],
+    [
+      117,
+      45,
+      0,
+      71,
+      5,
+      "STRING"
+    ],
+    [
+      118,
+      71,
+      0,
+      46,
+      0,
+      "STRING"
+    ],
+    [
+      120,
+      51,
+      0,
+      72,
+      0,
+      "STRING"
+    ],
+    [
+      121,
+      49,
+      0,
+      72,
+      5,
+      "STRING"
+    ],
+    [
+      122,
+      72,
+      0,
+      52,
+      0,
+      "STRING"
+    ],
+    [
+      124,
+      54,
+      0,
+      73,
+      0,
+      "STRING"
+    ],
+    [
+      125,
+      53,
+      0,
+      73,
+      5,
+      "STRING"
+    ],
+    [
+      126,
+      73,
+      0,
+      55,
+      0,
+      "STRING"
+    ],
+    [
+      128,
+      58,
+      0,
+      74,
+      0,
+      "STRING"
+    ],
+    [
+      129,
+      57,
+      0,
+      74,
+      5,
+      "STRING"
+    ],
+    [
+      130,
+      74,
+      0,
+      59,
+      0,
+      "STRING"
+    ],
+    [
+      132,
+      69,
+      0,
+      75,
+      0,
+      "STRING"
+    ],
+    [
+      134,
+      75,
+      0,
+      17,
+      0,
+      "IMAGE"
+    ],
+    [
+      135,
+      75,
+      0,
+      61,
+      0,
+      "IMAGE"
+    ],
+    [
+      136,
+      75,
+      1,
+      24,
+      0,
+      "STRING"
+    ],
+    [
+      145,
+      71,
+      0,
+      77,
+      0,
+      "STRING"
+    ],
+    [
+      148,
+      77,
+      0,
+      20,
+      0,
+      "IMAGE"
+    ],
+    [
+      149,
+      77,
+      0,
+      62,
+      1,
+      "IMAGE"
+    ],
+    [
+      150,
+      77,
+      1,
+      26,
+      0,
+      "STRING"
+    ],
+    [
+      152,
+      72,
+      0,
+      78,
+      0,
+      "STRING"
+    ],
+    [
+      155,
+      78,
+      0,
+      22,
+      0,
+      "IMAGE"
+    ],
+    [
+      156,
+      78,
+      0,
+      63,
+      1,
+      "IMAGE"
+    ],
+    [
+      157,
+      78,
+      1,
+      27,
+      0,
+      "STRING"
+    ],
+    [
+      159,
+      73,
+      0,
+      79,
+      0,
+      "STRING"
+    ],
+    [
+      162,
+      79,
+      0,
+      23,
+      0,
+      "IMAGE"
+    ],
+    [
+      163,
+      79,
+      0,
+      64,
+      1,
+      "IMAGE"
+    ],
+    [
+      164,
+      79,
+      1,
+      28,
+      0,
+      "STRING"
+    ],
+    [
+      166,
+      74,
+      0,
+      80,
+      0,
+      "STRING"
+    ],
+    [
+      169,
+      80,
+      0,
+      30,
+      0,
+      "IMAGE"
+    ],
+    [
+      170,
+      80,
+      0,
+      65,
+      1,
+      "IMAGE"
+    ],
+    [
+      171,
+      80,
+      1,
+      31,
+      0,
+      "STRING"
+    ],
+    [
+      173,
+      81,
+      0,
+      68,
+      0,
+      "STRING"
+    ],
+    [
+      174,
+      7,
+      0,
+      68,
+      5,
+      "STRING"
+    ],
+    [
+      177,
+      70,
+      0,
+      82,
+      0,
+      "STRING"
+    ],
+    [
+      178,
+      82,
+      0,
+      19,
+      0,
+      "IMAGE"
+    ],
+    [
+      179,
+      82,
+      0,
+      61,
+      1,
+      "IMAGE"
+    ],
+    [
+      182,
+      82,
+      1,
+      25,
+      0,
+      "STRING"
+    ],
+    [
+      184,
+      83,
+      0,
+      67,
+      1,
+      "IMAGE"
+    ],
+    [
+      185,
+      83,
+      0,
+      69,
+      1,
+      "IMAGE"
+    ],
+    [
+      186,
+      83,
+      0,
+      70,
+      1,
+      "IMAGE"
+    ],
+    [
+      187,
+      83,
+      0,
+      71,
+      1,
+      "IMAGE"
+    ],
+    [
+      188,
+      83,
+      0,
+      72,
+      1,
+      "IMAGE"
+    ],
+    [
+      189,
+      83,
+      0,
+      73,
+      1,
+      "IMAGE"
+    ],
+    [
+      190,
+      83,
+      0,
+      74,
+      1,
+      "IMAGE"
+    ],
+    [
+      191,
+      83,
+      0,
+      80,
+      1,
+      "IMAGE"
+    ],
+    [
+      192,
+      83,
+      0,
+      79,
+      1,
+      "IMAGE"
+    ],
+    [
+      193,
+      83,
+      0,
+      78,
+      1,
+      "IMAGE"
+    ],
+    [
+      194,
+      83,
+      0,
+      77,
+      1,
+      "IMAGE"
+    ],
+    [
+      195,
+      83,
+      0,
+      82,
+      1,
+      "IMAGE"
+    ],
+    [
+      196,
+      83,
+      0,
+      75,
+      1,
+      "IMAGE"
+    ],
+    [
+      197,
+      83,
+      0,
+      68,
+      1,
+      "IMAGE"
+    ],
+    [
+      198,
+      67,
+      0,
+      81,
+      0,
+      "STRING"
+    ]
+  ],
+  "groups": [],
+  "config": {},
+  "extra": {
+    "ds": {
+      "scale": 0.20992832109439083,
+      "offset": [
+        4121.454321841486,
+        2615.2210679096115
+      ]
+    },
+    "workflowRendererVersion": "LG",
+    "ue_links": [],
+    "frontendVersion": "1.42.10",
+    "VHS_latentpreview": false,
+    "VHS_latentpreviewrate": 0,
+    "VHS_MetadataImage": true,
+    "VHS_KeepIntermediate": true
+  },
+  "version": 0.4
+}
