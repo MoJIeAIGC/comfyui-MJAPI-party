@@ -61,8 +61,8 @@
 ![alt text](doc/assets/node.png)
 
 #### 更新新增了多图上传节点，非常好用
-![alt text](doc/assets/multi-image.png)
-做多可以支持10张图片上传。
+![alt text](doc/assets/Multi-image.png)
+最多可以支持10张图片上传。
 工作流同时新增了Gemini3多图详情页工作流和多图详情页seedream版本，消耗更少。更适合国内电商。
 
 - 250121 mojie-api-party-2.2版本更新
