@@ -1,0 +1,668 @@
+{
+  "id": "d6e72976-781f-412d-bfb4-f418a41275f4",
+  "revision": 0,
+  "last_node_id": 91,
+  "last_link_id": 226,
+  "nodes": [
+    {
+      "id": 7,
+      "type": "PrimitiveStringMultiline",
+      "pos": [
+        -3100.630866849501,
+        -9.999090312022322
+      ],
+      "size": [
+        400,
+        296
+      ],
+      "flags": {
+        "collapsed": false
+      },
+      "order": 0,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "links": [
+            92,
+            174
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.7.0",
+        "Node name for S&R": "PrimitiveStringMultiline"
+      },
+      "widgets_values": [
+        "你是一名电商专家，对亚马逊，天猫，tumn等各大电商平台的规则和数据了如指掌。能够迅速的分析输入图片或输入的文字的产品该制定怎样的策略销售和商品视觉策略。\n"
+      ]
+    },
+    {
+      "id": 2,
+      "type": "PrimitiveStringMultiline",
+      "pos": [
+        -3095.716804726609,
+        -273.4868947471627
+      ],
+      "size": [
+        400,
+        200
+      ],
+      "flags": {},
+      "order": 1,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "links": [
+            90
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.7.0",
+        "Node name for S&R": "PrimitiveStringMultiline"
+      },
+      "widgets_values": [
+        "这款蓝牙耳机产品在淘宝商城上面向中国市场该以何种策略售卖。"
+      ]
+    },
+    {
+      "id": 91,
+      "type": "Note",
+      "pos": [
+        -3671.3194164616284,
+        -246.56141463691867
+      ],
+      "size": [
+        532.5936140640613,
+        156.07174355703205
+      ],
+      "flags": {},
+      "order": 2,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [],
+      "title": "多图要求说明",
+      "properties": {},
+      "widgets_values": [
+        "这里可以写入一些卖点，或者你想要加入的文案。"
+      ],
+      "color": "#432",
+      "bgcolor": "#653"
+    },
+    {
+      "id": 67,
+      "type": "GeminiLLMNode",
+      "pos": [
+        -2638.727679004162,
+        -279.9224534759299
+      ],
+      "size": [
+        270,
+        306
+      ],
+      "flags": {},
+      "order": 5,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "prompt",
+          "shape": 7,
+          "type": "STRING",
+          "link": 90
+        },
+        {
+          "name": "image_input",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": 184
+        },
+        {
+          "name": "video",
+          "shape": 7,
+          "type": "VIDEO",
+          "link": null
+        },
+        {
+          "name": "file",
+          "shape": 7,
+          "type": "FILE",
+          "link": null
+        },
+        {
+          "name": "context",
+          "shape": 7,
+          "type": "ANY",
+          "link": null
+        },
+        {
+          "name": "System_prompt",
+          "type": "STRING",
+          "widget": {
+            "name": "System_prompt"
+          },
+          "link": 92
+        }
+      ],
+      "outputs": [
+        {
+          "name": "output",
+          "type": "STRING",
+          "links": [
+            93,
+            198
+          ]
+        },
+        {
+          "name": "context",
+          "type": "ANY",
+          "links": [
+            97
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "Mojie-API-Party",
+        "ver": "d4f36ca7531c26e5b2f5f84191b85f3068c07c82",
+        "Node name for S&R": "GeminiLLMNode"
+      },
+      "widgets_values": [
+        "Gemini 3.1 Pro Preview",
+        "Default",
+        "High",
+        "",
+        true,
+        false,
+        193,
+        "randomize"
+      ]
+    },
+    {
+      "id": 68,
+      "type": "GeminiLLMNode",
+      "pos": [
+        -1781.3279417509991,
+        -205.3100531647355
+      ],
+      "size": [
+        281.4035137384599,
+        329.94737885076574
+      ],
+      "flags": {},
+      "order": 8,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "prompt",
+          "shape": 7,
+          "type": "STRING",
+          "link": 173
+        },
+        {
+          "name": "image_input",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": 197
+        },
+        {
+          "name": "video",
+          "shape": 7,
+          "type": "VIDEO",
+          "link": null
+        },
+        {
+          "name": "file",
+          "shape": 7,
+          "type": "FILE",
+          "link": null
+        },
+        {
+          "name": "context",
+          "shape": 7,
+          "type": "ANY",
+          "link": 97
+        },
+        {
+          "name": "System_prompt",
+          "type": "STRING",
+          "widget": {
+            "name": "System_prompt"
+          },
+          "link": 174
+        }
+      ],
+      "outputs": [
+        {
+          "name": "output",
+          "type": "STRING",
+          "links": [
+            98,
+            225
+          ]
+        },
+        {
+          "name": "context",
+          "type": "ANY",
+          "links": null
+        }
+      ],
+      "properties": {
+        "cnr_id": "Mojie-API-Party",
+        "ver": "d4f36ca7531c26e5b2f5f84191b85f3068c07c82",
+        "Node name for S&R": "GeminiLLMNode"
+      },
+      "widgets_values": [
+        "Gemini 3.1 Pro Preview",
+        "Default",
+        "High",
+        "",
+        true,
+        false,
+        304,
+        "randomize"
+      ]
+    },
+    {
+      "id": 81,
+      "type": "StringConcatenate",
+      "pos": [
+        -2292.3623306992617,
+        -200.21347456801513
+      ],
+      "size": [
+        400,
+        200
+      ],
+      "flags": {},
+      "order": 7,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "string_b",
+          "type": "STRING",
+          "widget": {
+            "name": "string_b"
+          },
+          "link": 198
+        }
+      ],
+      "outputs": [
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "links": [
+            173
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.7.0",
+        "Node name for S&R": "StringConcatenate"
+      },
+      "widgets_values": [
+        "请你根据该策略和输入的图片指定一个完整的具有高转化率的产品详情页方案。该方案一共8张图。请你结合输入的商品描绘出每张图的具体该有怎样的视觉表现和排版以及文字。",
+        "",
+        ""
+      ]
+    },
+    {
+      "id": 83,
+      "type": "MultiImageUpload",
+      "pos": [
+        -3078.7685688440547,
+        -830.2889505955064
+      ],
+      "size": [
+        381.0068700930783,
+        400.7594668053957
+      ],
+      "flags": {},
+      "order": 3,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "image1",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": null
+        },
+        {
+          "name": "image2",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "image_batch",
+          "type": "IMAGE",
+          "links": [
+            184,
+            197,
+            217
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "Mojie-API-Party",
+        "ver": "6cfee1312c9b48a11ba3c8dbb05bdd1da3ea6cb5",
+        "Node name for S&R": "MultiImageUpload"
+      },
+      "widgets_values": [
+        "图层 3.png,图层 4.png,图层 5.png,图层 6.png,图层 7.png,图层 8.png,1x.png",
+        2048,
+        "",
+        ""
+      ]
+    },
+    {
+      "id": 10,
+      "type": "PreviewAny",
+      "pos": [
+        -1677.5054857859852,
+        -1116.6482504584812
+      ],
+      "size": [
+        528.2010556503208,
+        748.7542809180603
+      ],
+      "flags": {},
+      "order": 9,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "source",
+          "type": "*",
+          "link": 98
+        }
+      ],
+      "outputs": [],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.7.0",
+        "Node name for S&R": "PreviewAny"
+      },
+      "widgets_values": [
+        null,
+        null,
+        null
+      ]
+    },
+    {
+      "id": 6,
+      "type": "PreviewAny",
+      "pos": [
+        -2360.984208925023,
+        -1119.2489319103418
+      ],
+      "size": [
+        500.44749491857965,
+        695.0090023271656
+      ],
+      "flags": {},
+      "order": 6,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "source",
+          "type": "*",
+          "link": 93
+        }
+      ],
+      "outputs": [],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.7.0",
+        "Node name for S&R": "PreviewAny"
+      },
+      "widgets_values": [
+        null,
+        null,
+        null
+      ]
+    },
+    {
+      "id": 85,
+      "type": "DoubaoSeedreamNode",
+      "pos": [
+        -1281.5609393958698,
+        -187.1127647221989
+      ],
+      "size": [
+        400,
+        256
+      ],
+      "flags": {},
+      "order": 10,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "image_input",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": 217
+        },
+        {
+          "name": "prompt",
+          "type": "STRING",
+          "widget": {
+            "name": "prompt"
+          },
+          "link": 225
+        }
+      ],
+      "outputs": [
+        {
+          "name": "output",
+          "type": "IMAGE",
+          "links": [
+            218
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "Mojie-API-Party",
+        "ver": "6cfee1312c9b48a11ba3c8dbb05bdd1da3ea6cb5",
+        "Node name for S&R": "DoubaoSeedreamNode"
+      },
+      "widgets_values": [
+        "A beautiful sunset",
+        1342,
+        "randomize",
+        false,
+        "2K:1664x2496",
+        1024,
+        1024,
+        "auto"
+      ]
+    },
+    {
+      "id": 84,
+      "type": "Note",
+      "pos": [
+        -3658.903140933799,
+        -714.3367358049492
+      ],
+      "size": [
+        532.5936140640613,
+        156.07174355703205
+      ],
+      "flags": {},
+      "order": 4,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [],
+      "title": "多图要求说明",
+      "properties": {},
+      "widgets_values": [
+        "多图上传最多支持10张\n可以上传多角度，多细节，多款式。也可以上传模特。\nmax_size是图片最大尺寸，默认是不超过2048.\n根据需求填写，也别填太大，图片太大太多传输慢，消耗token。"
+      ],
+      "color": "#432",
+      "bgcolor": "#653"
+    },
+    {
+      "id": 86,
+      "type": "SaveImage",
+      "pos": [
+        -595.1831419225089,
+        -1875.7888911430623
+      ],
+      "size": [
+        3733.3830985396917,
+        2701.962226022807
+      ],
+      "flags": {},
+      "order": 11,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 218
+        }
+      ],
+      "outputs": [],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.19.0"
+      },
+      "widgets_values": [
+        "ComfyUI"
+      ]
+    }
+  ],
+  "links": [
+    [
+      90,
+      2,
+      0,
+      67,
+      0,
+      "STRING"
+    ],
+    [
+      92,
+      7,
+      0,
+      67,
+      5,
+      "STRING"
+    ],
+    [
+      93,
+      67,
+      0,
+      6,
+      0,
+      "STRING"
+    ],
+    [
+      97,
+      67,
+      1,
+      68,
+      4,
+      "ANY"
+    ],
+    [
+      98,
+      68,
+      0,
+      10,
+      0,
+      "STRING"
+    ],
+    [
+      173,
+      81,
+      0,
+      68,
+      0,
+      "STRING"
+    ],
+    [
+      174,
+      7,
+      0,
+      68,
+      5,
+      "STRING"
+    ],
+    [
+      184,
+      83,
+      0,
+      67,
+      1,
+      "IMAGE"
+    ],
+    [
+      197,
+      83,
+      0,
+      68,
+      1,
+      "IMAGE"
+    ],
+    [
+      198,
+      67,
+      0,
+      81,
+      0,
+      "STRING"
+    ],
+    [
+      217,
+      83,
+      0,
+      85,
+      0,
+      "IMAGE"
+    ],
+    [
+      218,
+      85,
+      0,
+      86,
+      0,
+      "IMAGE"
+    ],
+    [
+      225,
+      68,
+      0,
+      85,
+      1,
+      "STRING"
+    ]
+  ],
+  "groups": [],
+  "config": {},
+  "extra": {
+    "ds": {
+      "scale": 0.3719008264463087,
+      "offset": [
+        3469.430129966474,
+        1697.4476972810435
+      ]
+    },
+    "workflowRendererVersion": "LG",
+    "ue_links": [],
+    "frontendVersion": "1.42.10",
+    "VHS_latentpreview": false,
+    "VHS_latentpreviewrate": 0,
+    "VHS_MetadataImage": true,
+    "VHS_KeepIntermediate": true
+  },
+  "version": 0.4
+}

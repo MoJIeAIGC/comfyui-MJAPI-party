@@ -1,5 +1,6 @@
 #### 所有API节点列表
 所有的节点示例工作流都可以在workflow目录下找到
+- [多图上传节点](#多图上传节点)
 - [Gemini3-Nano节点](#gemini3-nano节点)
 - [Gemini3-LLM](#gemini3-llm节点)
 - [Nano-pro节点](#nano-pro节点)
@@ -19,8 +20,13 @@
 - [Dreamina(即梦参考生图)](#dreamina即梦参考生图)
 
 ***
+#### 多图上传节点
+这个节点支持最多10张照片上传参考
+非常好用
+![alt text](assets/multi-image.png)
+
 #### Gemini3-LLM节点
-这是gemini3的大语言模型节点。支持上下文。接入上下文管理即可直接读取上下文,也可以直接将多个LLM节点短接。更多用法可咨询摩诘AI，或查看我们相关教程.
+这是gemini3的大语言模型节点。支持上下文。接入上下文管理即可直接读取上下文,也可以直接将多个LLM节点短接。更多用法可咨询摩摩AI，或查看我们相关教程.
 支持Gemini3的全量参数
 - 通过model参数选择不同模型
 - mdeia_resolution是输入图像参考程度
