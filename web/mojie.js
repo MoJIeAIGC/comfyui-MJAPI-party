@@ -569,7 +569,6 @@ app.registerExtension({
 
     }
 });
-
 app.registerExtension({
     name: "my.custom.nodes.multi.image.upload",
     async beforeRegisterNodeDef(nodeType, nodeData, app) {
@@ -585,12 +584,44 @@ app.registerExtension({
                 fileInput.accept = "image/png, image/jpeg, image/webp";
                 fileInput.style.display = "none";
                 
+                // 按钮容器（让两个按钮并排）
+                const buttonRow = document.createElement("div");
+                buttonRow.style.display = "flex";
+                buttonRow.style.gap = "5px";
+                buttonRow.style.marginTop = "5px";
+                
                 // 上传按钮
                 const uploadButton = document.createElement("button");
                 uploadButton.textContent = "选择多张图片";
-                uploadButton.style.marginTop = "5px";
-                uploadButton.style.width = "100%";
+                uploadButton.style.flex = "2";
                 uploadButton.onclick = () => fileInput.click();
+                
+                // 清空按钮
+                const clearButton = document.createElement("button");
+                clearButton.textContent = "清空图片";
+                clearButton.style.flex = "1";
+                clearButton.style.backgroundColor = "#a33";
+                clearButton.style.color = "white";
+                clearButton.style.border = "none";
+                clearButton.style.borderRadius = "4px";
+                clearButton.style.cursor = "pointer";
+                clearButton.onclick = () => {
+                    // 清空预览容器
+                    previewContainer.innerHTML = "";
+                    // 清空存储的文件名列表
+                    let filenamesWidget = this.widgets.find(w => w.name === "filenames");
+                    if (filenamesWidget) {
+                        filenamesWidget.value = "";
+                    } else {
+                        // 如果 widget 还不存在，创建一个空值的
+                        filenamesWidget = this.addWidget("string", "filenames", "", () => { });
+                    }
+                    // 刷新节点尺寸
+                    this.onResize?.(this.size);
+                };
+                
+                buttonRow.appendChild(uploadButton);
+                buttonRow.appendChild(clearButton);
                 
                 // 图片预览容器
                 const previewContainer = document.createElement("div");
@@ -606,16 +637,32 @@ app.registerExtension({
                 previewContainer.style.backgroundColor = "#1e1e1e";
                 
                 // 将 UI 元素添加到节点
-                this.addDOMWidget("upload_button", "button", uploadButton);
+                this.addDOMWidget("upload_button_row", "custom", buttonRow);
                 this.addDOMWidget("preview_container", "custom", previewContainer);
                                 
                 fileInput.onchange = async () => {
                     const files = Array.from(fileInput.files);
                     if (files.length === 0) return;
-
-                    // 清空预览区域并显示上传进度
-                    previewContainer.innerHTML = `<div style="width:100%; text-align:center; padding:8px; color:#aaa;">正在上传 ${files.length} 个文件...</div>`;
-
+                    
+                    // 获取当前已存在的文件名列表（用于追加）
+                    let filenamesWidget = this.widgets.find(w => w.name === "filenames");
+                    if (!filenamesWidget) {
+                        filenamesWidget = this.addWidget("string", "filenames", "", () => { });
+                    }
+                    const currentFilenames = filenamesWidget.value 
+                        ? filenamesWidget.value.split(',').filter(Boolean) 
+                        : [];
+                    
+                    // 显示上传进度（不影响原有预览）
+                    const progressDiv = document.createElement("div");
+                    progressDiv.style.width = "100%";
+                    progressDiv.style.textAlign = "center";
+                    progressDiv.style.padding = "4px";
+                    progressDiv.style.color = "#aaa";
+                    progressDiv.style.fontSize = "12px";
+                    progressDiv.textContent = `正在上传 ${files.length} 个文件...`;
+                    previewContainer.appendChild(progressDiv);
+                    
                     const uploadPromises = files.map(async (file) => {
                         const formData = new FormData();
                         formData.append("image", file);
@@ -636,18 +683,31 @@ app.registerExtension({
                             return null;
                         }
                     });
-
+                    
                     try {
                         const uploadedNames = (await Promise.all(uploadPromises)).filter(name => name !== null);
-
+                        
+                        // 移除进度提示
+                        progressDiv.remove();
+                        
                         if (uploadedNames.length === 0) {
-                            previewContainer.innerHTML = `<div style="width:100%; text-align:center; padding:8px; color:#f66;">所有文件上传失败</div>`;
+                            // 没有成功上传的文件，仅提示
+                            const errorDiv = document.createElement("div");
+                            errorDiv.style.width = "100%";
+                            errorDiv.style.textAlign = "center";
+                            errorDiv.style.padding = "8px";
+                            errorDiv.style.color = "#f66";
+                            errorDiv.textContent = "所有文件上传失败";
+                            previewContainer.appendChild(errorDiv);
                             return;
                         }
-
-                        // 渲染预览图
+                        
+                        // 合并新旧文件名列表（追加）
+                        const allFilenames = [...currentFilenames, ...uploadedNames];
+                        
+                        // 重新渲染预览容器（基于完整列表）
                         previewContainer.innerHTML = "";
-                        uploadedNames.forEach(filename => {
+                        allFilenames.forEach(filename => {
                             const imgWrapper = document.createElement("div");
                             imgWrapper.style.width = "60px";
                             imgWrapper.style.height = "60px";
@@ -655,7 +715,7 @@ app.registerExtension({
                             imgWrapper.style.overflow = "hidden";
                             imgWrapper.style.border = "1px solid #555";
                             imgWrapper.style.backgroundColor = "#2a2a2a";
-
+                            
                             const img = document.createElement("img");
                             img.src = `/view?filename=${encodeURIComponent(filename)}&type=input`;
                             img.style.width = "100%";
@@ -663,25 +723,31 @@ app.registerExtension({
                             img.style.objectFit = "cover";
                             img.alt = filename;
                             img.title = filename;
-
+                            
                             imgWrapper.appendChild(img);
                             previewContainer.appendChild(imgWrapper);
                         });
-
-                        // 保存文件名列表到隐藏 widget
-                        let filenamesWidget = this.widgets.find(w => w.name === "filenames");
-                        if (!filenamesWidget) {
-                            filenamesWidget = this.addWidget("string", "filenames", "", () => { });
-                        }
-                        filenamesWidget.value = uploadedNames.join(",");
-
+                        
+                        // 更新存储的字符串
+                        filenamesWidget.value = allFilenames.join(',');
+                        
                         // 刷新节点尺寸
                         this.onResize?.(this.size);
-
+                        
                     } catch (error) {
                         console.error("批量上传出错:", error);
-                        previewContainer.innerHTML = `<div style="width:100%; text-align:center; padding:8px; color:#f66;">上传过程发生异常</div>`;
+                        progressDiv.remove();
+                        const errorDiv = document.createElement("div");
+                        errorDiv.style.width = "100%";
+                        errorDiv.style.textAlign = "center";
+                        errorDiv.style.padding = "8px";
+                        errorDiv.style.color = "#f66";
+                        errorDiv.textContent = "上传过程发生异常";
+                        previewContainer.appendChild(errorDiv);
                     }
+                    
+                    // 清空 input 的值，以便再次选择相同文件时仍能触发 change 事件
+                    fileInput.value = "";
                 };
                                 
                 return result;
