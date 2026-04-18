@@ -2301,10 +2301,10 @@ class FurnitureAngleNode:
         # 调用配置管理器获取配置
         oneapi_url, oneapi_token = config_manager.get_api_config()
         # 合并图像和遮罩
-        merged_image = ImageConverter.tensor_to_base64(input_image)
+        merged_image = [ImageConverter.tensor_to_base64(input_image)]
         if reference_image is not None:
-            reference_image = ImageConverter.concat_images_to_base64(reference_image)
-            merged_image = [merged_image] + reference_image
+            reference_image = ImageConverter.convert_images_to_base64(reference_image)
+            merged_image = merged_image + reference_image
         def cell(num):
             payload = {
                 "model": "furniture-angle",
