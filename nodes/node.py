@@ -2304,12 +2304,11 @@ class FurnitureAngleNode:
         merged_image = ImageConverter.tensor_to_base64(input_image)
         if reference_image is not None:
             reference_image = ImageConverter.concat_images_to_base64(reference_image)
-        
+            merged_image = [merged_image] + reference_image
         def cell(num):
             payload = {
                 "model": "furniture-angle",
-                "input_image": [merged_image],
-                "reference_image": reference_image,
+                "input_image": merged_image,
                 "angle_type": angle_type,
                 "seed": int(seed+num),
                 "watermark": False,
