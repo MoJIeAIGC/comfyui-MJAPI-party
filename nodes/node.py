@@ -3261,11 +3261,9 @@ class GPT_Image_2_Node:
     def INPUT_TYPES(cls):
         return {
             "required": {                
-                "media_resolution": (["Default","Low","Medium","High"], {"default": "Default"}),  # 值需和后端 RESOLUTION_MAPPING 的 key 完全一致
-                "thinking_level": (["minimal","low","medium","high"], {"default": "high"}),  # 值需和后端 THINKING_LEVEL_MAPPING 的 key 完全一致
+                "Quality_options": (["auto","low","medium","high"], {"default": "auto"}),  # 值需和后端 THINKING_LEVEL_MAPPING 的 key 完全一致
                 "safe_level": (["high","medium","low"], {"default": "medium"}),  # 值需和后端 THINKING_LEVEL_MAPPING 的 key 完全一致
-                "resolution": (["1K", "2K", "4K"], {"default": "1K"}),
-                "aspect_ratio": (["16:9","4:3","2:3","4:5","1:1","3:2","5:4","3:4", "9:16","21:9"], {"default": "1:1"}),
+                "size": (["1K 1:1","1K 3:2","1K 2:3", "2K 1:1", "2K 16:9", "4K 16:9", "4K 9:16"], {"default": "1K 1:1"}),
                 "System_prompt": ("STRING", {"default": ""}),
                 "Web_search": ("BOOLEAN", {"default": False}), 
                 "seed": ("INT", {"default": 0}),
@@ -3282,7 +3280,7 @@ class GPT_Image_2_Node:
     FUNCTION = "generate"
     CATEGORY = "🎨MJapiparty/LLM"
 
-    def generate(self, seed, input_images=None, resolution="1K", aspect_ratio="1:1",  prompt="", safe_level="medium", thinking_level="High", System_prompt="", Web_search=True, context=None, media_resolution="Default"):
+    def generate(self, seed, input_images=None, size="1K 1:1",  prompt="", safe_level="medium", System_prompt="", Web_search=True, context=None, Quality_options="auto"):
         # 获取配置
         from PIL import Image
         oneapi_url, oneapi_token = config_manager.get_api_config()
@@ -3292,11 +3290,13 @@ class GPT_Image_2_Node:
         else:
             conversation_history = []
         output_tensors = []
+        resolution, aspect_ratio = size.split(" ")
+        
         payload = {
             "model": "gpt-5.4-image-2",
             "resolution": resolution,
-            "media_resolution": media_resolution,
             "prompt": prompt,
+            "quality": Quality_options,
             "seed": 666,
             "safe_level": safe_level,
             "System_prompt": System_prompt,
