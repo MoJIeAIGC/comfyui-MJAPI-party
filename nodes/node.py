@@ -2284,6 +2284,7 @@ class FurnitureAngleNode:
         return {
             "required": {
                 "input_image": ("IMAGE",),  # 接收多个图片
+                "resolution": (["2K", "4K"], {"default": "2K"}),
                 "angle_type": (["俯视45度","正视图","对角线视图","左45度视图","左90度视图","右45度视图","右90度视图"], {"default": "俯视45度"}),
                 "seed": ("INT", {"default": 0}),
             },
@@ -2297,7 +2298,7 @@ class FurnitureAngleNode:
     FUNCTION = "generate"
     CATEGORY = "🎨MJapiparty/Product&tool"
 
-    def generate(self, seed, input_image=None,angle_type="俯视45度",num_images=1,reference_image=None):
+    def generate(self, seed, input_image=None,resolution="2K",angle_type="俯视45度",num_images=1,reference_image=None):
         # 调用配置管理器获取配置
         oneapi_url, oneapi_token = config_manager.get_api_config()
         # 合并图像和遮罩
@@ -2312,7 +2313,7 @@ class FurnitureAngleNode:
                 "angle_type": angle_type,
                 "seed": int(seed+num),
                 "watermark": False,
-                "resolution": "2K",
+                "resolution": resolution,
             }
             headers = {
                 "Content-Type": "application/json",
@@ -3255,6 +3256,153 @@ class MultiImageUpload:
 
 
 
+class GPT_Image_2_Node:
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {                
+                "media_resolution": (["Default","Low","Medium","High"], {"default": "Default"}),  # 值需和后端 RESOLUTION_MAPPING 的 key 完全一致
+                "thinking_level": (["minimal","low","medium","high"], {"default": "high"}),  # 值需和后端 THINKING_LEVEL_MAPPING 的 key 完全一致
+                "safe_level": (["high","medium","low"], {"default": "medium"}),  # 值需和后端 THINKING_LEVEL_MAPPING 的 key 完全一致
+                "resolution": (["1K", "2K", "4K"], {"default": "1K"}),
+                "aspect_ratio": (["16:9","4:3","2:3","4:5","1:1","3:2","5:4","3:4", "9:16","21:9"], {"default": "1:1"}),
+                "System_prompt": ("STRING", {"default": ""}),
+                "Web_search": ("BOOLEAN", {"default": False}), 
+                "seed": ("INT", {"default": 0}),
+            },
+            "optional": {
+                "prompt": ("STRING",{ "forceInput": True} ),
+                "input_images": ("IMAGE",),  # 接收多个图片
+                "context": ("ANY",),  # 接收对话历史上下文数据
+            }
+        }
+
+    RETURN_TYPES = ("IMAGE","STRING", "ANY")  # 返回图片和对话历史（ANY类型兼容conversation_history数组）
+    RETURN_NAMES = ("image", "text", "context")  # 输出端口名称
+    FUNCTION = "generate"
+    CATEGORY = "🎨MJapiparty/LLM"
+
+    def generate(self, seed, input_images=None, resolution="1K", aspect_ratio="1:1",  prompt="", safe_level="medium", thinking_level="High", System_prompt="", Web_search=True, context=None, media_resolution="Default"):
+        # 获取配置
+        from PIL import Image
+        oneapi_url, oneapi_token = config_manager.get_api_config()
+        # 如果没有提供对话历史，初始化为空列表
+        if context is not None:
+            conversation_history = context.get("image", [])
+        else:
+            conversation_history = []
+        output_tensors = []
+        payload = {
+            "model": "gpt-5.4-image-2",
+            "resolution": resolution,
+            "media_resolution": media_resolution,
+            "prompt": prompt,
+            "seed": 666,
+            "safe_level": safe_level,
+            "System_prompt": System_prompt,
+            "Web_search": Web_search,
+            "aspect_ratio": aspect_ratio,
+            "conversation_history": conversation_history,  # 发送API请求时带上上下文数据
+        }
+        if input_images is not None:
+            # 检查图像长边是否大于1280，如果是则等比压缩
+            compressed_images = []
+            for img in input_images:
+                # 将张量转换为PIL图像
+                pil_image = ImageConverter.tensor2pil(img)
+                if pil_image is not None:
+                    # 检查长边
+                    width, height = pil_image.size
+                    max_size = max(width, height)
+                    
+                    if max_size > 1280:
+                        # 计算缩放比例
+                        scale = 1280 / max_size
+                        new_width = int(width * scale)
+                        new_height = int(height * scale)
+                        # 使用高质量的重采样方法进行缩放
+                        pil_image = pil_image.resize((new_width, new_height), Image.LANCZOS)
+                    
+                    # 将处理后的图像转换回张量
+                    compressed_tensor = ImageConverter.pil2tensor(pil_image)
+                    compressed_images.append(compressed_tensor)
+            
+            input_image_base64 = ImageConverter.convert_images_to_base64(compressed_images)
+            payload["input_image"] = input_image_base64
+        headers = {
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {oneapi_token}"
+        }
+        try:
+            response = requests.post(oneapi_url, headers=headers, json=payload, timeout=300)
+
+            response.raise_for_status()
+        except requests.exceptions.RequestException as e:
+            print(f"=== API调用失败 ===")
+            print(f"错误类型: 请求异常")
+            print(f"错误详情: {str(e)}")
+            # 创建一个纯白色的图片
+            from PIL import Image
+            white_image = Image.new("RGB", (512, 512), (255, 255, 255))
+            white_tensor = ImageConverter.pil2tensor(white_image)
+            # return (white_tensor, result.get("restext"), conversation_history)
+            if hasattr(e, 'response') and e.response is not None:
+                print(f"错误状态码: {e.response.status_code}")
+                try:
+                    error_response = e.response.json()
+                    print(f"错误响应内容: {error_response}")
+                except:
+                    print(f"错误响应文本: {e.response.text[:500]}...")
+            # 返回错误信息作为字符串
+            if e.response.status_code == 429:
+                return (white_tensor, "错误：API调用频率超过限制，请稍后重试")
+            elif e.response.status_code == 403:
+                return (white_tensor, "错误。请检查令牌余额或权限" )
+            else:
+                return (white_tensor, f"API调用失败，请稍后重试")
+
+        result = response.json()
+        image_url = result.get("res_url")
+        restext = result.get("restext","")
+
+        conversation_history = result.get("conversation_history", [])  # 提取对话历史
+        if conversation_history:
+            # print(f"API返回对话历史: {conversation_history}")
+            ImageConverter.conversation_context["image"] = conversation_history
+            conversation_history = {
+                "image": conversation_history
+            }
+        if not image_url:
+            if result.get("restext"):
+                # 创建一个纯白色的图片
+                from PIL import Image
+                white_image = Image.new("RGB", (512, 512), (255, 255, 255))
+                white_tensor = ImageConverter.pil2tensor(white_image)
+                return (white_tensor, result.get("restext"), conversation_history)
+            else:
+                raise ValueError("模型未回复")
+        image_urls = image_url.split("|") if image_url else []
+        print(image_urls)
+        for image_url in image_urls:
+            if not image_url:
+                continue
+            try:
+                # 下载图片
+                response = requests.get(image_url)
+                response.raise_for_status()
+                # 将图片数据转换为 PIL 图像对象
+                from PIL import Image
+                img = Image.open(BytesIO(response.content)).convert("RGB")
+                output_tensors.append(ImageConverter.pil2tensor(img))
+            except Exception as e:
+                print(f"下载图片 {image_url} 失败: {str(e)}")
+                error_tensor = ImageConverter.create_error_image("下载图片失败")
+                output_tensors.append(error_tensor)
+        if not output_tensors:
+            error_tensor = ImageConverter.create_error_image("未获取到有效图片 URL")
+            output_tensors.append(error_tensor)
+        return (torch.cat(output_tensors, dim=0),restext,conversation_history)
+
 
 NODE_CLASS_MAPPINGS = {
     "GeminiEditNode": GeminiEditNode,
@@ -3292,6 +3440,7 @@ NODE_CLASS_MAPPINGS = {
     "SinotecdesginNode": SinotecdesginNode,
     "ChangeHeadNode": ChangeHeadNode,
     "MultiImageUpload": MultiImageUpload,
+    "GPT_Image_2_Node": GPT_Image_2_Node,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
@@ -3330,4 +3479,5 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "SinotecdesginNode": "人设设计",
     "ChangeHeadNode": "头像替换",
     "MultiImageUpload": "多图上传",
+    "GPT_Image_2_Node": "GPT-Image-2",
 }
