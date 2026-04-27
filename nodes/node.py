@@ -2284,6 +2284,7 @@ class FurnitureAngleNode:
         return {
             "required": {
                 "input_image": ("IMAGE",),  # 接收多个图片
+                "resolution": (["2K", "4K"], {"default": "2K"}),
                 "angle_type": (["俯视45度","正视图","对角线视图","左45度视图","左90度视图","右45度视图","右90度视图"], {"default": "俯视45度"}),
                 "seed": ("INT", {"default": 0}),
             },
@@ -2297,7 +2298,7 @@ class FurnitureAngleNode:
     FUNCTION = "generate"
     CATEGORY = "🎨MJapiparty/Product&tool"
 
-    def generate(self, seed, input_image=None,angle_type="俯视45度",num_images=1,reference_image=None):
+    def generate(self, seed, input_image=None,resolution="2K",angle_type="俯视45度",num_images=1,reference_image=None):
         # 调用配置管理器获取配置
         oneapi_url, oneapi_token = config_manager.get_api_config()
         # 合并图像和遮罩
@@ -2312,7 +2313,7 @@ class FurnitureAngleNode:
                 "angle_type": angle_type,
                 "seed": int(seed+num),
                 "watermark": False,
-                "resolution": "2K",
+                "resolution": resolution,
             }
             headers = {
                 "Content-Type": "application/json",
