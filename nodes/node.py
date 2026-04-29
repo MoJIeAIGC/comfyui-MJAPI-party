@@ -3266,7 +3266,7 @@ class GPT_Image_2_Node:
                 "quality": (["auto","low","medium","high"], {"default": "auto"}),  # 值需和后端 THINKING_LEVEL_MAPPING 的 key 完全一致
                 # "safe_level": (["high","medium","low"], {"default": "medium"}), 
                 "resolution": (["1K","2K","4K"], {"default": "1K"}), 
-                "size": (["1:1","1:3","2:3", "3:4","4:5","9:16"], {"default": "1:1"}),
+                "size": (["1:1","1:3","3:1","2:3","3:2","3:4","4:3","4:5","5:4","9:16","16:9"], {"default": "1:1"}),
                 # "System_prompt": ("STRING", {"default": ""}),
                 # "Web_search": ("BOOLEAN", {"default": False}), 
                 "seed": ("INT", {"default": 0}),
