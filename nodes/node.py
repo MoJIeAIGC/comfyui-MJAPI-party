@@ -3256,18 +3256,19 @@ class MultiImageUpload:
 
 
 
+
 class GPT_Image_2_Node:
     @classmethod
     def INPUT_TYPES(cls):
         return {
             "required": {                
-                "media_resolution": (["Default","Low","Medium","High"], {"default": "Default"}),  # 值需和后端 RESOLUTION_MAPPING 的 key 完全一致
-                "thinking_level": (["minimal","low","medium","high"], {"default": "high"}),  # 值需和后端 THINKING_LEVEL_MAPPING 的 key 完全一致
-                "safe_level": (["high","medium","low"], {"default": "medium"}),  # 值需和后端 THINKING_LEVEL_MAPPING 的 key 完全一致
-                "resolution": (["1K", "2K", "4K"], {"default": "1K"}),
-                "aspect_ratio": (["16:9","4:3","2:3","4:5","1:1","3:2","5:4","3:4", "9:16","21:9"], {"default": "1:1"}),
-                "System_prompt": ("STRING", {"default": ""}),
-                "Web_search": ("BOOLEAN", {"default": False}), 
+                "model": (["GPT-image-2"], {"default": "GPT-image-2"}), 
+                "quality": (["auto","low","medium","high"], {"default": "auto"}),  # 值需和后端 THINKING_LEVEL_MAPPING 的 key 完全一致
+                # "safe_level": (["high","medium","low"], {"default": "medium"}), 
+                "resolution": (["1K","2K","4K"], {"default": "1K"}), 
+                "size": (["1:1","1:3","3:1","2:3","3:2","3:4","4:3","4:5","5:4","9:16","16:9"], {"default": "1:1"}),
+                # "System_prompt": ("STRING", {"default": ""}),
+                # "Web_search": ("BOOLEAN", {"default": False}), 
                 "seed": ("INT", {"default": 0}),
             },
             "optional": {
@@ -3282,26 +3283,28 @@ class GPT_Image_2_Node:
     FUNCTION = "generate"
     CATEGORY = "🎨MJapiparty/LLM"
 
-    def generate(self, seed, input_images=None, resolution="1K", aspect_ratio="1:1",  prompt="", safe_level="medium", thinking_level="High", System_prompt="", Web_search=True, context=None, media_resolution="Default"):
+    def generate(self, seed, input_images=None, size="1:1",  prompt="", safe_level="medium", System_prompt="", Web_search=True, context=None, quality="auto", model="GPT-image-2", resolution="1K"):
         # 获取配置
         from PIL import Image
         oneapi_url, oneapi_token = config_manager.get_api_config()
+        model_dict = {"GPT-image-2": "gpt-5.4-image-2"}
         # 如果没有提供对话历史，初始化为空列表
         if context is not None:
             conversation_history = context.get("image", [])
         else:
             conversation_history = []
         output_tensors = []
+        
         payload = {
-            "model": "gpt-5.4-image-2",
+            "model": model_dict[model],
             "resolution": resolution,
-            "media_resolution": media_resolution,
             "prompt": prompt,
+            "quality": quality,
             "seed": 666,
             "safe_level": safe_level,
             "System_prompt": System_prompt,
             "Web_search": Web_search,
-            "aspect_ratio": aspect_ratio,
+            "aspect_ratio": size,
             "conversation_history": conversation_history,  # 发送API请求时带上上下文数据
         }
         if input_images is not None:
