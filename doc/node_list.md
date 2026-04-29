@@ -1,5 +1,6 @@
 #### 所有API节点列表
 所有的节点示例工作流都可以在workflow目录下找到
+- [gpt-image-2](#gpt-image-2)
 - [多图上传节点](#多图上传节点)
 - [Gemini3-Nano节点](#gemini3-nano节点)
 - [Gemini3-LLM](#gemini3-llm节点)
@@ -20,6 +21,10 @@
 - [Dreamina(即梦参考生图)](#dreamina即梦参考生图)
 
 ***
+#### 更新chatgpt-image-2 图像生成节点
+效果非常不错，但是价格也是真的不便宜,工作流在workflow目录下。
+![alt text](assets/gpt-image-2.png)
+
 #### 多图上传节点
 这个节点支持最多10张照片上传参考
 非常好用

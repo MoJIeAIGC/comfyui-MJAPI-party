@@ -31,7 +31,7 @@
 [传送门](https://space.bilibili.com/483532108)
 
 ### 目前已支持的节点
-- [gpt=image-2](/doc/node_list.md#gpt-image-2)
+- [gpt-image-2](/doc/node_list.md#gpt-image-2)
 - [多图上传节点](/doc/node_list.md#多图上传节点)
 - [Gemini3-Nano节点](/doc/node_list.md#gemini3-nano节点)
 - [Gemini3-LLM](/doc/node_list.md#gemini3-llm节点)
@@ -59,6 +59,10 @@
 
 在comfyui节点列表中找到mjapiparty
 ![alt text](doc/assets/node.png)
+
+#### 更新chatgpt-image-2 图像生成节点
+效果非常不错，但是价格也是真的不便宜,工作流在workflow目录下。
+![alt text](doc/assets/gpt-image-2.png)
 
 #### 更新新增了多图上传节点，非常好用
 ![alt text](doc/assets/Multi-image.png)
