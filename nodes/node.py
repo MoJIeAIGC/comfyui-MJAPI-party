@@ -2813,6 +2813,10 @@ class GeminiLLMNode:
             elif e.response.status_code == 403:
                 return ("错误。请检查令牌余额或权限",)
             else:
+                # 创建一个纯白色的图片
+                from PIL import Image
+                white_image = Image.new("RGB", (512, 512), (255, 255, 255))
+                white_tensor = ImageConverter.pil2tensor(white_image)
                 return (white_tensor, f"API调用失败，请稍后重试")
         except Exception as e:
             print(f"=== GeminiLLMNode 执行失败 ===")
