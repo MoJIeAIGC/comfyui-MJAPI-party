@@ -358,6 +358,126 @@ class DreaminaT2VNode:
 
 
 
+
+class HappyHorseTI2VNode:
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "prompt": ("STRING", {"default": "", "multiline": True}),
+                "resolution": (["720P", "1080P"], {"default": "720P"}),
+                "duration": ("INT", {"default": 5, "min": 3, "max": 15}),  # 新增参数，只能是1或2
+                "Size": (["1:1", "3:4", "4:3", "9:16", "16:9", "5:4"], {"default": "16:9"}),
+                "seed": ("INT", {"default": 0}),
+            },
+            "optional": {
+                "input_image": ("IMAGE",),  # 接收多个图片
+            }
+        }
+
+    RETURN_TYPES = ("VIDEO",)  # 返回VIDEO类型
+    RETURN_NAMES = ("video",)
+    FUNCTION = "generate"
+    CATEGORY = "🎨MJapiparty/VideoCreat"
+
+    def generate(self, prompt, seed,  resolution="1080p", Size="16:9", duration=5, input_image=None):
+        # 获取配置
+        oneapi_url, oneapi_token = config_manager.get_api_config()
+
+        def call_api(seed_override):
+            payload = {
+                "model": "HappyHorseTI2vNode",
+                "prompt": prompt,
+                "seed": int(seed_override),
+                "resolution": resolution,
+                "ratio": Size,
+                "duration": duration,
+            }
+            if input_image is not None:
+                payload["input_image"] = ImageConverter.tensor_to_base64(input_image)
+
+            headers = {
+                "Content-Type": "application/json",
+                "Authorization": f"Bearer {oneapi_token}"
+            }
+            response = requests.post(oneapi_url, headers=headers, json=payload, timeout=240)
+
+            response.raise_for_status()
+
+            result = response.json()
+            print(result)
+
+            video_url = result.get("video_url")
+            if not video_url:
+                raise ValueError("Empty video data from API.")
+            return video_url
+
+        video_url = call_api(seed)
+        print(video_url)
+        # 下载视频并提取帧
+        video_path = ImageConverter.download_video(video_url)
+        # 使用 VideoFromFile 封装视频
+
+        return (VideoFromFile(video_path),)
+
+
+class HappyHorseReferenceNode:
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "Reference_image": ("IMAGE",[]),  # 接收多个图片
+                "prompt": ("STRING", {"default": "", "multiline": True}),
+                "resolution": (["720P", "1080P"], {"default": "720P"}),
+                "Size": (["1:1", "3:4", "4:3", "9:16", "16:9", "5:4"], {"default": "16:9"}),
+                "duration": ("INT", {"default": 5, "min": 3, "max": 15}),  # 新增参数，只能是1或2
+                "seed": ("INT", {"default": 0}),
+            }
+        }
+
+    RETURN_TYPES = ("VIDEO",)  # 返回VIDEO类型
+    RETURN_NAMES = ("video",)
+    FUNCTION = "generate"
+    CATEGORY = "🎨MJapiparty/VideoCreat"
+
+    def generate(self, prompt, seed, Reference_image=[], resolution="720p", Size="16:9", duration=5):
+        # 获取配置
+        oneapi_url, oneapi_token = config_manager.get_api_config()
+        Reference_image_base64 = ImageConverter.convert_images_to_base64(Reference_image)
+        def call_api(seed_override):
+            payload = {
+                "model": "HappyHorseReference",
+                "prompt": prompt,
+                "resolution": resolution,
+                "ratio": Size,
+                "duration": duration,
+                "seed": int(seed_override),
+                "Reference_image_base64": Reference_image_base64,
+            }
+            headers = {
+                "Content-Type": "application/json",
+                "Authorization": f"Bearer {oneapi_token}"
+            }
+            response = requests.post(oneapi_url, headers=headers, json=payload, timeout=240)
+
+            response.raise_for_status()
+            result = response.json()
+            video_url = result.get("video_url")
+            if not video_url:
+                raise ValueError("Empty video data from API.")
+            return video_url
+
+        # 调用API
+        video_url = call_api(seed)
+        print(video_url)
+        # 下载视频并提取帧
+        video_path = ImageConverter.download_video(video_url)
+        # 使用 VideoFromFile 封装视频
+
+        return (VideoFromFile(video_path),)
+
+
+
 # seedance图生视频 + seedance首尾帧视频
 class DreaminaI2VNode:
     @classmethod
@@ -3081,6 +3201,8 @@ NODE_CLASS_MAPPINGS = {
     "ChangeHeadNode": ChangeHeadNode,
     "MultiImageUpload": MultiImageUpload,
     "GPT_Image_2_Node": GPT_Image_2_Node,
+    "HappyHorseTI2VNode": HappyHorseTI2VNode,
+    "HappyHorseReferenceNode": HappyHorseReferenceNode,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
@@ -3116,4 +3238,6 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "ChangeHeadNode": "头像替换",
     "MultiImageUpload": "多图上传",
     "GPT_Image_2_Node": "GPT-Image-2",
+    "HappyHorseTI2VNode": "HappyHorse-图片文字生视频",
+    "HappyHorseReferenceNode": "HappyHorse-参考生视频",
 }
