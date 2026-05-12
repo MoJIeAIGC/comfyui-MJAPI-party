@@ -1,5 +1,6 @@
 #### 所有API节点列表
 所有的节点示例工作流都可以在workflow目录下找到
+- [happyhorse视频生成](#更新happyhorse视频生成节点)
 - [gpt-image-2](#gpt-image-2)
 - [多图上传节点](#多图上传节点)
 - [Gemini3-Nano节点](#gemini3-nano节点)
