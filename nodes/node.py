@@ -2063,6 +2063,7 @@ class FurnitureAngleNode:
         if reference_image is not None:
             reference_image = ImageConverter.convert_images_to_base64(reference_image)
             merged_image = merged_image + reference_image
+            
         def cell(num):
             payload = {
                 "model": "furniture-angle",
