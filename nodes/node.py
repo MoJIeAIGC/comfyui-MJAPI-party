@@ -400,7 +400,7 @@ class HappyHorseTI2VNode:
                 "Content-Type": "application/json",
                 "Authorization": f"Bearer {oneapi_token}"
             }
-            response = requests.post(oneapi_url, headers=headers, json=payload, timeout=240)
+            response = requests.post(oneapi_url, headers=headers, json=payload, timeout=600)
 
             response.raise_for_status()
 
@@ -458,7 +458,7 @@ class HappyHorseReferenceNode:
                 "Content-Type": "application/json",
                 "Authorization": f"Bearer {oneapi_token}"
             }
-            response = requests.post(oneapi_url, headers=headers, json=payload, timeout=240)
+            response = requests.post(oneapi_url, headers=headers, json=payload, timeout=600)
 
             response.raise_for_status()
             result = response.json()
