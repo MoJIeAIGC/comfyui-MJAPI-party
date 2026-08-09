@@ -546,6 +546,67 @@ class DreaminaI2VNode:
         return (VideoFromFile(video_path),)
 
 
+# seedance参考生视频
+class DreaminaR2VNode:
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "Reference_image": ("IMAGE",),  # 接收多个图片
+                "prompt": ("STRING", {"default": "", "multiline": True}),
+                "resolution": (["480P", "720P"], {"default": "720P"}),
+                "ratio": (["1:1", "3:4", "4:3", "9:16", "16:9", "21:9"], {"default": "16:9"}),
+                "duration": ("INT", {"default": 10, "min": 3, "max": 12}),  # 新增参数，只能是1或2
+                "seed": ("INT", {"default": 0}),
+            }
+        }
+
+    RETURN_TYPES = ("VIDEO",)  # 返回VIDEO类型
+    RETURN_NAMES = ("video",)
+    FUNCTION = "generate"
+    CATEGORY = "🎨MJapiparty/VideoCreat"
+
+    def generate(self, prompt, seed, Reference_image, resolution="720P", ratio="16:9", duration=10):
+        # 获取配置
+        oneapi_url, oneapi_token = config_manager.get_api_config()
+        Reference_image_base64 = ImageConverter.convert_images_to_base64(Reference_image)
+        def call_api(seed_override):
+            payload = {
+                "model": "DreaminaR2VNode",
+                "prompt": prompt,
+                "resolution": resolution,
+                "Size": ratio,
+                "duration": duration,
+                "seed": int(seed_override),
+                "reference_image_base64": Reference_image_base64,
+            }
+            headers = {
+                "Content-Type": "application/json",
+                "Authorization": f"Bearer {oneapi_token}"
+            }
+            response = requests.post(oneapi_url, headers=headers, json=payload, timeout=240)
+
+            response.raise_for_status()
+
+            result = response.json()
+            print(result)
+
+            video_url = result.get("content").get("video_url")
+            if not video_url:
+                raise ValueError("Empty video data from API.")
+            return video_url
+
+        # 调用API
+        video_url = call_api(seed)
+        print(video_url)
+        # 下载视频并提取帧
+        video_path = ImageConverter.download_video(video_url)
+        # 使用 VideoFromFile 封装视频
+
+        return (VideoFromFile(video_path),)
+
+
+
 class QwenImageNode:
     @classmethod
     def INPUT_TYPES(cls):
@@ -3207,6 +3268,7 @@ NODE_CLASS_MAPPINGS = {
     "GPT_Image_2_Node": GPT_Image_2_Node,
     "HappyHorseTI2VNode": HappyHorseTI2VNode,
     "HappyHorseReferenceNode": HappyHorseReferenceNode,
+    "DreaminaR2VNode": DreaminaR2VNode,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
@@ -3220,6 +3282,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "KouTuNode": "自动抠图",
     "DreaminaT2VNode": "Seedance文生视频",
     "DreaminaI2VNode": "Seedance图生视频",
+    "DreaminaR2VNode": "Seedance参考生视频",
     "GetDressing": "AI服装提取",
     "ViduNode": "Vidu参考生视频",
     "ReplaceClothesNode": "AI同款服装替换",
