@@ -57,7 +57,8 @@
 在comfyui节点列表中找到mjapiparty
 ![alt text](doc/assets/node.png)
 
-- 删除了一些现在已经没有人用的节点，如Kontext-pro&max,seededit3
+> 2.6.0版本更新，删除了不少旧版节点，也为新版本做准备。mojieAgentflow主站全新改版发布，所有节点支持在线使用，当然旧的Mojie-api-party也会更新。
+
 ### 更新happyhorse视频生成节点
 happyhorse参考生视频功能和文生图生视频。
 happyhorse虽然在动作方面不太行，但是电商的产品稳定性上还不错，至少审核非常宽松。
